@@ -24,6 +24,7 @@ module.exports = async () => {
     }
   } finally {
     await client.end();
+    print.log('CONNECTION CLOSED');
   }
   return client;
 };

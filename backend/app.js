@@ -18,6 +18,8 @@ dotenv.config();
 app.use(cors({
   origin: [
     'http://localhost:3000',
+    'http://read.exchange',
+    'https://read.exchange',
   ],
   optionsSuccessStatus: 200,
 }));
