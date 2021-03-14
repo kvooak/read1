@@ -1,0 +1,397 @@
+[
+  {
+    "_key": "ALUMINIUM",
+    "_id": "material_groups/ALUMINIUM",
+    "_rev": "_bJUdAl6--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "ALUMINIUM",
+    "name": "Aluminium",
+    "sort": 100,
+    "timestamp": 1593735097.214401,
+    "type": "material_groups",
+    "type_suffix": "packaging"
+  },
+  {
+    "_key": "EPS_RIGID",
+    "_id": "material_groups/EPS_RIGID",
+    "_rev": "_bJUdVE6--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "EPS_RIGID",
+    "name": "EPS rigid",
+    "sort": 100,
+    "timestamp": 1593735097.208368,
+    "type": "material_groups",
+    "type_suffix": "rigid packaging"
+  },
+  {
+    "_key": "HDPE_BOTTLES",
+    "_id": "material_groups/HDPE_BOTTLES",
+    "_rev": "_bJUcdum--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "HDPE_BOTTLES",
+    "name": "HDPE Bottles",
+    "sort": 100,
+    "timestamp": 1593735097.19568,
+    "type": "material_groups",
+    "type_suffix": "bottles"
+  },
+  {
+    "_key": "HDPE_OTHER_RIGID",
+    "_id": "material_groups/HDPE_OTHER_RIGID",
+    "_rev": "_bJUclnu--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "HDPE_OTHER_RIGID",
+    "name": "HDPE other rigid",
+    "sort": 90,
+    "timestamp": 1593735097.197762,
+    "type": "material_groups",
+    "type_suffix": "rigid packaging"
+  },
+  {
+    "_key": "LDPE_FLEX_GT_A4",
+    "_id": "material_groups/LDPE_FLEX_GT_A4",
+    "_rev": "_bJUcVWu--_",
+    "country_codes": [
+      "DEU",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "LDPE_FLEX_GT_A4",
+    "name": ">A4 LDPE flexibles",
+    "sort": 95,
+    "timestamp": 1593735097.172719,
+    "type": "material_groups",
+    "type_suffix": "flexible packaging (>A4)"
+  },
+  {
+    "_key": "LDPE_FLEX_LTE_A4",
+    "_id": "material_groups/LDPE_FLEX_LTE_A4",
+    "_rev": "_bJUd4Cy--_",
+    "country_codes": [
+      "DEU",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "LDPE_FLEX_LTE_A4",
+    "name": "<A4 LDPE flexibles",
+    "sort": 100,
+    "timestamp": 1593735097.180223,
+    "type": "material_groups",
+    "type_suffix": "flexible packaging (<A4)"
+  },
+  {
+    "_key": "OTHER_FLEX_GT_A4",
+    "_id": "material_groups/OTHER_FLEX_GT_A4",
+    "_rev": "_bJUcGwW--_",
+    "country_codes": [
+      "DEU",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "OTHER_FLEX_GT_A4",
+    "name": "Other >A4 flexibles",
+    "sort": 90,
+    "timestamp": 1593735097.178072,
+    "type": "material_groups",
+    "type_suffix": "flexible packaging (>A4)"
+  },
+  {
+    "_key": "OTHER_FLEX_LTE_A4",
+    "_id": "material_groups/OTHER_FLEX_LTE_A4",
+    "_rev": "_bJUcyQ2--_",
+    "country_codes": [
+      "DEU",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "OTHER_FLEX_LTE_A4",
+    "name": "Other <A4 flexibles",
+    "sort": 90,
+    "timestamp": 1593735097.184406,
+    "type": "material_groups",
+    "type_suffix": "flexible packaging (<A4)"
+  },
+  {
+    "_key": "OTHER_RIGID",
+    "_id": "material_groups/OTHER_RIGID",
+    "_rev": "_bJUdbKW--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "OTHER_RIGID",
+    "name": "Other rigid",
+    "sort": 50,
+    "timestamp": 1593735097.212498,
+    "type": "material_groups",
+    "type_suffix": "rigid packaging"
+  },
+  {
+    "_key": "PAPER_MONO",
+    "_id": "material_groups/PAPER_MONO",
+    "_rev": "_bJUdjiC--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "NLD",
+      "GBR",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "PAPER_MONO",
+    "name": "Paper / Cardboard (Mono)",
+    "sort": 100,
+    "timestamp": 1593735097.5076091,
+    "type": "material_groups",
+    "type_suffix": "packaging"
+  },
+  {
+    "_key": "PAPER_PLASTICS",
+    "_id": "material_groups/PAPER_PLASTICS",
+    "_rev": "_bJUdxDm--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "NLD",
+      "GBR",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "PAPER_PLASTICS",
+    "name": "Paper / Plastics Composite",
+    "sort": 100,
+    "timestamp": 1593735097.509825,
+    "type": "material_groups",
+    "type_suffix": "packaging"
+  },
+  {
+    "_key": "PET_BOTTLES",
+    "_id": "material_groups/PET_BOTTLES",
+    "_rev": "_bJUdp1e--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "PET_BOTTLES",
+    "name": "PET Bottles",
+    "sort": 100,
+    "timestamp": 1593735097.191058,
+    "type": "material_groups",
+    "type_suffix": "bottles"
+  },
+  {
+    "_key": "PET_THERMOFORMS",
+    "_id": "material_groups/PET_THERMOFORMS",
+    "_rev": "_bJUbslC--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "PET_THERMOFORMS",
+    "name": "PET Thermoforms",
+    "sort": 90,
+    "timestamp": 1593735097.193507,
+    "type": "material_groups",
+    "type_suffix": "thermoforms"
+  },
+  {
+    "_key": "PP_BOTTLES",
+    "_id": "material_groups/PP_BOTTLES",
+    "_rev": "_bJUcOre--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "PP_BOTTLES",
+    "name": "PP bottles",
+    "sort": 100,
+    "timestamp": 1593735097.201823,
+    "type": "material_groups",
+    "type_suffix": "bottles"
+  },
+  {
+    "_key": "PP_FLEX_GT_A4",
+    "_id": "material_groups/PP_FLEX_GT_A4",
+    "_rev": "_bJUc5sm--_",
+    "country_codes": [
+      "DEU",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "PP_FLEX_GT_A4",
+    "name": ">A4 PP flexibles",
+    "sort": 95,
+    "timestamp": 1593735097.175362,
+    "type": "material_groups",
+    "type_suffix": "flexible packaging (>A4)"
+  },
+  {
+    "_key": "PP_FLEX_LTE_A4",
+    "_id": "material_groups/PP_FLEX_LTE_A4",
+    "_rev": "_bJUb8J6--_",
+    "country_codes": [
+      "DEU",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "PP_FLEX_LTE_A4",
+    "name": "<A4 PP flexibles",
+    "sort": 100,
+    "timestamp": 1593735097.182236,
+    "type": "material_groups",
+    "type_suffix": "flexible packaging (<A4)"
+  },
+  {
+    "_key": "PP_OTHER_RIGID",
+    "_id": "material_groups/PP_OTHER_RIGID",
+    "_rev": "_bJUdHbO--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "PP_OTHER_RIGID",
+    "name": "PP other rigid",
+    "sort": 90,
+    "timestamp": 1593735097.2037709,
+    "type": "material_groups",
+    "type_suffix": "rigid packaging"
+  },
+  {
+    "_key": "PS_RIGID",
+    "_id": "material_groups/PS_RIGID",
+    "_rev": "_bJUdNJG--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "PS_RIGID",
+    "name": "PS rigid",
+    "sort": 100,
+    "timestamp": 1593735097.2058601,
+    "type": "material_groups",
+    "type_suffix": "rigid packaging"
+  },
+  {
+    "_key": "PVC_RIGID",
+    "_id": "material_groups/PVC_RIGID",
+    "_rev": "_bJUcsYi--_",
+    "country_codes": [
+      "DEU",
+      "FRA",
+      "GBR",
+      "NLD",
+      "ITA",
+      "POL",
+      "AUT",
+      "ESP"
+    ],
+    "id": "PVC_RIGID",
+    "name": "PVC rigid",
+    "sort": 100,
+    "timestamp": 1593735097.2106,
+    "type": "material_groups",
+    "type_suffix": "rigid packaging"
+  }
+]

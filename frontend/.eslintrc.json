@@ -1,21 +1,45 @@
 {
-    "env": {
-        "es2021": true
-    },
-    "extends": [
-        "plugin:react/recommended",
-        "airbnb"
-    ],
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "ecmaVersion": 12,
-        "sourceType": "module"
-    },
-    "plugins": [
-        "react"
-    ],
-    "rules": {
-    }
+  "env": {
+      "browser": true,
+      "es6": true
+  },
+  "extends": [
+      "plugin:react/recommended",
+      "airbnb"
+  ],
+  "parser": "babel-eslint",
+  "globals": {
+      "Atomics": "readonly",
+      "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+      "ecmaFeatures": {
+          "jsx": true
+      },
+      "ecmaVersion": 2018,
+      "sourceType": "module"
+  },
+  "plugins": [
+      "react"
+  ],
+  "rules": {
+      "react/sort-comp": [1, {
+          "order": [
+            "constructor",
+            "everything-else",
+            "lifecycle",
+            "render"
+          ]
+      }],
+      "no-console": "off",
+      "import/no-extraneous-dependencies" : ["error", {"devDependencies": true}],
+      "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+      "no-restricted-syntax": [
+          "error",
+          {
+              "selector": "CallExpression[callee.object.name='console'][callee.property.name!=/^(log|warn|error|info|trace)$/]",
+              "message": "Unexpected property on console object was called"
+          }
+      ]
+  }
 }
