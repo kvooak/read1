@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 
 import './DataManagementScreen.css';
@@ -13,14 +15,22 @@ export default function DataManagementScreen() {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    setCategories(managementData.map((item) => {
+    let categoryNameList = managementData.map((item) => {
       if (categories.indexOf(item.category) === -1) {
         return item.category;
       }
       return null;
-    }));
+    });
 
-    setCategories((prev) => prev.filter((value, index, arr) => arr.indexOf(value) === index));
+    categoryNameList = categoryNameList.filter((value, index, arr) => arr.indexOf(value) === index);
+    const _categories = categoryNameList.map((category) => (
+      {
+        name: category,
+        data: managementData.filter((item) => item.category === category),
+      }
+    ));
+
+    setCategories(_categories);
   }, [managementData]);
 
   return (
@@ -28,7 +38,7 @@ export default function DataManagementScreen() {
       <h1>Data Management</h1>
       {categories?.map((category) => (
         <CategoryTable
-          key={category.category}
+          key={category.name}
           category={category}
         />
       ))}
