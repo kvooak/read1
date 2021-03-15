@@ -38,4 +38,4 @@ app.use(async (req, res, next) => {
 
 app.use('/', indexRouter);
 
-app.listen(port);
+app.listen(port, '0.0.0.0');

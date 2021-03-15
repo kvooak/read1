@@ -3,7 +3,7 @@ const print = require('./_utils/print');
 
 const dbCreds = {
   user: 'read.exchange.admin',
-  host: 'localhost',
+  host: process.env.DB_HOST || 'localhost',
   database: 'read1',
   password: 'admin@24',
   port: 5432,

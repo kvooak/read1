@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "lint": "./node_modules/eslint/bin/eslint.js ."
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -15,7 +16,7 @@
     "pg": "^8.5.1"
   },
   "devDependencies": {
-    "eslint": "^7.21.0",
+    "eslint": "^7.22.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1"
   }
