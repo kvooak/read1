@@ -12,8 +12,8 @@ a, a:hover {
 
 td.content > div.content-div,
 td.content > div.content-div-focused {
-  padding: 0.5rem 0.5rem 1rem 0.5rem;
-  /* px-2 pt-2 pb-3 */
+  position: relative;
+  padding: 0.5rem 0.5rem 1rem 0.5rem; /* px-2 pt-2 pb-3 */
 }
 
 td.content > div.content-div-focused {

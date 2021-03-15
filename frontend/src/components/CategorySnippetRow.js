@@ -10,6 +10,7 @@ import './CountrySnippetRow.css';
 
 import Badge from 'react-bootstrap/Badge';
 
+import OpenAsModalButton from './common/OpenAsModalButton';
 import { timeConverter } from '../widgets/utilities';
 
 function SnippetEffectBadge(value) {
@@ -47,11 +48,14 @@ export default function CategorySnippetRow(props) {
 
   const [contentEditable, setContentEditable] = useState(false);
   const [contentDivClassName, setContentDivClassName] = useState('content-div');
+  const [showOpenAsModalButton, setShowOpenAsModalButton] = useState(false);
 
   const handleContentMouseEnter = () => {
+    setShowOpenAsModalButton(true);
   };
 
   const handleContentMouseLeave = () => {
+    setShowOpenAsModalButton(false);
   };
 
   const handleContentOnClick = () => {
@@ -70,7 +74,7 @@ export default function CategorySnippetRow(props) {
 
   return (
     <tr>
-      <td className="id"><span className="px-2 pt-2 pb-3">{id.slice(-5)}</span></td>
+      <td className="id"><div className="px-2 pt-2 pb-3">{id.slice(-5)}</div></td>
       <td className="content">
         <div
           aria-hidden="true"
@@ -82,12 +86,13 @@ export default function CategorySnippetRow(props) {
           id={id}
           className={contentDivClassName}
         >
+          {showOpenAsModalButton && <OpenAsModalButton />}
           {content}
         </div>
       </td>
-      <td><div className="px-2 pb-2">{SnippetEffectBadge(effect)}</div></td>
+      <td><div className="px-2 pt-2 pb-2">{SnippetEffectBadge(effect)}</div></td>
       <td>
-        <div className="px-2 pb-2">
+        <div className="px-2 pt-2 pb-2">
           {for_material_groups.map((material) => (
             <div key={material}>
               {MaterialGroupTag(material)}
@@ -95,8 +100,8 @@ export default function CategorySnippetRow(props) {
           ))}
         </div>
       </td>
-      <td><div className="px-2 pb-2">{country_code}</div></td>
-      <td><span className="px-2 pb-2">{timeConverter(timestamp)}</span></td>
+      <td><div className="px-2 pt-2 pb-2">{country_code}</div></td>
+      <td><div className="px-2 pt-2 pb-2">{timeConverter(timestamp)}</div></td>
     </tr>
   );
 }

@@ -7,6 +7,7 @@ th {
   border-left: 0px solid;
   border-right: 1px solid rgb(237, 237, 236);
   color: rgba(55, 53, 47, 0.6);
+  font-weight: 400;
 }
 
 tr {
@@ -31,21 +32,27 @@ td.content {
 
 .material-group-badge {
   background-color: rgba(45, 170, 219, 0.3);
-  font-weight: 500;
+  font-weight: 400;
+  font-size: 1rem;
   margin-bottom: 0.5rem;
+}
+
+.snippet-effect-badge-good,
+.snippet-effect-badge-neutral,
+.snippet-effect-badge-bad {
+  min-width: 4rem;
+  font-weight: 400;
+  font-size: 1rem;
 }
 
 .snippet-effect-badge-good {
   background-color: rgba(0, 135, 107, 0.4);
-  min-width: 4rem;
 }
 
 .snippet-effect-badge-neutral {
   background-color: rgb(255, 193, 7, 0.4);
-  min-width: 4rem;
 }
 
 .snippet-effect-badge-bad {
   background-color: rgba(255, 0, 26, 0.4);
-  min-width: 4rem;
 }

@@ -1,0 +1,24 @@
+.open-as-modal-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 200000;
+  background-color: #ffffff;
+  border-radius: 0.3rem;
+  border-color: rgba(55, 53, 47, 0.2);
+  color: rgba(55, 53, 47, 0.6);
+  padding: 0.2rem 0.4rem 0.1rem 0.4rem;
+  font-weight: 500;
+  letter-spacing: 0.04rem;
+  text-transform: uppercase;
+  transition: 0.04s;
+  box-shadow:
+    rgb(15 15 15 / 6%) 0px 1px 4px,
+    rgb(15 15 15 / 6%) 0px 1px 2px;
+}
+
+.open-as-modal-button:hover {
+  background-color: rgb(237, 237, 236);
+  border-color: rgba(55, 53, 47, 0.2);
+  color: rgba(55, 53, 47, 0.6);
+}
