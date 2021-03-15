@@ -8,6 +8,7 @@ import Spinner from './widgets/spinner';
 
 function App() {
   const Screen = lazy(() => import('./components/DataManagementScreen'));
+  const SnippetDetailScreen = lazy(() => import('./components/SnippetDetailScreen'));
 
   return (
     <Provider store={store}>
@@ -15,6 +16,7 @@ function App() {
         <Suspense fallback={<Spinner />}>
           <Switch>
             <Route exact path="/" component={Screen} />
+            <Route path="/snippet-:snippetID" component={SnippetDetailScreen} />
           </Switch>
         </Suspense>
       </Router>

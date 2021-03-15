@@ -1,0 +1,33 @@
+td.content > div.content-div,
+a, a:hover {
+  text-decoration: underline;
+  text-decoration-color: rgba(55, 53, 47, 0.2);
+  text-decoration-style: solid;
+  text-decoration-thickness: 0.12rem;
+  text-underline-offset: 0.2rem;
+  cursor: default;
+  color: inherit;
+  text-underline-offset: 1;
+}
+
+td.content > div.content-div,
+td.content > div.content-div-focused {
+  padding: 0.5rem 0.5rem 1rem 0.5rem;
+  /* px-2 pt-2 pb-3 */
+}
+
+td.content > div.content-div-focused {
+  border-radius: 3px;
+  background: white;
+  position: relative;
+  /* max-width: calc(100vw - 24px); */
+  box-shadow: rgb(15 15 15 / 5%) 0px 0px 0px 1px, rgb(15 15 15 / 10%) 0px 3px 6px, rgb(15 15 15 / 20%) 0px 9px 24px;
+  overflow: hidden auto;
+  /* width: 240px; */
+  min-height: 55px;
+  max-height: 720px;
+}
+
+[contenteditable] {
+  outline: 0px solid transparent;
+}

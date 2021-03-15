@@ -34,7 +34,7 @@ export default function DataManagementScreen() {
   }, [managementData]);
 
   return (
-    <Container className="container" fluid>
+    <Container fluid>
       <h1>Data Management</h1>
       {categories?.map((category) => (
         <CategoryTable
