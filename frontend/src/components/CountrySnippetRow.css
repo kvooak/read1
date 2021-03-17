@@ -1,4 +1,31 @@
-td.content > div.content-div,
+div.table-row {
+  display: flex;
+  border-bottom: 1px solid rgb(223, 223, 222);
+}
+
+div.table-cell {
+  display: block;
+  border-right: 1px solid rgb(237, 237, 236);
+  white-space: normal;
+  min-height: 2.286rem;
+  cursor: default;
+  padding: 0.3571rem 0.5714rem 0.4286rem;
+  overflow: hidden;
+  /* min-width: 5rem;
+  max-width: 5rem; */
+}
+
+div.table-cell.id {
+  padding: 0;
+  min-width: 5rem;
+  max-width: 5rem;
+}
+
+div.table-cell.content {
+  position: relative;
+}
+
+div.content > div.content-inner,
 a, a:hover {
   text-decoration: underline;
   text-decoration-color: rgba(55, 53, 47, 0.2);
@@ -10,16 +37,16 @@ a, a:hover {
   text-underline-offset: 1;
 }
 
-td.content > div.content-div,
-td.content > div.content-div-focused {
+div.content > div.content-inner,
+div.content > div.content-inner-focused {
   position: relative;
   padding: 0.5rem 0.5rem 1rem 0.5rem; /* px-2 pt-2 pb-3 */
 }
 
-td.content > div.content-div-focused {
+div.content > div.content-inner-focused {
+  position: relative;
   border-radius: 3px;
   background: white;
-  position: relative;
   /* max-width: calc(100vw - 24px); */
   box-shadow: rgb(15 15 15 / 5%) 0px 0px 0px 1px, rgb(15 15 15 / 10%) 0px 3px 6px, rgb(15 15 15 / 20%) 0px 9px 24px;
   overflow: hidden auto;

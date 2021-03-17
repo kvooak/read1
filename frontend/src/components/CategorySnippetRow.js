@@ -47,7 +47,7 @@ export default function CategorySnippetRow(props) {
   } = snippet;
 
   const [contentEditable, setContentEditable] = useState(false);
-  const [contentDivClassName, setContentDivClassName] = useState('content-div');
+  const [contentDivClassName, setContentDivClassName] = useState('content-inner');
   const [showOpenAsModalButton, setShowOpenAsModalButton] = useState(false);
 
   const handleContentMouseEnter = () => {
@@ -60,12 +60,13 @@ export default function CategorySnippetRow(props) {
 
   const handleContentOnClick = () => {
     setContentEditable(true);
-    setContentDivClassName('content-div-focused');
+    setShowOpenAsModalButton(false);
+    setContentDivClassName('content-inner-focused');
   };
 
   const handleContentOnBlur = () => {
     setContentEditable(false);
-    setContentDivClassName('content-div');
+    setContentDivClassName('content-inner');
   };
 
   // const detailPath = generatePath('/snippet-:id', {
@@ -73,25 +74,31 @@ export default function CategorySnippetRow(props) {
   // });
 
   return (
-    <tr>
-      <td className="id"><div className="px-2 pt-2 pb-3">{id.slice(-5)}</div></td>
-      <td className="content">
+    <div className="table-row">
+      <div className="table-cell id">
+        <div className="px-2 pt-2 pb-3">{id.slice(-5)}</div>
+      </div>
+      <div
+        className="table-cell content col-4"
+        onMouseEnter={handleContentMouseEnter}
+        onMouseLeave={handleContentMouseLeave}
+      >
+        {showOpenAsModalButton && <OpenAsModalButton />}
         <div
           aria-hidden="true"
-          onMouseEnter={handleContentMouseEnter}
-          onMouseLeave={handleContentMouseLeave}
           onMouseDown={handleContentOnClick}
           onBlur={handleContentOnBlur}
           contentEditable={contentEditable}
           id={id}
           className={contentDivClassName}
         >
-          {showOpenAsModalButton && <OpenAsModalButton />}
           {content}
         </div>
-      </td>
-      <td><div className="px-2 pt-2 pb-2">{SnippetEffectBadge(effect)}</div></td>
-      <td>
+      </div>
+      <div className="table-cell col-2">
+        <div className="px-2 pt-2 pb-2">{SnippetEffectBadge(effect)}</div>
+      </div>
+      <div className="table-cell col-2">
         <div className="px-2 pt-2 pb-2">
           {for_material_groups.map((material) => (
             <div key={material}>
@@ -99,10 +106,14 @@ export default function CategorySnippetRow(props) {
             </div>
           ))}
         </div>
-      </td>
-      <td><div className="px-2 pt-2 pb-2">{country_code}</div></td>
-      <td><div className="px-2 pt-2 pb-2">{timeConverter(timestamp)}</div></td>
-    </tr>
+      </div>
+      <div className="table-cell col-1">
+        <div className="px-2 pt-2 pb-2">{country_code}</div>
+      </div>
+      <div className="table-cell col-2">
+        <div className="px-2 pt-2 pb-2">{timeConverter(timestamp)}</div>
+      </div>
+    </div>
   );
 }
 

@@ -6,15 +6,10 @@ import PropTypes from 'prop-types';
 
 import './CategoryTable.css';
 
-import Table from 'react-bootstrap/Table';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFont } from '@fortawesome/free-solid-svg-icons/';
 
 import CategorySnippetRow from './CategorySnippetRow';
-
-import {
-  tableHeaders,
-  tableStyle,
-} from './CategoryTableConstants';
-
 import { capitalizeFirstLetter } from '../widgets/utilities';
 
 export default function CategoryTable(props) {
@@ -24,20 +19,28 @@ export default function CategoryTable(props) {
   return (
     <div className="category-table">
       <h4>{capitalizeFirstLetter(name)}</h4>
-      <Table size="sm" responsive>
-        <thead>
-          <tr>
-            {tableHeaders.map((col) => (
-              <th key={col.styleID} style={tableStyle.columnWidth[col.styleID]}>
-                <span className="mx-2">{col.title}</span>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((snippet) => <CategorySnippetRow key={snippet.id} snippet={snippet} />)}
-        </tbody>
-      </Table>
+      <div>
+        <div className="table-header">
+          <div className="table-header-inner-wrap">
+            <div className="table-header-cell-wrap id">
+              <div
+                className="table-header-cell"
+                role="button"
+                aria-disabled="false"
+                tabIndex="0"
+              >
+                <div className="table-header-cell-title">
+                  <div className="table-header-cell-title-icon-wrap">
+                    <FontAwesomeIcon className="table-header-cell-title-icon" icon={faFont} />
+                  </div>
+                  <div className="table-header-cell-title-text">Key</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {data.map((snippet) => <CategorySnippetRow key={snippet.id} snippet={snippet} />)}
+      </div>
     </div>
   );
 }
