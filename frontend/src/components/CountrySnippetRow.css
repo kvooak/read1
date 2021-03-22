@@ -11,18 +11,18 @@ div.table-cell {
   cursor: default;
   padding: 0.3571rem 0.5714rem 0.4286rem;
   overflow: hidden;
-  /* min-width: 5rem;
-  max-width: 5rem; */
+  width: 12rem;
 }
 
 div.table-cell.id {
   padding: 0;
-  min-width: 5rem;
-  max-width: 5rem;
+  width: 4rem;
 }
 
 div.table-cell.content {
   position: relative;
+  padding: 0;
+  width: 24rem;
 }
 
 div.content > div.content-inner,

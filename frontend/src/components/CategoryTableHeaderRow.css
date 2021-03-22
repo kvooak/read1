@@ -19,12 +19,16 @@ div.table-header-cell-wrap {
   flex-shrink: 0;
   overflow: hidden;
   padding: 0px;
-  min-width: 5rem;
+  width: 10rem;
   border-right: 1px solid rgba(55, 53, 47, 0.09);
 }
 
 div.table-header-cell-wrap.id {
-  max-width: 5rem;
+  width: 4rem;
+}
+
+div.table-header-cell-wrap.content {
+  width: 24rem;
 }
 
 div.table-header-cell {

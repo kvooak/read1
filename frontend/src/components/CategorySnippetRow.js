@@ -40,11 +40,15 @@ export default function CategorySnippetRow(props) {
   const {
     id,
     content,
+    ...rest
+  } = snippet;
+
+  const {
     effect,
     for_material_groups,
     country_code,
     timestamp,
-  } = snippet;
+  } = rest;
 
   const [contentEditable, setContentEditable] = useState(false);
   const [contentDivClassName, setContentDivClassName] = useState('content-inner');
@@ -78,8 +82,9 @@ export default function CategorySnippetRow(props) {
       <div className="table-cell id">
         <div className="px-2 pt-2 pb-3">{id.slice(-5)}</div>
       </div>
+
       <div
-        className="table-cell content col-4"
+        className="table-cell content"
         onMouseEnter={handleContentMouseEnter}
         onMouseLeave={handleContentMouseLeave}
       >
@@ -95,10 +100,10 @@ export default function CategorySnippetRow(props) {
           {content}
         </div>
       </div>
-      <div className="table-cell col-2">
+      <div className="table-cell">
         <div className="px-2 pt-2 pb-2">{SnippetEffectBadge(effect)}</div>
       </div>
-      <div className="table-cell col-2">
+      <div className="table-cell">
         <div className="px-2 pt-2 pb-2">
           {for_material_groups.map((material) => (
             <div key={material}>
@@ -107,11 +112,11 @@ export default function CategorySnippetRow(props) {
           ))}
         </div>
       </div>
-      <div className="table-cell col-1">
+      <div className="table-cell">
         <div className="px-2 pt-2 pb-2">{country_code}</div>
       </div>
-      <div className="table-cell col-2">
-        <div className="px-2 pt-2 pb-2">{timeConverter(timestamp)}</div>
+      <div className="table-cell">
+        <div className="px-2 pt-2 pb-2">{timeConverter(timestamp, 'compactTime')}</div>
       </div>
     </div>
   );

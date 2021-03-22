@@ -5,8 +5,23 @@ import './css/bootstrap.min.css';
 import './css/index.css';
 import './css/custom.css';
 
+import firebase from 'firebase';
+
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyBpi2CkTuVuZ9Mfub55N4Dc4SuQGoPsRws',
+  authDomain: 'read-exchange-1.firebaseapp.com',
+  projectId: 'read-exchange-1',
+  storageBucket: 'read-exchange-1.appspot.com',
+  messagingSenderId: '309198426885',
+  appId: '1:309198426885:web:835a04718c3fc2e5ba1d6c',
+  measurementId: 'G-K92XBR544B',
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
 
 ReactDOM.render(
   <React.StrictMode>
