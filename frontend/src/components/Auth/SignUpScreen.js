@@ -6,28 +6,40 @@ import React, { useEffect, useState } from 'react';
 
 import './SignXScreen.css';
 
-import { Form } from 'react-bootstrap';
-
 import useInput from '../../widgets/useInput';
+import checkEmailFormat from '../../widgets/checkEmailFormat';
+import signFormMessages from './utils/signFormMessages';
 
 function SignUpScreen() {
   const [showEmailBoxSuggestion, setShowEmailBoxSuggestion] = useState(true);
   const [showEmailBox, setShowEmailBox] = useState(false);
   const [showPasswordBox, setShowPasswordBox] = useState(false);
-  const [formError, setFormError] = useState(false);
+  const [emailValid, setEmailValid] = useState(false);
+  const [formError, setFormError] = useState(null);
 
   const [email, setEmail] = useInput();
   const [password, setPassword] = useInput();
 
-  console.log(email, password);
+  useEffect(() => {
+    if (showPasswordBox) {
+      setShowPasswordBox(false);
+    }
+  }, [email]);
 
   const handleContinueWithEmail = () => {
     setShowEmailBoxSuggestion(false);
     setShowEmailBox(true);
   };
 
-  const handleUseThisEmail = () => {
-    setShowPasswordBox(true);
+  const handleInputConfirmButton = () => {
+    if (checkEmailFormat.validFormat(email)) {
+      if (checkEmailFormat.isReadExchangeEmail(email)) {
+        setFormError(null);
+        return setShowPasswordBox(true);
+      }
+      return setFormError(signFormMessages.error.notReadExchangeEmail);
+    }
+    return setFormError(signFormMessages.error.invalidEmailFormat);
   };
 
   const handleResetPassword = () => {
@@ -58,29 +70,33 @@ function SignUpScreen() {
                   <div className="form-upperline" />
                 </div>
 
-                <form controlId="email">
-                  <Form.Label className="form-label" for="email-input">Email</Form.Label>
-                  <div className="form-input-box">
-                    <input
-                      autoFocus
-                      id="email-input"
-                      type="email"
-                      placeholder="Enter your email address..."
-                      onChange={setEmail}
-                    />
-                  </div>
+                <form>
+                  <label className="form-label" htmlFor="email-input">
+                    Email
+                    <div className="form-input-box">
+                      <input
+                        autoFocus
+                        id="email-input"
+                        type="email"
+                        placeholder="Enter your email address..."
+                        onChange={setEmail}
+                      />
+                    </div>
+                  </label>
 
                   {showPasswordBox && (
                   <>
-                    <Form.Label className="form-label" for="password-input">Password</Form.Label>
-                    <div className="form-input-box">
-                      <input
-                        id="password-input"
-                        type="password"
-                        placeholder="Enter your password..."
-                        onChange={setPassword}
-                      />
-                    </div>
+                    <label className="form-label" htmlFor="password-input">
+                      Password
+                      <div className="form-input-box">
+                        <input
+                          id="password-input"
+                          type="password"
+                          placeholder="Enter your password..."
+                          onChange={setPassword}
+                        />
+                      </div>
+                    </label>
                   </>
                   )}
 
@@ -88,9 +104,11 @@ function SignUpScreen() {
                     role="button"
                     tabIndex={0}
                     className="form-confirm-button"
-                    onClick={handleUseThisEmail}
+                    onClick={handleInputConfirmButton}
                   >
-                    Use this email
+                    {email && emailValid
+                      ? 'Continue with password'
+                      : 'Use this email'}
                   </div>
                 </form>
               </>
