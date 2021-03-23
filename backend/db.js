@@ -24,9 +24,6 @@ const dbPostgresConnect = async () => {
     } else {
       throw e;
     }
-  // } finally {
-    // await client.end();
-    // print.log('CONNECTION CLOSED');
   }
   return client;
 };

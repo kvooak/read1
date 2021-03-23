@@ -9,6 +9,10 @@ import './SignXScreen.css';
 import useInput from '../../widgets/useInput';
 import checkEmailFormat from '../../widgets/checkEmailFormat';
 import signFormMessages from './utils/signFormMessages';
+import signUpFirebaseUser from './utils/signUpFirebaseUser';
+import {
+  EMAIL_ALREADY_IN_USE,
+} from './utils/firebaseErrorCodes';
 
 function SignUpScreen() {
   const [showEmailBoxSuggestion, setShowEmailBoxSuggestion] = useState(true);
@@ -20,26 +24,72 @@ function SignUpScreen() {
   const [email, setEmail] = useInput();
   const [password, setPassword] = useInput();
 
+  const [focusPasswordBox, setFocusPasswordBox] = useState(false);
+
   useEffect(() => {
     if (showPasswordBox) {
       setShowPasswordBox(false);
     }
+    setFormError(false);
+    return setEmailValid(false);
   }, [email]);
+
+  useEffect(() => {
+    if (showPasswordBox) {
+      setFormError(false);
+      setShowEmailBoxSuggestion(false);
+    }
+  }, [password]);
 
   const handleContinueWithEmail = () => {
     setShowEmailBoxSuggestion(false);
     setShowEmailBox(true);
   };
 
-  const handleInputConfirmButton = () => {
+  const handleInputConfirmButton = async () => {
+    if (emailValid && password) {
+      const firebaseUser = await signUpFirebaseUser(email, password);
+      if (firebaseUser.code && firebaseUser.message) {
+        if (firebaseUser.code === EMAIL_ALREADY_IN_USE) {
+          setShowEmailBoxSuggestion(true);
+          setFormError('This email has already been used');
+        } else {
+          setFormError(firebaseUser.message);
+        }
+        return false;
+      }
+
+      const {
+        additionalUserInfo,
+        user,
+      } = firebaseUser;
+
+      const { isNewUser } = additionalUserInfo;
+      const { emailVerified } = user;
+
+      if (isNewUser === true && emailVerified === false) {
+        console.log('user needs email confirmation');
+      }
+    }
+
     if (checkEmailFormat.validFormat(email)) {
       if (checkEmailFormat.isReadExchangeEmail(email)) {
-        setFormError(null);
-        return setShowPasswordBox(true);
+        setEmailValid(true);
+        setShowPasswordBox(true);
+        return setFocusPasswordBox(true);
       }
       return setFormError(signFormMessages.error.notReadExchangeEmail);
     }
     return setFormError(signFormMessages.error.invalidEmailFormat);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && e.target.value) {
+      setFormError(false);
+      return handleInputConfirmButton();
+    }
+
+    return false;
   };
 
   const handleResetPassword = () => {
@@ -70,16 +120,18 @@ function SignUpScreen() {
                   <div className="form-upperline" />
                 </div>
 
-                <form>
+                <form onSubmit={(e) => e.preventDefault()}>
                   <label className="form-label" htmlFor="email-input">
                     Email
                     <div className="form-input-box">
                       <input
-                        autoFocus
                         id="email-input"
                         type="email"
                         placeholder="Enter your email address..."
                         onChange={setEmail}
+                        onKeyDown={handleKeyDown}
+                        autoFocus={!focusPasswordBox}
+                        autoComplete="off"
                       />
                     </div>
                   </label>
@@ -94,6 +146,9 @@ function SignUpScreen() {
                           type="password"
                           placeholder="Enter your password..."
                           onChange={setPassword}
+                          onKeyDown={handleKeyDown}
+                          autoFocus={focusPasswordBox}
+                          autoComplete="off"
                         />
                       </div>
                     </label>

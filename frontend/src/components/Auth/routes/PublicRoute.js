@@ -2,20 +2,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Route, Redirect } from 'react-router-dom';
-import isSignedIn from '../utils/isSignedIn';
+import getUserLoginStatus from '../utils/getUserLoginStatus';
 
-const PublicRoute = ({ component: Component, restricted, ...rest }) => (
+const PublicRoute = ({ component: Component, restricted, ...rest }) => {
   // public route: restricted = false
   // restricted route: restricted = true
-  <Route
-    {...rest}
-    render={(props) => (
-      isSignedIn() && restricted
-        ? <Redirect to="/dashboard" />
-        : <Component {...props} />
-    )}
-  />
-);
+  const userLoginStatus = getUserLoginStatus();
+  console.log(userLoginStatus);
+  return (
+    <Route
+      {...rest}
+      render={(props) => (
+        userLoginStatus.isSignedIn && restricted
+          ? <Redirect to="/dashboard" />
+          : <Component {...props} />
+      )}
+    />
+  );
+};
 
 PublicRoute.propTypes = {
   component: PropTypes.elementType.isRequired,

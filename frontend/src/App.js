@@ -10,7 +10,7 @@ import Spinner from './widgets/spinner';
 
 function App() {
   const Screen = lazy(() => import('./components/DataManagementScreen'));
-  const SignInScreen = lazy(() => import('./components/Auth/SignInScreen'));
+  // const SignInScreen = lazy(() => import('./components/Auth/SignInScreen'));
   const SignUpScreen = lazy(() => import('./components/Auth/SignUpScreen'));
   // const SnippetDetailScreen = lazy(() => import('./components/SnippetDetailScreen'));
 
@@ -19,7 +19,8 @@ function App() {
       <Router>
         <Suspense fallback={<Spinner />}>
           <Switch>
-            <PublicRoute path="/signin" restricted component={SignInScreen} />
+            <PublicRoute path="/email-not-verified" restricted component={SignUpScreen} />
+            <PublicRoute path="/signin" restricted component={SignUpScreen} />
             <PublicRoute path="/signup" restricted component={SignUpScreen} />
             <PrivateRoute path="/dashboard" component={Screen} />
             <PrivateRoute exact path="/" component={Screen} />
