@@ -18,6 +18,7 @@ const cors = require('cors');
 
 const database = require('./db');
 const indexRouter = require('./routes/index');
+const userAuth = require('./controllers/userAuth');
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use(async (req, res, next) => {
   next();
 });
 
-app.use('/', indexRouter);
+app.use(userAuth);
+app.use('/v1', indexRouter);
 
 app.listen(port, '0.0.0.0');

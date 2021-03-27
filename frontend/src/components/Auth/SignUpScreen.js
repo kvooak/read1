@@ -3,6 +3,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable jsx-a11y/no-autofocus */
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import './SignXScreen.css';
 
@@ -10,16 +11,22 @@ import useInput from '../../widgets/useInput';
 import checkEmailFormat from '../../widgets/checkEmailFormat';
 import signFormMessages from './utils/signFormMessages';
 import signUpFirebaseUser from './utils/signUpFirebaseUser';
+import verifyEmailFromBackend from '../../api/dev/verifyEmailFromBackend';
+
 import {
   EMAIL_ALREADY_IN_USE,
+  TOO_MANY_REQUESTS,
+  WRONG_PASSWORD_SIGNUP,
 } from './utils/firebaseErrorCodes';
 
 function SignUpScreen() {
+  const dispatch = useDispatch();
   const [showEmailBoxSuggestion, setShowEmailBoxSuggestion] = useState(true);
   const [showEmailBox, setShowEmailBox] = useState(false);
   const [showPasswordBox, setShowPasswordBox] = useState(false);
   const [emailValid, setEmailValid] = useState(false);
   const [formError, setFormError] = useState(null);
+  const backEndError = useSelector((state) => state.read_exchange_user.error);
 
   const [email, setEmail] = useInput();
   const [password, setPassword] = useInput();
@@ -41,6 +48,10 @@ function SignUpScreen() {
     }
   }, [password]);
 
+  useEffect(() => {
+    setFormError(backEndError.message);
+  }, [backEndError.message]);
+
   const handleContinueWithEmail = () => {
     setShowEmailBoxSuggestion(false);
     setShowEmailBox(true);
@@ -50,9 +61,15 @@ function SignUpScreen() {
     if (emailValid && password) {
       const firebaseUser = await signUpFirebaseUser(email, password);
       if (firebaseUser.code && firebaseUser.message) {
-        if (firebaseUser.code === EMAIL_ALREADY_IN_USE) {
+        if (firebaseUser.code === EMAIL_ALREADY_IN_USE.code) {
           setShowEmailBoxSuggestion(true);
-          setFormError('This email has already been used');
+          setFormError(EMAIL_ALREADY_IN_USE.message);
+        } if (firebaseUser.code === WRONG_PASSWORD_SIGNUP.code) {
+          setShowEmailBoxSuggestion(true);
+          setFormError(WRONG_PASSWORD_SIGNUP.message);
+        } if (firebaseUser.code === TOO_MANY_REQUESTS.code) {
+          setShowEmailBoxSuggestion(true);
+          setFormError(TOO_MANY_REQUESTS.message);
         } else {
           setFormError(firebaseUser.message);
         }
@@ -67,8 +84,10 @@ function SignUpScreen() {
       const { isNewUser } = additionalUserInfo;
       const { emailVerified } = user;
 
+      console.log(isNewUser, emailVerified);
+
       if (isNewUser === true && emailVerified === false) {
-        console.log('user needs email confirmation');
+        dispatch(verifyEmailFromBackend());
       }
     }
 

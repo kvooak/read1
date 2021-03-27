@@ -6,6 +6,8 @@ import './css/index.css';
 import './css/custom.css';
 
 import firebase from 'firebase';
+import { Provider } from 'react-redux';
+import store from './redux/store';
 
 import App from './App';
 import * as serviceWorker from './serviceWorker';
@@ -25,7 +27,9 @@ firebase.analytics();
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root'),
 );

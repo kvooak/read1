@@ -1,16 +1,17 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Route, Redirect } from 'react-router-dom';
-import getUserLoginStatus from '../utils/getUserLoginStatus';
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
-  const userLoginStatus = getUserLoginStatus();
+  const currentUser = useSelector((state) => state.read_exchange_user);
+
   return (
     <Route
       {...rest}
       render={(props) => (
-        userLoginStatus.isSignedIn && userLoginStatus.emailVerified
+        currentUser.isSignedIn && currentUser.emailVerified
           ? <Component {...props} />
           : <Redirect to="/signin" />
       )}

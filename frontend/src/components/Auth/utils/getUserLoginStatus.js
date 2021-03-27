@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars */
 import firebase from 'firebase';
 
-function getUserLoginStatus() {
+import { GET_USER_VALUE } from '../../../redux/reducers/userReducer';
+
+const getUserLoginStatus = () => async (dispatch) => {
   firebase.auth().onAuthStateChanged((user) => {
     let userStatus;
     if (user) {
@@ -21,9 +23,8 @@ function getUserLoginStatus() {
         isSignedIn: false,
       };
     }
-
-    return userStatus;
+    return dispatch(GET_USER_VALUE(userStatus));
   });
-}
+};
 
 export default getUserLoginStatus;
