@@ -8,6 +8,7 @@ npm install
 
 # Waiting for dependent containers
 /wait-for-it.sh db:5432 -t 300
+/wait-for-it.sh arangodb:8529 -t 300
 
 # Migrate
 

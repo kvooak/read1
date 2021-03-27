@@ -8,6 +8,13 @@ services:
       POSTGRES_PASSWORD: admin@24
       POSTGRES_DB: read1
 
+  arangodb:
+    image: arangodb:3.7
+    ports:
+      - 8529:8529
+    environment:
+      ARANGO_ROOT_PASSWORD: ''
+
   backend:
     tty: true
     stdin_open: true
@@ -15,6 +22,7 @@ services:
     build: ./docker/backend
     links:
       - db
+      - arangodb
     ports:
       - 8081:8081
     volumes:
@@ -22,6 +30,7 @@ services:
       - backend_node_modules_cache:/app/node_modules
     environment:
       DB_HOST: db
+      ARANGO_DB_URL: http://arangodb:8529
 
   frontend:
     tty: true
