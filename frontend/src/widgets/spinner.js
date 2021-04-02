@@ -1,10 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Spinner } from 'spin.js';
 
 const opts = {
-  lines: 9, // The number of lines to draw
+  lines: 8, // The number of lines to draw
   length: 22, // The length of each line
   width: 17, // The line thickness
   radius: 45, // The radius of the inner circle
@@ -12,7 +11,7 @@ const opts = {
   corners: 1, // Corner roundness (0..1)
   speed: 1, // Rounds per second
   rotate: 0, // The rotation offset
-  animation: 'spinner-line-fade-quick', // The CSS animation name for the lines
+  // animation: 'spinner-line-fade-quick', // The CSS animation name for the lines
   direction: 1, // 1: clockwise, -1: counterclockwise
   color: 'gray', // CSS color or array of colors
   fadeColor: 'white', // CSS color or array of colors
@@ -24,31 +23,14 @@ const opts = {
   position: 'absolute', // Element positioning
 };
 
-function Loader({ pastDelay, error }) {
+function Loader() {
   const target = document.getElementById('spinner');
   // eslint-disable-next-line no-unused-vars
   const spinner = new Spinner(opts).spin(target);
 
-  if (!pastDelay) {
-    return null;
-  } if (error) {
-    return (
-      <>
-        {error.message}
-      </>
-    );
-  }
-  return <span id="spinner" />;
+  return (
+    <div id="spinner" className="spinner" />
+  );
 }
-
-Loader.defaultProps = {
-  pastDelay: false,
-  error: null,
-};
-
-Loader.propTypes = {
-  pastDelay: PropTypes.bool,
-  error: PropTypes.instanceOf(Object),
-};
 
 export default Loader;

@@ -1,19 +1,25 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Route, Redirect } from 'react-router-dom';
 
+import Spinner from '../../../widgets/spinner';
+
 const PrivateRoute = ({ component: Component, ...rest }) => {
-  const currentUser = useSelector((state) => state.read_exchange_user);
+  const reduxUserValue = useSelector((state) => state.read_exchange_user.value);
+  const reduxUserLoading = useSelector((state) => state.read_exchange_user.loading);
 
   return (
     <Route
       {...rest}
       render={(props) => (
-        currentUser.isSignedIn && currentUser.emailVerified
-          ? <Component {...props} />
-          : <Redirect to="/signin" />
+        reduxUserLoading
+          ? <Spinner />
+          : reduxUserValue.is_signed_in && reduxUserValue.email_verified
+            ? <Component {...props} />
+            : <Redirect to="/signin" />
       )}
     />
   );

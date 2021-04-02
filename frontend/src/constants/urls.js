@@ -10,3 +10,5 @@ export const API_USER_SUFFIX = 'users/';
 
 export const API_CURRENT_USER_SUFFIX = 'current/';
 export const API_USER_SIGNUP_SUFFIX = 'signup/';
+
+export const API_USER_VERIFY_EMAIL_SUFFIX = 'email-verification/';

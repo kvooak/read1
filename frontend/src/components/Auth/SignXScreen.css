@@ -139,6 +139,16 @@
   text-align: center; 
 }
 
+.form-middle-noti {
+  text-align: center;
+  display: block;
+  width: 100%;
+  font-size: 14px;
+  margin-top: 12px;
+  margin-bottom: 16px;
+  font-weight: 300;
+}
+
 .form-bottom-error {
   color: rgb(235, 87, 87);
   text-align: center;

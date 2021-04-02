@@ -8,13 +8,15 @@ const PublicRoute = ({ component: Component, restricted, ...rest }) => {
   // public route: restricted = false
   // restricted route: restricted = true
 
-  const currentUser = useSelector((state) => state.read_exchange_user);
+  const reduxUserValue = useSelector((state) => state.read_exchange_user.value);
 
   return (
     <Route
       {...rest}
       render={(props) => (
-        currentUser.isSignedIn && restricted
+        reduxUserValue.is_signed_in
+        && reduxUserValue.email_verified
+        && restricted
           ? <Redirect to="/dashboard" />
           : <Component {...props} />
       )}

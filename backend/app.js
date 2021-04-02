@@ -25,8 +25,10 @@ dotenv.config();
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'http://read.exchange',
-    'https://read.exchange',
+    'http://dm.recyda.com',
+    'https://dm.recyda.com',
+    // 'http://read.exchange',
+    // 'https://read.exchange',
   ],
   optionsSuccessStatus: 200,
 }));
@@ -47,6 +49,6 @@ app.use(async (req, res, next) => {
 });
 
 app.use(userAuth);
-app.use('/v1', indexRouter);
+app.use('/api/v1', indexRouter);
 
 app.listen(port, '0.0.0.0');

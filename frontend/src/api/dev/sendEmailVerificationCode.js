@@ -1,14 +1,19 @@
+/* eslint-disable camelcase */
 import axios from 'axios';
 import firebase from 'firebase';
 
-import { SIGN_UP_FORM_ERROR } from '../../redux/reducers/userReducer';
+import {
+  SIGN_UP_FORM_VERIFICATION_CODE,
+  SIGN_UP_FORM_ERROR,
+} from '../../redux/reducers/userReducer';
 
 import {
   API_BASE_URL,
-  API_USER_SIGNUP_SUFFIX,
+  API_USER_SUFFIX,
+  API_USER_VERIFY_EMAIL_SUFFIX,
 } from '../../constants/urls';
 
-const verifyEmailFromBackend = () => async (dispatch) => {
+const sendEmailVerificationCode = () => async (dispatch) => {
   firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
       const { currentUser } = firebase.auth();
@@ -19,12 +24,17 @@ const verifyEmailFromBackend = () => async (dispatch) => {
         Authorization: `Bearer ${token}`,
       };
 
-      const apiURL = `${API_BASE_URL}${API_USER_SIGNUP_SUFFIX}`;
+      const apiURL = `${API_BASE_URL}${API_USER_SUFFIX}${API_USER_VERIFY_EMAIL_SUFFIX}`;
 
       const data = { uid };
       axios.post(apiURL, data, { headers })
         .then((res) => {
-          console.log(res);
+          const { sent_verification_code } = res.data;
+          dispatch(SIGN_UP_FORM_VERIFICATION_CODE({ sent_verification_code }));
+        })
+        .catch((error) => {
+          const { code, message } = error;
+          dispatch(SIGN_UP_FORM_ERROR({ code, message }));
         });
     } else {
       const error = new Error();
@@ -35,4 +45,4 @@ const verifyEmailFromBackend = () => async (dispatch) => {
   });
 };
 
-export default verifyEmailFromBackend;
+export default sendEmailVerificationCode;

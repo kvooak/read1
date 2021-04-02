@@ -10,17 +10,19 @@ const getUserLoginStatus = () => async (dispatch) => {
       const { currentUser } = firebase.auth();
       const {
         uid,
+        email,
         emailVerified,
       } = currentUser;
 
       userStatus = {
         uid,
-        isSignedIn: Boolean(user),
-        emailVerified,
+        email_address: email,
+        is_signed_in: Boolean(user),
+        email_verified: emailVerified,
       };
     } else {
       userStatus = {
-        isSignedIn: false,
+        is_signed_in: false,
       };
     }
     return dispatch(GET_USER_VALUE(userStatus));

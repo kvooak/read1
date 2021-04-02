@@ -1,9 +1,13 @@
+/* eslint-disable camelcase */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable jsx-a11y/no-autofocus */
 import React, { useEffect, useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import PropTypes, { string } from 'prop-types';
 
 import './SignXScreen.css';
 
@@ -11,7 +15,9 @@ import useInput from '../../widgets/useInput';
 import checkEmailFormat from '../../widgets/checkEmailFormat';
 import signFormMessages from './utils/signFormMessages';
 import signUpFirebaseUser from './utils/signUpFirebaseUser';
-import verifyEmailFromBackend from '../../api/dev/verifyEmailFromBackend';
+import signUpArangoUser from './utils/signUpArangoUser';
+import sendEmailVerificationCode from '../../api/dev/sendEmailVerificationCode';
+import confirmEmailVerificationCode from '../../api/dev/confirmEmailVerificationCode';
 
 import {
   EMAIL_ALREADY_IN_USE,
@@ -19,23 +25,78 @@ import {
   WRONG_PASSWORD_SIGNUP,
 } from './utils/firebaseErrorCodes';
 
-function SignUpScreen() {
+function SignUpScreen(props) {
+  const { location } = props;
   const dispatch = useDispatch();
+
+  const reduxUserValue = useSelector((state) => state.read_exchange_user.value);
+
+  const [screenTitle, setScreenTitle] = useState('Sign');
+  useEffect(() => {
+    if (location.pathname === '/signin') {
+      setScreenTitle('Sign in');
+    } else {
+      setScreenTitle('Sign up');
+    }
+  }, []);
+
+  const [continueWithEmail, setContinueWithEmail] = useState(false);
   const [showEmailBoxSuggestion, setShowEmailBoxSuggestion] = useState(true);
   const [showEmailBox, setShowEmailBox] = useState(false);
   const [showPasswordBox, setShowPasswordBox] = useState(false);
+  const [showVerificationCodeBox, setShowVerificationCodeBox] = useState(false);
   const [emailValid, setEmailValid] = useState(false);
   const [formError, setFormError] = useState(null);
+  const [formMiddleNoti, setFormMiddleNoti] = useState(null);
+
   const backEndError = useSelector((state) => state.read_exchange_user.error);
+
+  const [userProfileCreated, setUserProfileCreated] = useState(false);
+  const [emailVerificationCodeSent, setEmailVerificationCodeSent] = useState(false);
+
+  useEffect(() => {
+    const { user_profile_created, sent_verification_code } = reduxUserValue;
+    setUserProfileCreated(user_profile_created);
+    setEmailVerificationCodeSent(sent_verification_code);
+  }, [reduxUserValue]);
 
   const [email, setEmail] = useInput();
   const [password, setPassword] = useInput();
+  const [verificationCode, setVerificationCode] = useInput(null);
 
   const [focusPasswordBox, setFocusPasswordBox] = useState(false);
+  const [focusVerificationCodeBox, setFocusVerificationCodeBox] = useState(false);
+
+  useEffect(() => {
+    if (userProfileCreated === true) {
+      dispatch(sendEmailVerificationCode());
+    }
+  }, [userProfileCreated]);
+
+  useEffect(() => {
+    if (emailVerificationCodeSent === true) {
+      setShowVerificationCodeBox(true);
+      setShowPasswordBox(false);
+      setFormMiddleNoti('We just sent you an email verification code. Please check your inbox.');
+      setFocusVerificationCodeBox(true);
+    } else {
+      setFormMiddleNoti(null);
+      setShowVerificationCodeBox(false);
+      setFocusVerificationCodeBox(false);
+    }
+  }, [emailVerificationCodeSent]);
 
   useEffect(() => {
     if (showPasswordBox) {
       setShowPasswordBox(false);
+      setFocusPasswordBox(false);
+    } if (showVerificationCodeBox) {
+      setShowVerificationCodeBox(false);
+      setFocusVerificationCodeBox(false);
+    } if (formMiddleNoti) {
+      setFormMiddleNoti(null);
+    } if (verificationCode) {
+      setVerificationCode(null);
     }
     setFormError(false);
     return setEmailValid(false);
@@ -53,9 +114,32 @@ function SignUpScreen() {
   }, [backEndError.message]);
 
   const handleContinueWithEmail = () => {
-    setShowEmailBoxSuggestion(false);
-    setShowEmailBox(true);
+    setContinueWithEmail(true);
   };
+
+  useEffect(() => {
+    if (continueWithEmail === true) {
+      setShowEmailBoxSuggestion(false);
+      setShowEmailBox(true);
+    }
+  }, [continueWithEmail]);
+
+  const handleVerificationCodeConfirmButton = async () => {
+    dispatch(confirmEmailVerificationCode(verificationCode));
+    return true;
+  };
+
+  useEffect(() => {
+    if (continueWithEmail) {
+      const { email_address, is_signed_in, email_verified } = reduxUserValue;
+      if (email_address) {
+        setEmail(email_address);
+      }
+      if (is_signed_in === true && email_verified === false) {
+        dispatch(sendEmailVerificationCode());
+      }
+    }
+  }, [continueWithEmail, reduxUserValue]);
 
   const handleInputConfirmButton = async () => {
     if (emailValid && password) {
@@ -84,21 +168,25 @@ function SignUpScreen() {
       const { isNewUser } = additionalUserInfo;
       const { emailVerified } = user;
 
-      console.log(isNewUser, emailVerified);
-
       if (isNewUser === true && emailVerified === false) {
-        dispatch(verifyEmailFromBackend());
+        dispatch(signUpArangoUser());
+        return true;
+      } if (emailVerified === true) {
+        return (
+          <Redirect to="/dashboard" />
+        );
       }
     }
 
     if (checkEmailFormat.validFormat(email)) {
-      if (checkEmailFormat.isReadExchangeEmail(email)) {
+      if (checkEmailFormat.isCompanyEmail(email)) {
         setEmailValid(true);
         setShowPasswordBox(true);
         return setFocusPasswordBox(true);
       }
-      return setFormError(signFormMessages.error.notReadExchangeEmail);
+      return setFormError(signFormMessages.error.notCompanyEmail);
     }
+
     return setFormError(signFormMessages.error.invalidEmailFormat);
   };
 
@@ -106,6 +194,16 @@ function SignUpScreen() {
     if (e.key === 'Enter' && e.target.value) {
       setFormError(false);
       return handleInputConfirmButton();
+    }
+
+    return false;
+  };
+
+  const handleKeyDownVerificationBox = (e) => {
+    if (e.key === 'Enter' && e.target.value) {
+      setFormError(false);
+      setFormMiddleNoti();
+      return handleVerificationCodeConfirmButton();
     }
 
     return false;
@@ -120,7 +218,7 @@ function SignUpScreen() {
     <section>
       <div className="wrapper">
         <div className="inner-wrapper">
-          <div className="screen-title">Sign up</div>
+          <div className="screen-title">{screenTitle}</div>
 
           <div className="sign-x-box">
             <div className="use-google-account-button" role="button" tabIndex="0">
@@ -146,7 +244,7 @@ function SignUpScreen() {
                       <input
                         id="email-input"
                         type="email"
-                        placeholder="Enter your email address..."
+                        placeholder={email || 'Enter your email address...'}
                         onChange={setEmail}
                         onKeyDown={handleKeyDown}
                         autoFocus={!focusPasswordBox}
@@ -154,6 +252,8 @@ function SignUpScreen() {
                       />
                     </div>
                   </label>
+
+                  <div className="form-middle-noti">{formMiddleNoti}</div>
 
                   {showPasswordBox && (
                   <>
@@ -174,15 +274,38 @@ function SignUpScreen() {
                   </>
                   )}
 
+                  {showVerificationCodeBox && (
+                  <>
+                    <label className="form-label" htmlFor="verification-code-input">
+                      Verification code
+                      <div className="form-input-box">
+                        <input
+                          id="verification-code-input"
+                          type="text"
+                          placeholder="Paste verification code"
+                          onChange={setVerificationCode}
+                          onKeyDown={handleKeyDownVerificationBox}
+                          autoFocus={focusVerificationCodeBox}
+                          autoComplete="off"
+                        />
+                      </div>
+                    </label>
+                  </>
+                  )}
+
                   <div
                     role="button"
                     tabIndex={0}
                     className="form-confirm-button"
-                    onClick={handleInputConfirmButton}
+                    onClick={verificationCode
+                      ? handleVerificationCodeConfirmButton
+                      : handleInputConfirmButton}
                   >
-                    {email && emailValid
-                      ? 'Continue with password'
-                      : 'Use this email'}
+                    {showVerificationCodeBox === false
+                      ? email && emailValid
+                        ? 'Continue with password'
+                        : 'Use this email'
+                      : 'Continue with login code'}
                   </div>
                 </form>
               </>
@@ -224,11 +347,11 @@ function SignUpScreen() {
               By clicking “Continue with Google/Email” above, you acknowledge
               that you have read and understood, and agree to our
               {' '}
-              <a href="https://www.read.exchange" rel="noopener noreferrer" className="read-exchange-link">Terms &amp; Conditions</a>
+              <a href="/" rel="noopener noreferrer" className="read-exchange-link">Terms &amp; Conditions</a>
               {' '}
               and
               {' '}
-              <a href="https://www.read.exchange" rel="noopener noreferrer" className="read-exchange-link">Privacy Policy</a>
+              <a href="/" rel="noopener noreferrer" className="read-exchange-link">Privacy Policy</a>
               .
             </p>
           </div>
@@ -238,5 +361,14 @@ function SignUpScreen() {
     </section>
   );
 }
+
+SignUpScreen.propTypes = {
+  location: PropTypes.shape({
+    hash: PropTypes.string.isRequired,
+    pathname: PropTypes.string.isRequired,
+    state: PropTypes.string,
+    key: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
 export default SignUpScreen;

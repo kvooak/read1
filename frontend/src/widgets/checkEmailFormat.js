@@ -5,8 +5,9 @@ export default {
     domain_specific_validation: true,
   }),
 
-  isReadExchangeEmail: (email) => {
+  isCompanyEmail: (email) => {
     const domainRegex = new RegExp('@read.exchange');
+    // const domainRegex = new RegExp('@recyda.com');
     return domainRegex.test(email);
   },
 
