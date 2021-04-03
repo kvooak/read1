@@ -12,16 +12,22 @@
 - Docker build
 
 ```bash
-docker-compose build
+make init
 ```
 
 - Start server
 
 ```bash
 docker-compose up
+# or
+make dev
 ```
 
-Then access http://localhost:8081/ or http://localhost:3000/ to check backend and frontend
+Then access localhost to check
+
+- Backend: http://localhost:8081/
+- Frontend: http://localhost:3000/
+- ArangoDB: http://localhost:8529/
 
 - Run command inside container
 
