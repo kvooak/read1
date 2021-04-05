@@ -43,12 +43,6 @@ input {
   outline: 0px solid transparent;
 }
 
-::placeholder {
-  font-size: 0.9rem;
-  font-weight: 300;
-  color: rgba(55, 53, 47, 0.6);
-}
-
 .read-exchange-link,
 .read-exchange-link:hover {
   display: inline;

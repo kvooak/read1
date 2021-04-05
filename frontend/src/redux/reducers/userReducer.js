@@ -22,7 +22,6 @@ const userSlice = createSlice({
     },
 
     EMAIL_VERIFIED: (state, action) => {
-      console.log(action.payload);
       const { email_verified } = action.payload;
       state.value.emailVerified = email_verified;
     },

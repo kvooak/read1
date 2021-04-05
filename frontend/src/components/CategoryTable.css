@@ -1,0 +1,8 @@
+.database-table-wrapper {
+  margin-bottom: 2rem;
+}
+
+.database-table {
+  overflow: scroll;
+  overflow-y:scroll;
+}

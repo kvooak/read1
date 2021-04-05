@@ -4,20 +4,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import CategoryTableHeaderRow from './CategoryTableHeaderRow';
+import './CategoryTable.css';
+
 import CategorySnippetRow from './CategorySnippetRow';
-import { capitalizeFirstLetter } from '../widgets/utilities';
 
 export default function CategoryTable(props) {
   const { category } = props;
   const { name, data } = category;
 
   return (
-    <div className="category-table">
-      <h4>{capitalizeFirstLetter(name)}</h4>
-      <div>
-        <CategoryTableHeaderRow data={data} />
-        {data.map((snippet) => <CategorySnippetRow key={snippet.id} snippet={snippet} />)}
+    <div className="database-table-wrapper">
+      <div className="database-table">
+        {data.map((snippet) => (
+          <CategorySnippetRow
+            key={snippet.id}
+            category={name}
+            snippet={snippet}
+          />
+        ))}
       </div>
     </div>
   );

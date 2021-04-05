@@ -1,3 +1,8 @@
+::placeholder {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: rgba(55, 53, 47, 0.6);
+}
 .wrapper {
   width: 100%;
   max-width: 58.75rem;

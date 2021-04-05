@@ -35,8 +35,14 @@ function MaterialGroupTag(name) {
   );
 }
 
+function CategoryTag(name) {
+  return (
+    <Badge className="category-badge">{name}</Badge>
+  );
+}
+
 export default function CategorySnippetRow(props) {
-  const { snippet } = props;
+  const { category, snippet } = props;
   const {
     id,
     content,
@@ -80,10 +86,12 @@ export default function CategorySnippetRow(props) {
   return (
     <div className="table-row">
       <div className="table-cell id">
-        <div className="px-2 pt-2 pb-3">{id.slice(-5)}</div>
+        {CategoryTag(category)}
+        <div className="px-1 pb-3">{id.slice(-5)}</div>
       </div>
 
       <div
+        aria-hidden="true"
         className="table-cell content"
         onMouseEnter={handleContentMouseEnter}
         onMouseLeave={handleContentMouseLeave}
@@ -123,5 +131,6 @@ export default function CategorySnippetRow(props) {
 }
 
 CategorySnippetRow.propTypes = {
+  category: PropTypes.string.isRequired,
   snippet: PropTypes.instanceOf(Object).isRequired,
 };

@@ -6,7 +6,9 @@ import './DataManagementScreen.css';
 
 import Container from 'react-bootstrap/Container';
 
+import CategoryTableHeaderRow from './CategoryTableHeaderRow';
 import CategoryTable from './CategoryTable';
+import TopControlBar from './TopControlBar/TopControlBar';
 
 import managementData from './data.json';
 // import materialGroups from './material_groups.json';
@@ -36,6 +38,8 @@ export default function DataManagementScreen() {
   return (
     <Container fluid>
       <h1>Data Management</h1>
+      <TopControlBar />
+      <CategoryTableHeaderRow />
       {categories?.map((category) => (
         <CategoryTable
           key={category.name}

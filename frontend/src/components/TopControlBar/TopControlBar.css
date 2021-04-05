@@ -1,0 +1,28 @@
+.table-top-control-bar-wrapper {
+  position: relative;
+  min-height: 42px;
+  padding-right: 96px;
+  padding-bottom: 2px;
+  flex-shrink: 0;
+  z-index: 1;
+  overflow: visible;
+  position: sticky;
+  left: 0px;
+  /* border: 1px solid; */
+}
+
+.feature-buttons-group-wrapper {
+  padding-top: 8px;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  opacity: 1;
+}
+
+.feature-icon {
+  display: block;
+  fill: rgba(55, 53, 47, 0.4);
+  flex-shrink: 0;
+  backface-visibility: hidden;
+  margin-right: 6px;
+}

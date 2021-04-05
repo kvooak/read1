@@ -41,7 +41,7 @@ export default function CategoryTableHeaderRow() {
               <div className="table-header-cell-title-icon-wrap">
                 <FontAwesomeIcon className="table-header-cell-title-icon" icon={faFont} />
               </div>
-              <div className="table-header-cell-title-text">Key</div>
+              <div className="table-header-cell-title-text">Content</div>
             </div>
           </div>
         </div>
