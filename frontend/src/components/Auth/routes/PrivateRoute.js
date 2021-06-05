@@ -5,8 +5,6 @@ import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Route, Redirect } from 'react-router-dom';
 
-import Spinner from '../../../widgets/spinner';
-
 const PrivateRoute = ({ component: Component, ...rest }) => {
   const reduxUserValue = useSelector((state) => state.read_exchange_user.value);
   const reduxUserLoading = useSelector((state) => state.read_exchange_user.loading);
@@ -16,7 +14,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
       {...rest}
       render={(props) => (
         reduxUserLoading
-          ? <Spinner />
+          ? null
           : reduxUserValue.is_signed_in && reduxUserValue.email_verified
             ? <Component {...props} />
             : <Redirect to="/signin" />

@@ -6,7 +6,6 @@ const crypto = require('crypto');
 const { isArangoError } = require('arangojs/error');
 // const { aql } = require('arangojs');
 
-const sendVerificationCodeViaEmail = require('./features/sendVerificationCodeViaEmail');
 const print = require('../_utils/print');
 
 exports.createUserProfile = async (req, res, next) => {
@@ -54,11 +53,6 @@ exports.sendEmailVerficicationCode = async (req, res, next) => {
     print.info(`User ${uid}: Verification code updated ${verificationCode}`);
 
     const userProfile = await usersCollection.document(uid);
-    const { email } = userProfile;
-    // await sendVerificationCodeViaEmail(
-    //   verificationCode,
-    //   email,
-    // );
 
     res.status(201).send({
       sent_verification_code: true,
