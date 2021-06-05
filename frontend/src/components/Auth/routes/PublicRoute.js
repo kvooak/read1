@@ -24,9 +24,13 @@ const PublicRoute = ({ component: Component, restricted, ...rest }) => {
   );
 };
 
+PublicRoute.defaultProps = {
+  restricted: false,
+};
+
 PublicRoute.propTypes = {
   component: PropTypes.elementType.isRequired,
-  restricted: PropTypes.bool.isRequired,
+  restricted: PropTypes.bool,
 };
 
 export default PublicRoute;

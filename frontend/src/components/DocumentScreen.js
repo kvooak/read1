@@ -1,16 +1,84 @@
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react';
+/* eslint-disable no-underscore-dangle */
+import React, { useEffect, useRef, useState } from 'react';
+import styled from '@emotion/styled';
+
+import striptags from 'striptags';
+
+import useDebounce from '../_custom/Code/useDebounce';
+
+import EmoContainer from '../_custom/UI/Container';
+import EmoEditableDiv from '../_custom/UI/EmoEditableDiv';
+
+const RowWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
+const ColumnSeparator = styled.div`
+  width: 20px;
+`;
 
 export default function DocumentScreen() {
-  const [categories, setCategories] = useState([]);
+  const inputRef = useRef();
+  const outputRef = useRef();
+  const [input, setInput] = useState();
+  const [output, setOutput] = useState();
+
+  const debouncedInput = useDebounce(input, 300);
+  useEffect(() => {
+    outputRef.current.innerHTML = debouncedInput || '';
+  }, [debouncedInput]);
+
+  const debouncedOutput = useDebounce(output, 300);
+  useEffect(() => {
+    console.log(debouncedOutput);
+  }, [debouncedOutput]);
+
+  const handlePaste = (e) => {
+    const data = e.clipboardData.getData('text/plain');
+    e.target.innerHTML = data;
+  };
+
+  const handleInput = (e) => {
+    const data = e.target.innerHTML;
+    const stripped = striptags(data);
+    e.target.innerHTML = stripped;
+    setInput(stripped);
+  };
+
+  useEffect(() => {
+    const selection = window.getSelection();
+    const range = document.createRange();
+    selection.removeAllRanges();
+    range.selectNodeContents(inputRef.current);
+    range.collapse(false);
+    selection.addRange(range);
+    inputRef.current.focus();
+  }, [input]);
+
+  const handleOutputChange = (e) => {
+    const data = e.target.innerHTML;
+    const stripped = striptags(data);
+    e.target.innerHTML = stripped;
+    setOutput(stripped);
+  };
 
   return (
-    <div className="p-6 max-w-lg mx-auto bg-white rounded-lg border flex items-center space-x-12">
-      <div>
-        <div className="text-xl font-medium text-black">ChitChat</div>
-        <p className="text-gray-500">You have a new message!</p>
-      </div>
-    </div>
+    <EmoContainer>
+      <RowWrapper>
+        <EmoEditableDiv
+          ref={inputRef}
+          onInput={handleInput}
+          onPaste={handlePaste}
+        />
+        <ColumnSeparator />
+        <EmoEditableDiv
+          ref={outputRef}
+          onInput={handleOutputChange}
+          onPaste={handlePaste}
+        />
+      </RowWrapper>
+    </EmoContainer>
   );
 }
