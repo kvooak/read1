@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@editorjs/editorjs": "^2.22.0",
+    "@editorjs/header": "^2.6.1",
+    "@editorjs/list": "^1.6.2",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^11.3.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.34",

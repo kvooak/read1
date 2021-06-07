@@ -15,15 +15,29 @@ const RowWrapper = styled.div`
   flex-direction: row;
 `;
 
-const ColumnSeparator = styled.div`
-  width: 20px;
-`;
-
 export default function DocumentScreen() {
   const inputRef = useRef();
   const outputRef = useRef();
   const [input, setInput] = useState();
   const [output, setOutput] = useState();
+  const [inputPasteEvent, setInputPasteEvent] = useState(false);
+  const [outputPasteEvent, setOutputPasteEvent] = useState(false);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.addEventListener('paste', () => {
+        setInputPasteEvent(true);
+      });
+    }
+  }, [inputRef]);
+
+  useEffect(() => {
+    if (outputRef.current && !outputPasteEvent) {
+      outputRef.current.addEventListener('paste', () => {
+        setOutputPasteEvent(true);
+      });
+    }
+  }, [outputRef]);
 
   const debouncedInput = useDebounce(input, 300);
   useEffect(() => {
@@ -35,16 +49,50 @@ export default function DocumentScreen() {
     console.log(debouncedOutput);
   }, [debouncedOutput]);
 
-  const handlePaste = (e) => {
+  const handleInputPaste = (e) => {
+    // stop data from actually being pasted
+    e.stopPropagation();
+    e.preventDefault();
+
     const data = e.clipboardData.getData('text/plain');
-    e.target.innerHTML = data;
+    const stripped = striptags(data);
+    e.target.innerHTML += stripped;
+    setInput(e.target.innerHTML);
+    setInputPasteEvent(false);
+  };
+
+  const handleOutputPaste = (e) => {
+    // stop data from actually being pasted
+    e.stopPropagation();
+    e.preventDefault();
+
+    const data = e.clipboardData.getData('text/plain');
+    const stripped = striptags(data, ['br']);
+    e.target.innerHTML += stripped;
+    setOutput(e.target.innerHTML);
+    setOutputPasteEvent(false);
   };
 
   const handleInput = (e) => {
+    if (inputPasteEvent) {
+      return false;
+    }
     const data = e.target.innerHTML;
-    const stripped = striptags(data);
+    const stripped = striptags(data, ['br']);
     e.target.innerHTML = stripped;
     setInput(stripped);
+    return true;
+  };
+
+  const handleOutputChange = (e) => {
+    if (outputPasteEvent) {
+      return false;
+    }
+    const data = e.target.innerHTML;
+    const stripped = striptags(data, ['br']);
+    e.target.innerHTML = stripped;
+    setOutput(stripped);
+    return true;
   };
 
   useEffect(() => {
@@ -57,12 +105,15 @@ export default function DocumentScreen() {
     inputRef.current.focus();
   }, [input]);
 
-  const handleOutputChange = (e) => {
-    const data = e.target.innerHTML;
-    const stripped = striptags(data);
-    e.target.innerHTML = stripped;
-    setOutput(stripped);
-  };
+  useEffect(() => {
+    const selection = window.getSelection();
+    const range = document.createRange();
+    selection.removeAllRanges();
+    range.selectNodeContents(outputRef.current);
+    range.collapse(false);
+    selection.addRange(range);
+    outputRef.current.focus();
+  }, [output]);
 
   return (
     <EmoContainer>
@@ -70,13 +121,13 @@ export default function DocumentScreen() {
         <EmoEditableDiv
           ref={inputRef}
           onInput={handleInput}
-          onPaste={handlePaste}
+          onPaste={handleInputPaste}
         />
-        <ColumnSeparator />
+
         <EmoEditableDiv
           ref={outputRef}
           onInput={handleOutputChange}
-          onPaste={handlePaste}
+          onPaste={handleOutputPaste}
         />
       </RowWrapper>
     </EmoContainer>

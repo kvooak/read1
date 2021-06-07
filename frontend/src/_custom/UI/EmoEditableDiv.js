@@ -29,7 +29,6 @@ const EmoEditableDiv = React.forwardRef((props, ref) => {
         transition: background 20ms ease-in 0.01s;
         cursor: pointer;
         align-items: top left;
-        border-radius: 4px;
         padding: 4px 8px 4px;
         overflow-y: visible;
         color: rgb(55, 53, 47);
