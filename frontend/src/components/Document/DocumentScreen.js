@@ -1,23 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { v4 as uuidv4 } from 'uuid';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import styled from '@emotion/styled';
+
 import DocumentLine from './DocumentLine';
 import DocumentMenu from './DocumentMenu';
 
 import Container from '../../_custom/UI/Container';
+import documentSlice from '../../redux/reducers/documentSlice';
+
+const LinesWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-top: 24px;
+`;
 
 const Lines = (props) => {
   const { lines } = props;
   return (
-    <>
+    <LinesWrapper>
       {lines.map((line) => (
         <DocumentLine
           key={line.id}
           line={line}
         />
       ))}
-    </>
+    </LinesWrapper>
   );
 };
 
@@ -26,17 +34,22 @@ Lines.propTypes = {
 };
 
 export default function DocumentScreen() {
-  const blankLine = {
-    id: uuidv4(),
-    left: '',
-    right: '',
+  const dispatch = useDispatch();
+
+  const documentStore = useSelector((state) => state.document);
+  const [lines, setLines] = useState([]);
+
+  const addLine = () => {
+    dispatch(documentSlice.actions.ADD_BLANK_LINE());
   };
 
-  const documentReducer = useSelector((state) => state.document);
-  const [lines, setLines] = useState([blankLine]);
-  const addLine = () => {
-    setLines([...lines, blankLine]);
-  };
+  useEffect(() => {
+    if (!documentStore.lines.length) {
+      addLine();
+    }
+
+    setLines(documentStore.lines);
+  }, [documentStore.lines]);
 
   return (
     <Container>

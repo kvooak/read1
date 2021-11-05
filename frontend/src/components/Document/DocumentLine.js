@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
 import { useDispatch } from 'react-redux';
-import { UPDATE_LINE } from '../../redux/reducers/documentReducer';
+import documentSlice from '../../redux/reducers/documentSlice';
 import StandardInput from '../../_custom/UI/StandardInput';
 
 const RowWrapper = styled.div`
@@ -24,9 +24,13 @@ const SeparatorWrapper = styled.div`
 export default function DocumentLine(props) {
   const { line } = props;
   const dispatch = useDispatch();
-
   const handleChange = (event) => {
-    dispatch(UPDATE_LINE({
+    console.log(event);
+    console.log(documentSlice.actions.UPDATE_LINE({
+      id: line.id,
+      [event.target.name]: event.target.value,
+    }));
+    dispatch(documentSlice.actions.UPDATE_LINE({
       id: line.id,
       [event.target.name]: event.target.value,
     }));
@@ -36,6 +40,7 @@ export default function DocumentLine(props) {
     <RowWrapper>
       <InputWrapper>
         <StandardInput
+          name="left"
           multiline
           value={line.left}
           onChange={handleChange}
@@ -46,6 +51,7 @@ export default function DocumentLine(props) {
 
       <InputWrapper>
         <StandardInput
+          name="right"
           multiline
           value={line.right}
           onChange={handleChange}

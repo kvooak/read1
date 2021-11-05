@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';
@@ -20,12 +21,17 @@ const styles = (theme) => ({
 const StyledInput = withStyles(styles)(InputBase);
 
 export default function StandardInput(props) {
-  const { onChange, multiline, value } = props;
+  const {
+    onChange,
+    multiline, value, ...rest
+  } = props;
+
   return (
     <StyledInput
       multiline={multiline}
       value={value}
       onChange={onChange}
+      {...rest}
     />
   );
 }
