@@ -25,15 +25,11 @@ export default function DocumentLine(props) {
   const { line } = props;
   const dispatch = useDispatch();
   const handleChange = (event) => {
-    console.log(event);
-    console.log(documentSlice.actions.UPDATE_LINE({
+    const data = {
       id: line.id,
       [event.target.name]: event.target.value,
-    }));
-    dispatch(documentSlice.actions.UPDATE_LINE({
-      id: line.id,
-      [event.target.name]: event.target.value,
-    }));
+    };
+    dispatch(documentSlice.actions.UPDATE_LINE(data));
   };
 
   return (

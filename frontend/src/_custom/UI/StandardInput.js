@@ -25,7 +25,7 @@ export default function StandardInput(props) {
     onChange,
     multiline, value, ...rest
   } = props;
-
+  console.log(value);
   return (
     <StyledInput
       multiline={multiline}
