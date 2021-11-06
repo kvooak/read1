@@ -28,6 +28,7 @@ export default function StandardInput(props) {
       multiline={multiline}
       value={value}
       onChange={onChange}
+      spellCheck={false}
       {...rest}
     />
   );
