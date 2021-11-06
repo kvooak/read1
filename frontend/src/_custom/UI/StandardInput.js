@@ -8,22 +8,19 @@ const styles = (theme) => ({
   root: {
     width: '100%',
     borderRadius: '4px',
-    '&:hover': {
-      backgroundColor: theme.palette.grey[50],
-    },
   },
-
   focused: {
-    backgroundColor: theme.palette.grey[50],
+    background: theme.palette.grey[50],
   },
 });
 
 const StyledInput = withStyles(styles)(InputBase);
-
 export default function StandardInput(props) {
   const {
     onChange,
-    multiline, value, ...rest
+    multiline,
+    value,
+    ...rest
   } = props;
 
   return (
