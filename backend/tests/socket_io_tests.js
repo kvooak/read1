@@ -26,25 +26,24 @@ const portInUse = (port, callback) => {
 describe('Socket.io Tests', () => {
 	before((done) => {
 		portInUse(socket_io.port, async (inUse) => {
-			if (inUse) {
-				clientSocket = Client(`http://localhost:${socket_io.port}`);
-				clientSocket.on('connect', done);
-			} else {
+			clientSocket = Client(`http://localhost:${socket_io.port}`);
+			clientSocket.on('connect', done);
+
+			if (!inUse) {
 				testServer = http.createServer(testApp);
 				testIO = require('socket.io')(testServer);
 
 				testServer.listen(socket_io.port, () => {
-					clientSocket = Client(`http://localhost:${socket_io.port}`);
 					testIO.on('connection', (socket) => {
 						serverSocket = socket;
 					});
-					clientSocket.on('connect', done);
 				});
 			}
 		});
 	});
 
 	after(() => {
+		if (testServer) testServer.close();
 		if (testIO) testIO.close();
 		clientSocket.close();
 	});

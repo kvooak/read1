@@ -42,6 +42,5 @@ io.on('connection', (socket) => {
 
 module.exports = {
 	port,
-	io,
 	server,
 };
