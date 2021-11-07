@@ -2,10 +2,24 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { Provider } from 'react-redux';
-import store from './redux/store';
+import { io } from 'socket.io-client';
 
+import store from './redux/store';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { BASE_SOCKET_IO_URL } from './constants/urls';
+
+const socket = io.connect('http://localhost:8080');
+socket.on('connect', () => {
+  console.log(socket.connected);
+  console.log(socket.id);
+});
+console.log(socket.connected);
+
+socket.on('disconnect', () => {
+  console.log(socket.connected);
+  console.log(socket.id);
+});
 
 ReactDOM.render(
   <React.StrictMode>

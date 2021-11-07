@@ -1,8 +1,9 @@
 const express = require('express');
-
 const app = express();
 
-const port = 8081;
+const print = require('./_utils/print');
+
+const http_port = 8081;
 
 const firebaseAdmin = require('firebase-admin');
 const serviceAccount = require('./constants/read-exchange-1-firebase-adminsdk-ytboj-a76d1387e1.json');
@@ -22,13 +23,12 @@ const userAuth = require('./controllers/userAuth');
 
 dotenv.config();
 
+const io = require('./io');
+io.init();
+
 app.use(cors({
-  origin: [
+	origin: [
     'http://localhost:3000',
-    'http://dm.recyda.com',
-    'https://dm.recyda.com',
-    // 'http://read.exchange',
-    // 'https://read.exchange',
   ],
   optionsSuccessStatus: 200,
 }));
@@ -40,10 +40,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(async (req, res, next) => {
-  // Add PostGre handler
-  req.dbPostgres = await database.dbPostgresConnect();
-
-  // Add Arango handler
   req.dbArango = await database.dbArangoConnect();
   next();
 });
@@ -51,4 +47,4 @@ app.use(async (req, res, next) => {
 app.use(userAuth);
 app.use('/api/v1', indexRouter);
 
-app.listen(port, '0.0.0.0');
+app.listen(http_port, () => print.log(`http listening on :${http_port}`));
