@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-
+const io = require('./io');
 const print = require('./_utils/print');
 
 const http_port = 8081;
@@ -22,9 +22,6 @@ const indexRouter = require('./routes/index');
 const userAuth = require('./controllers/userAuth');
 
 dotenv.config();
-
-const io = require('./io');
-io.init();
 
 app.use(cors({
 	origin: [
@@ -48,3 +45,4 @@ app.use(userAuth);
 app.use('/api/v1', indexRouter);
 
 app.listen(http_port, () => print.log(`http listening on :${http_port}`));
+io.server.listen(io.port, () => print.log(`socket.io listening on :${io.port}`));

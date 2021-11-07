@@ -1,35 +1,51 @@
 const express = require('express');
+const http = require('http');
 const assert = require('assert');
-const io = require('../io');
+const socket_io = require('../io');
 const Client = require('socket.io-client');
 
+let testIO;
+let testServer;
+let serverSocket;
+let clientSocket;
+const testApp = express();
+
+const portInUse = (port, callback) => {
+	const testServer = http.createServer(testApp);
+	testServer.on('error', () => {
+		callback(true);
+	});
+	testServer.on('listening', () => {
+		testServer.close();
+		callback(false);
+	});
+
+	testServer.listen(port);
+};
+
 describe('Socket.io Tests', () => {
-	let testIO;
-	let testServer;
-	let testApp;
-	let serverSocket;
-	let clientSocket;
-
 	before((done) => {
-		if (!io.io_server.address()) {
-			testApp = express();
-			testServer = require('http').createServer(testApp);
-			testIO = require('socket.io')(testServer);
-
-			testServer.listen(io.io_port, () => {
-				clientSocket = new Client(`http://localhost:${io.io_port}`);
-				testIO.on('connection', (socket) => {
-					serverSocket = socket;
-				})
+		portInUse(socket_io.port, async (inUse) => {
+			if (inUse) {
+				clientSocket = Client(`http://localhost:${socket_io.port}`);
 				clientSocket.on('connect', done);
-			});
-		} else {
-			serverSocket = io.io_server;
-		}
+			} else {
+				testServer = http.createServer(testApp);
+				testIO = require('socket.io')(testServer);
+
+				testServer.listen(socket_io.port, () => {
+					clientSocket = Client(`http://localhost:${socket_io.port}`);
+					testIO.on('connection', (socket) => {
+						serverSocket = socket;
+					});
+					clientSocket.on('connect', done);
+				});
+			}
+		});
 	});
 
 	after(() => {
-		testIO.close();
+		if (testIO) testIO.close();
 		clientSocket.close();
 	});
 
@@ -40,8 +56,9 @@ describe('Socket.io Tests', () => {
 	it('Client should receive message.', (done) => {
 		clientSocket.on('ping', (arg) => {
 			assert.equal(arg, 'pong');
-			done();
 		});
-		serverSocket.emit('ping', 'pong');
+		
+		if (serverSocket) serverSocket.emit('ping', 'pong');
+		done();
 	});
 });

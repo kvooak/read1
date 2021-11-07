@@ -3,10 +3,10 @@ const app = express();
 const uuid = require('uuid');
 const print = require('./_utils/print');
 
-const io_port = 8080;
+const port = 8080;
 
-const io_server = require('http').createServer(app);
-const io = require('socket.io')(io_server, {
+let server = require('http').createServer(app);
+const io = require('socket.io')(server, {
 	cors: {
 		origin: 'http://localhost:3000',
 		methods: ["GET", "POST"],
@@ -35,21 +35,13 @@ io.use(async (socket, next) => {
 })
 
 const clients_count = io.engine.clientsCount;
-io.on('connection', (socket) =>{
+io.on('connection', (socket) => {
 	print.log(`socket connection #${clients_count + 1} ${socket.id}`);
-
-	io.on('event', () => {
-	});
-
-	io.on('disconect', () => {
-		
-	});
+	socket.emit('ping', 'pong');
 });
 
 module.exports = {
-	init: () => io_server.listen(io_port, () => {
-		print.log(`socket.io listening on :${io_port}`);
-	}),
-	io_port,
-	io_server,
+	port,
+	io,
+	server,
 };

@@ -9,16 +9,12 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { BASE_SOCKET_IO_URL } from './constants/urls';
 
-const socket = io.connect('http://localhost:8080');
+const socket = io.connect(BASE_SOCKET_IO_URL);
 socket.on('connect', () => {
-  console.log(socket.connected);
-  console.log(socket.id);
+  console.log(`socket connected. id ${socket.id}`);
 });
-console.log(socket.connected);
-
 socket.on('disconnect', () => {
-  console.log(socket.connected);
-  console.log(socket.id);
+  console.log(`socket disconnected. #${socket.id}`);
 });
 
 ReactDOM.render(
