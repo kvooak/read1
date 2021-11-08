@@ -35,9 +35,18 @@ io.use(async (socket, next) => {
 })
 
 const clients_count = io.engine.clientsCount;
+const UPDATE_LEFT_SIDE = 'UPDATE_LEFT_SIDE';
 io.on('connection', (socket) => {
 	print.log(`socket connection #${clients_count + 1} ${socket.id}`);
 	socket.emit('ping', 'pong');
+
+	socket.on(UPDATE_LEFT_SIDE, (data, callback) => {
+		const res_data = {
+			id: data.id,
+			right: data.left,
+		};
+		callback(res_data);
+	});
 });
 
 module.exports = {

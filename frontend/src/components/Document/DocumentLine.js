@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import styled from '@emotion/styled';
 
+import clientSocket from '../../socket';
 import useDebounce from '../../_custom/Hook/useDebounce';
 import useKeyPress from '../../_custom/Hook/useKeyPress';
 import documentSlice from '../../redux/reducers/documentSlice';
@@ -30,7 +31,10 @@ export default function DocumentLine(props) {
   // send left input to service
   const debouncedLeft = useDebounce(line.left, 600);
   useEffect(() => {
-    console.log(debouncedLeft);
+    clientSocket.sendLeftSide({
+      left: debouncedLeft,
+      id: line.id,
+    });
   }, [debouncedLeft]);
 
   // prevent input if user presses command shortcut while being in the text field

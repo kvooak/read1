@@ -15,10 +15,11 @@ const documentSlice = createSlice({
     UPDATE_LINE: (state, action) => {
       const updatedLines = state.lines.map((line) => {
         if (line.id === action.payload.id) {
-          return {
+          const updatedLine = {
             ...line,
             ...action.payload,
           };
+          return updatedLine;
         }
         return line;
       });
