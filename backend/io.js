@@ -1,7 +1,10 @@
 const express = require('express');
 const app = express();
 const uuid = require('uuid');
+
 const print = require('./_utils/print');
+const registerUserHandlers = require('./socket_handlers/user_handlers');
+const registerDocumentHandlers = require('./socket_handlers/document_handlers');
 
 const port = 8080;
 
@@ -34,20 +37,12 @@ io.use(async (socket, next) => {
 	}
 })
 
-const clients_count = io.engine.clientsCount;
-const UPDATE_LEFT_SIDE = 'UPDATE_LEFT_SIDE';
-io.on('connection', (socket) => {
-	print.log(`socket connection #${clients_count + 1} ${socket.id}`);
-	socket.emit('ping', 'pong');
+const onConnection = (socket) => {
+	registerUserHandlers(io, socket);
+	registerDocumentHandlers(io, socket);
+};
 
-	socket.on(UPDATE_LEFT_SIDE, (data, callback) => {
-		const res_data = {
-			id: data.id,
-			right: data.left,
-		};
-		callback(res_data);
-	});
-});
+io.on('connection', onConnection);
 
 module.exports = {
 	port,

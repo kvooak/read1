@@ -43,7 +43,6 @@ export default function DocumentScreen() {
   };
 
   useKeyCombo(addLine, 'Shift', 'Enter');
-
   const [lines, setLines] = useState([]);
   useEffect(() => {
     if (!documentStore.lines.length) {
