@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 import DocumentLine from './DocumentLine';
 import DocumentMenu from './DocumentMenu';
 
+import useKeyCombo from '../../_custom/Hook/useKeyCombo';
 import Container from '../../_custom/UI/Container';
 import documentSlice from '../../redux/reducers/documentSlice';
 
@@ -35,14 +36,15 @@ Lines.propTypes = {
 
 export default function DocumentScreen() {
   const dispatch = useDispatch();
-
   const documentStore = useSelector((state) => state.document);
-  const [lines, setLines] = useState([]);
 
   const addLine = () => {
     dispatch(documentSlice.actions.ADD_BLANK_LINE());
   };
 
+  useKeyCombo(addLine, 'Shift', 'Enter');
+
+  const [lines, setLines] = useState([]);
   useEffect(() => {
     if (!documentStore.lines.length) {
       addLine();

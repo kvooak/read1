@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
 import styled from '@emotion/styled';
 
-import { useDispatch } from 'react-redux';
+import clientSocket from '../../socket';
+import useDebounce from '../../_custom/Hook/useDebounce';
+import useKeyPress from '../../_custom/Hook/useKeyPress';
 import documentSlice from '../../redux/reducers/documentSlice';
 import StandardInput from '../../_custom/UI/StandardInput';
 
@@ -24,6 +27,24 @@ const SeparatorWrapper = styled.div`
 export default function DocumentLine(props) {
   const { line } = props;
   const dispatch = useDispatch();
+
+  // send left input to service
+  const debouncedLeft = useDebounce(line.left, 600);
+  useEffect(() => {
+    clientSocket.sendLeftSide({
+      left: debouncedLeft,
+      id: line.id,
+    });
+  }, [debouncedLeft]);
+
+  // prevent input if user presses command shortcut while being in the text field
+  const shiftKeyPressed = useKeyPress('Shift');
+  const handleKeyDown = (event) => {
+    if (shiftKeyPressed && event.key === 'Enter') {
+      event.preventDefault();
+    }
+  };
+
   const handleChange = (event) => {
     const data = {
       id: line.id,
@@ -40,6 +61,7 @@ export default function DocumentLine(props) {
           multiline
           value={line.left}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
         />
       </InputWrapper>
 
@@ -51,6 +73,7 @@ export default function DocumentLine(props) {
           multiline
           value={line.right}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
         />
       </InputWrapper>
     </RowWrapper>
