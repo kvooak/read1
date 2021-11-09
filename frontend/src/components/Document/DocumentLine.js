@@ -31,7 +31,7 @@ export default function DocumentLine(props) {
   // send left input to service
   const debouncedLeft = useDebounce(line.left, 600);
   useEffect(() => {
-    clientSocket.sendLeftSide({
+    clientSocket.updateBlock({
       left: debouncedLeft,
       id: line.id,
     });

@@ -10,9 +10,4 @@ export const BASE_SOCKET_IO_URL = `${SOCKET_IO_PROTOCOL}://${HOST_DOMAIN}:${SOCK
 
 export const API_BASE_URL = `${BASE_URL}/api/v1/`;
 
-export const API_USER_SUFFIX = 'users/';
-
-export const API_CURRENT_USER_SUFFIX = 'current/';
-export const API_USER_SIGNUP_SUFFIX = 'signup/';
-
-export const API_USER_VERIFY_EMAIL_SUFFIX = 'email-verification/';
+export const DOCUMENT_SUFFIX = 'documents/';

@@ -19,7 +19,7 @@ const cors = require('cors');
 
 const database = require('./db');
 const indexRouter = require('./routes/index');
-const userAuth = require('./controllers/userAuth');
+// const userAuth = require('./controllers/userAuth');
 
 dotenv.config();
 
@@ -41,7 +41,7 @@ app.use(async (req, res, next) => {
   next();
 });
 
-app.use(userAuth);
+//app.use(userAuth);
 app.use('/api/v1', indexRouter);
 
 app.listen(http_port, () => print.log(`http listening on :${http_port}`));

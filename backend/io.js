@@ -3,8 +3,10 @@ const app = express();
 const uuid = require('uuid');
 
 const print = require('./_utils/print');
+const database = require('./db');
 const registerUserHandlers = require('./socket_handlers/user_handlers');
 const registerDocumentHandlers = require('./socket_handlers/document_handlers');
+const registerBlockHandlers = require('./socket_handlers/block_handlers');
 
 const port = 8080;
 
@@ -30,6 +32,7 @@ io.engine.on('connection_error', (err) => {
 // middlewares
 io.use(async (socket, next) => {
 	try {
+		socket.db = await database.dbArangoConnect();
 		next();
 	} catch (e) {
 		print.log(e);
@@ -38,8 +41,9 @@ io.use(async (socket, next) => {
 })
 
 const onConnection = (socket) => {
-	registerUserHandlers(io, socket);
-	registerDocumentHandlers(io, socket);
+	registerUserHandlers(socket);
+	registerDocumentHandlers(socket);
+	registerBlockHandlers(socket);
 };
 
 io.on('connection', onConnection);

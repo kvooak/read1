@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+/* eslint no-underscore-dangle: 0 */
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from '@emotion/styled';
@@ -9,6 +10,9 @@ import DocumentMenu from './DocumentMenu';
 import useKeyCombo from '../../_custom/Hook/useKeyCombo';
 import Container from '../../_custom/UI/Container';
 import documentSlice from '../../redux/reducers/documentSlice';
+import clientSocket from '../../socket';
+
+import { getDocumentByID } from '../../redux/actions/documentActions';
 
 const LinesWrapper = styled.div`
   display: flex;
@@ -38,26 +42,25 @@ export default function DocumentScreen() {
   const dispatch = useDispatch();
   const documentStore = useSelector((state) => state.document);
 
-  const addLine = () => {
-    dispatch(documentSlice.actions.ADD_BLANK_LINE());
-  };
-
-  useKeyCombo(addLine, 'Shift', 'Enter');
-  const [lines, setLines] = useState([]);
   useEffect(() => {
-    if (!documentStore.lines.length) {
-      addLine();
-    }
+    dispatch(getDocumentByID('test_doc'));
+  }, []);
 
-    setLines(documentStore.lines);
-  }, [documentStore.lines]);
+  const addBlock = () => clientSocket.createBlock('test_doc');
+
+  useKeyCombo(addBlock, 'Shift', 'Enter');
+  useEffect(() => {
+    if (documentStore.identity._key && !documentStore.identity.content.length) {
+      addBlock();
+    }
+  }, [documentStore.identity]);
 
   return (
     <Container>
       <DocumentMenu
-        addLine={addLine}
+        addLine={addBlock}
       />
-      <Lines lines={lines} />
+      <Lines lines={documentStore.lines} />
     </Container>
   );
 }
