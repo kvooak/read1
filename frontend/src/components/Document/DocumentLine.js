@@ -25,17 +25,25 @@ const SeparatorWrapper = styled.div`
 `;
 
 export default function DocumentLine(props) {
-  const { line } = props;
+  const { block } = props;
   const dispatch = useDispatch();
 
-  // send left input to service
-  const debouncedLeft = useDebounce(line.left, 600);
+  // send input to service
+  const debouncedLeft = useDebounce(block.left, 120);
+  const debouncedRight = useDebounce(block.right, 120);
   useEffect(() => {
     clientSocket.updateBlock({
       left: debouncedLeft,
-      id: line.id,
+      id: block.id,
     });
   }, [debouncedLeft]);
+
+  useEffect(() => {
+    clientSocket.updateBlock({
+      right: debouncedRight,
+      id: block.id,
+    });
+  }, [debouncedRight]);
 
   // prevent input if user presses command shortcut while being in the text field
   const shiftKeyPressed = useKeyPress('Shift');
@@ -47,7 +55,7 @@ export default function DocumentLine(props) {
 
   const handleChange = (event) => {
     const data = {
-      id: line.id,
+      id: block.id,
       [event.target.name]: event.target.value,
     };
     dispatch(documentSlice.actions.UPDATE_LINE(data));
@@ -59,7 +67,7 @@ export default function DocumentLine(props) {
         <StandardInput
           name="left"
           multiline
-          value={line.left}
+          value={block.left}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />
@@ -71,7 +79,7 @@ export default function DocumentLine(props) {
         <StandardInput
           name="right"
           multiline
-          value={line.right}
+          value={block.right}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />
@@ -81,5 +89,5 @@ export default function DocumentLine(props) {
 }
 
 DocumentLine.propTypes = {
-  line: PropTypes.instanceOf(Object).isRequired,
+  block: PropTypes.instanceOf(Object).isRequired,
 };

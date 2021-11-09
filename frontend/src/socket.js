@@ -27,16 +27,18 @@ const clientSocket = {
     });
   },
   updateBlock: (data) => {
-    socket.emit('block:updateBlock', data, (res) => {
-      const { id, right } = res;
-      const payload = { id, right };
+    socket.emit('block:updateBlock', data, (block) => {
+      const payload = {
+        id: block._key,
+        left: block.properties.left,
+        right: block.properties.right,
+      };
       store.dispatch(documentSlice.actions.UPDATE_LINE(payload));
     });
   },
   createBlock: (parent_id) => {
     socket.emit('block:createBlock', parent_id, (res) => {
       const { new_block, parent } = res;
-      console.log(res);
       store.dispatch(documentSlice.actions.ADD_BLOCK({
         id: new_block._key,
         left: new_block.properties.left,

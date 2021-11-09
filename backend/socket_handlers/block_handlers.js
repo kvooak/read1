@@ -1,4 +1,5 @@
 const axios = require('axios');
+const arango = require('arangojs');
 const uuid = require('uuid');
 const { isArangoError } = require('arangojs/error');
 const print = require('../_utils/print');
@@ -52,9 +53,14 @@ async function _createBlock(socket, parent_id, callback) {
 	}
 }
 
-async function _getBlocks(socket, id_array) {
-	const collection = await socket.db.collection('blocks');
-	const blocks = await collection.document(id_array);
+async function _getBlocks(socket, id_array, callback) {
+	const query = arango.aql`
+		FOR block IN blocks
+			FILTER block._key IN ${id_array}
+			RETURN block
+	`;
+	const cursor = await socket.db.query(query);
+	const blocks = await cursor.all();
 	callback(blocks);
 };
 
@@ -62,24 +68,35 @@ async function _updateBlock(socket, data, callback) {
 	const { id, left, right } = data;
 	try {
 		const collection = await socket.db.collection('blocks');
-		const block = await collection.document(id);
+		let block = await collection.document(id);
+		if (left !== undefined) block = await collection.update(
+			{ _key: block._key },
+			{ properties: { ...block.properties, left } },
+			{ returnNew: true }
+		);
+		//if (left) translate_with_deepl(data, 'DE', async (translations) => {
+		//		block = await collection.update(
+		//			{ _key: block._key },
+		//			{ properties: { ...block.properties, left, right: translations[0] } },
+		//			{ returnNew: true }
+		//		);
+		//		callback(block.new);
+		//	}, async (e) => {
+		//		block = await collection.update(
+		//			{ _key: block._key },
+		//			{ properties: { ...block.properties, left } },
+		//			{ returnNew: true }
+		//		);
+		//		callback(block.new);
+		//		console.log(e.response.status, e.response.statusText);
+		//	}
+		//);
 
-		let res_data;
-		if (left) {
-			translate_with_deepl(data, 'DE', async (translations) => {
-					res_data = { id, right: translations[0] };
-					callback(res_data);
-					await block.update({ properties: { ...block.properties, left } });
-				}, async (e) => {
-					res_data = { id, right: data.left };
-					callback(res_data);
-					await block.update({ properties: { ...block.properties, left } });
-					console.log(e.response.status, e.response.statusText);
-				}
-			);
-		}
-
-		if (right) await block.update({ right }); 
+		if (right !== undefined) await collection.update(
+				{ _key: block._key },
+				{ properties: { ...block.properties, right } },
+				{ returnNew: true }
+		); 
 	} catch (e) {
 		if (isArangoError(e)) {
 			print.log({ code: e.code, message: e.message });
@@ -92,7 +109,7 @@ async function _updateBlock(socket, data, callback) {
 
 module.exports = (socket) => {
 	const updateBlock = (data, callback) => _updateBlock(socket, data, callback);  
-	const getBlocks = (data) => _getBlocks(socket, data);
+	const getBlocks = (data, callback) => _getBlocks(socket, data, callback);
 	const createBlock = (parent_id, callback) => _createBlock(socket, parent_id, callback);
 
 	socket.on('block:createBlock', createBlock);

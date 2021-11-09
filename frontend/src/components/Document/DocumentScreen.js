@@ -9,7 +9,6 @@ import DocumentMenu from './DocumentMenu';
 
 import useKeyCombo from '../../_custom/Hook/useKeyCombo';
 import Container from '../../_custom/UI/Container';
-import documentSlice from '../../redux/reducers/documentSlice';
 import clientSocket from '../../socket';
 
 import { getDocumentByID } from '../../redux/actions/documentActions';
@@ -20,22 +19,22 @@ const LinesWrapper = styled.div`
   margin-top: 24px;
 `;
 
-const Lines = (props) => {
-  const { lines } = props;
+const Blocks = (props) => {
+  const { blocks } = props;
   return (
     <LinesWrapper>
-      {lines.map((line) => (
+      {blocks.map((block) => (
         <DocumentLine
-          key={line.id}
-          line={line}
+          key={block.id}
+          block={block}
         />
       ))}
     </LinesWrapper>
   );
 };
 
-Lines.propTypes = {
-  lines: PropTypes.instanceOf(Array).isRequired,
+Blocks.propTypes = {
+  blocks: PropTypes.instanceOf(Array).isRequired,
 };
 
 export default function DocumentScreen() {
@@ -45,6 +44,11 @@ export default function DocumentScreen() {
   useEffect(() => {
     dispatch(getDocumentByID('test_doc'));
   }, []);
+
+  useEffect(() => {
+    const { content } = documentStore.identity;
+    if (content?.length) clientSocket.getBlocks(content);
+  }, [documentStore.identity.content]);
 
   const addBlock = () => clientSocket.createBlock('test_doc');
 
@@ -58,9 +62,9 @@ export default function DocumentScreen() {
   return (
     <Container>
       <DocumentMenu
-        addLine={addBlock}
+        addBlock={addBlock}
       />
-      <Lines lines={documentStore.lines} />
+      <Blocks blocks={documentStore.lines} />
     </Container>
   );
 }

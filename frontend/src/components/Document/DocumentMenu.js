@@ -11,14 +11,14 @@ const MenuWrapper = styled.div`
 `;
 
 export default function DocumentMenu(props) {
-  const { addLine } = props;
+  const { addBlock } = props;
 
   return (
     <MenuWrapper>
       <StandardButton
         size="small"
         variant="outlined"
-        onClick={addLine}
+        onClick={addBlock}
       >
         +1 line
       </StandardButton>
@@ -27,5 +27,5 @@ export default function DocumentMenu(props) {
 }
 
 DocumentMenu.propTypes = {
-  addLine: PropTypes.func.isRequired,
+  addBlock: PropTypes.func.isRequired,
 };
