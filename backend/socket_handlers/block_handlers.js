@@ -4,19 +4,19 @@ const uuid = require('uuid');
 const { isArangoError } = require('arangojs/error');
 const print = require('../_utils/print');
 
-const translate_with_deepl = (data, target_lang, callback, error) => {
-	const authentication_key = 'f533babd-91ee-1d6a-2c82-259ed6103c1c:fx';
-	const base_url = 'https://api-free.deepl.com/v2/translate';
-	const auth_url = `?auth_key=${authentication_key}`;
-	const target_lang_url = `&target_lang=${target_lang}`;
-	const translation_url = `&text=${data}`;
-	const url = `${base_url}${auth_url}${translation_url}${target_lang_url}`;
-	axios.get(url)
-		.then((data) => {
-			callback(data.translations);
-		})
-		.catch((e) => error(e));
-};
+//const translate_with_deepl = (data, target_lang, callback, error) => {
+//	const authentication_key = 'f533babd-91ee-1d6a-2c82-259ed6103c1c:fx';
+//	const base_url = 'https://api-free.deepl.com/v2/translate';
+//	const auth_url = `?auth_key=${authentication_key}`;
+//	const target_lang_url = `&target_lang=${target_lang}`;
+//	const translation_url = `&text=${data}`;
+//	const url = `${base_url}${auth_url}${translation_url}${target_lang_url}`;
+//	axios.get(url)
+//		.then((data) => {
+//			callback(data.translations);
+//		})
+//		.catch((e) => error(e));
+//};
 
 async function _createBlock(socket, parent_id, callback) {
 	try {
@@ -29,6 +29,8 @@ async function _createBlock(socket, parent_id, callback) {
 			properties: { left: '', right: '' },
 			content: [],
 			parent: parent_id,
+			updated_on: Date.now(),
+			created_on: Date.now(),
 		};
 		new_block = await block_collection.save(new_block, { returnNew: true });
 
@@ -71,9 +73,13 @@ async function _updateBlock(socket, data, callback) {
 		let block = await collection.document(id);
 		if (left !== undefined) block = await collection.update(
 			{ _key: block._key },
-			{ properties: { ...block.properties, left } },
+			{
+				properties: { ...block.properties, left },
+				updated_on: Date.now(),
+			},
 			{ returnNew: true }
 		);
+
 		//if (left) translate_with_deepl(data, 'DE', async (translations) => {
 		//		block = await collection.update(
 		//			{ _key: block._key },
@@ -94,7 +100,10 @@ async function _updateBlock(socket, data, callback) {
 
 		if (right !== undefined) await collection.update(
 				{ _key: block._key },
-				{ properties: { ...block.properties, right } },
+				{
+					properties: { ...block.properties, left },
+					updated_on: Date.now(),
+				},
 				{ returnNew: true }
 		); 
 	} catch (e) {
