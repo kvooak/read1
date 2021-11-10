@@ -49,25 +49,38 @@ async function _destroyBlock(socket, block_id, callback) {
 	}
 }
 
-async function _createBlock(socket, parent_id, callback) {
+async function _createBlock(socket, { parent_id, from_block }, callback) {
 	try {
 		const block_collection = await socket.db.collection('blocks');
 		const document_collection = await socket.db.collection('documents');
 
+		let parent;
+		let root_block;
 		let new_block = {
 			_key: uuid.v4(),
 			type: 'block',
 			properties: { left: '', right: '' },
 			content: [],
-			parent: parent_id,
 			updated_on: Date.now(),
 			created_on: Date.now(),
 		};
+
+		if (from_block) {
+			root_block = await block_collection.document(from_block);
+			parent = await document_collection.document(root_block.parent);
+			new_block.properties = root_block.properties;
+			new_block.parent = root_block.parent;
+		}
+
+		if (parent_id) {
+			parent = await document_collection.document(parent_id);
+			new_block.parent = parent._key;
+		}
+
 		new_block = await block_collection.save(new_block, { returnNew: true });
 
-		let parent = await document_collection.document(parent_id);
 		parent = await document_collection.update(
-			{ _key: parent_id },
+			{ _key: parent._key },
 			{ content: [...parent.content, new_block._key] },
 			{ returnNew: true }
 		);
@@ -170,7 +183,9 @@ module.exports = (socket) => {
 	const updateBlock = (data, callback) => _updateBlock(socket, data, callback);  
 	const updateBlockTranslate = (data, callback) => _updateBlockTranslate(socket, data, callback);  
 	const getBlocks = (data, callback) => _getBlocks(socket, data, callback);
-	const createBlock = (parent_id, callback) => _createBlock(socket, parent_id, callback);
+	const createBlock = ({ parent_id, from_block }, callback) => _createBlock(
+		socket, { parent_id, from_block }, callback
+	);
 	const destroyBlock = (block_id, callback) => _destroyBlock(socket, block_id, callback);
 	
 	socket.on('block:createBlock', createBlock);

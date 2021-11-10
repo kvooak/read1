@@ -17,7 +17,7 @@ const BlockWrapper = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
-`; // z-index of mui Popover is 1300
+`;
 
 const InputWrapper = styled.div`
   width: 49.5%;

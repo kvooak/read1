@@ -29,6 +29,10 @@ export default function BlockMenu(props) {
     clientSocket.destroyBlock(blockId);
   };
 
+  const handleDuplicateBlock = () => {
+    clientSocket.createBlock({ from_block: blockId });
+  };
+
   return (
     <MenuBlockPaper
       square
@@ -43,7 +47,7 @@ export default function BlockMenu(props) {
           <ListItemText>Delete</ListItemText>
         </MenuBlockItem>
 
-        <MenuBlockItem dense>
+        <MenuBlockItem dense onClick={handleDuplicateBlock}>
           <ListItemIcon>
             <ContentCopy fontSize="small" />
           </ListItemIcon>

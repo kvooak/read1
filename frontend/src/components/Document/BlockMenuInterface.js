@@ -8,7 +8,7 @@ import StandardPopover from '../../_custom/UI/StandardPopover';
 
 import BlockMenu from './BlockMenu';
 
-const ButtonWrapper = styled.div`
+const InterfaceWrapper = styled.div`
 	padding-right: 4px;
 `;
 
@@ -25,12 +25,10 @@ MenuButton.propTypes = {
   onClick: PropTypes.func.isRequired,
 };
 
-export default function BlockMenuInterface(props) {
+const BlockMenuInterface = React.forwardRef((props, ref) => {
   const { blockId } = props;
-
   const [anchorEl, setAnchorEl] = useState(null);
   const toggleMenu = (event) => {
-    console.log('triggers');
     if (anchorEl) {
       setAnchorEl(null);
     } else {
@@ -42,10 +40,8 @@ export default function BlockMenuInterface(props) {
   const menuId = openMenu ? `menu-${blockId}` : undefined;
 
   return (
-    <>
-      <ButtonWrapper>
-        <MenuButton id={blockId} onClick={toggleMenu} />
-      </ButtonWrapper>
+    <InterfaceWrapper ref={ref}>
+      <MenuButton id={blockId} onClick={toggleMenu} />
 
       <StandardPopover
         id={menuId}
@@ -63,10 +59,12 @@ export default function BlockMenuInterface(props) {
       >
         <BlockMenu blockId={blockId} />
       </StandardPopover>
-    </>
+    </InterfaceWrapper>
   );
-}
+});
 
 BlockMenuInterface.propTypes = {
   blockId: PropTypes.string.isRequired,
 };
+
+export default BlockMenuInterface;

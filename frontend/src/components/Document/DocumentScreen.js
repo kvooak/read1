@@ -56,7 +56,7 @@ export default function DocumentScreen() {
     if (content?.length) clientSocket.getBlocks(content);
   }, [documentStore.identity.content]);
 
-  const addBlock = () => clientSocket.createBlock('test_doc');
+  const addBlock = () => clientSocket.createBlock({ parent_id: 'test_doc' });
 
   useKeyCombo(addBlock, 'Shift', 'Enter');
   useEffect(() => {
