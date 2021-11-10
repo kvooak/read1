@@ -21,7 +21,6 @@ const dbArangoConnect = async () => {
     );
 
     const dbObject = db.database(ARANGO_DB_NAME);
-    print.log(await db.version());
     return dbObject;
   };
 

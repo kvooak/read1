@@ -19,6 +19,10 @@ const documentSlice = createSlice({
   initialState,
 
   reducers: {
+    BLOCK_ERROR: (state, action) => {
+      Object.assign(state.error, action.payload);
+    },
+
     UPDATE_BLOCK: (state, action) => {
       const updatedBlocks = state.lines.map((block) => {
         if (block.id === action.payload.id) {

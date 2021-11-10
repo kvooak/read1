@@ -17,15 +17,13 @@ const BlockWrapper = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.1);
+	border-right: 1px solid rgba(55, 53, 47, 0.1);
 `;
 
 const InputWrapper = styled.div`
-  width: 49.5%;
-  border-bottom: 1px solid #EAEEF3;
-`;
-
-const SeparatorWrapper = styled.div`
-  width: 1%;
+  width: 50%;
+	border-left: 1px solid rgba(55, 53, 47, 0.1);
 `;
 
 export default function DocumentLine(props) {
@@ -91,8 +89,6 @@ export default function DocumentLine(props) {
           onKeyDown={handleKeyDown}
         />
       </InputWrapper>
-
-      <SeparatorWrapper />
 
       <InputWrapper>
         <StandardInput

@@ -7,10 +7,6 @@ import InputBase from '@mui/material/InputBase';
 const styles = (theme) => ({
   root: {
     width: '100%',
-    borderRadius: '4px',
-  },
-  focused: {
-    background: theme.palette.grey[50],
   },
 });
 
