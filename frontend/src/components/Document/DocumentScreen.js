@@ -1,5 +1,5 @@
 /* eslint no-underscore-dangle: 0 */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from '@emotion/styled';
@@ -13,23 +13,29 @@ import clientSocket from '../../socket';
 
 import { getDocumentByID } from '../../redux/actions/documentActions';
 
-const LinesWrapper = styled.div`
+const BlocksWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin-top: 24px;
 `;
 
+const ContentWrapper = styled.div`
+	display: flex;
+	flex-direction: column;
+	padding: 0 6rem;
+`;
+
 const Blocks = (props) => {
   const { blocks } = props;
   return (
-    <LinesWrapper>
+    <BlocksWrapper>
       {blocks.map((block) => (
         <DocumentLine
           key={block.id}
           block={block}
         />
       ))}
-    </LinesWrapper>
+    </BlocksWrapper>
   );
 };
 
@@ -40,7 +46,7 @@ Blocks.propTypes = {
 export default function DocumentScreen() {
   const dispatch = useDispatch();
   const documentStore = useSelector((state) => state.document);
-
+  console.log(documentStore.lines);
   useEffect(() => {
     dispatch(getDocumentByID('test_doc'));
   }, []);
@@ -55,16 +61,18 @@ export default function DocumentScreen() {
   useKeyCombo(addBlock, 'Shift', 'Enter');
   useEffect(() => {
     if (documentStore.identity._key && !documentStore.identity.content.length) {
-      addBlock();
+      // addBlock();
     }
   }, [documentStore.identity]);
 
   return (
     <Container>
-      <DocumentMenu
-        addBlock={addBlock}
-      />
-      <Blocks blocks={documentStore.lines} />
+      <ContentWrapper>
+        <DocumentMenu
+          addBlock={addBlock}
+        />
+        <Blocks blocks={documentStore.lines} />
+      </ContentWrapper>
     </Container>
   );
 }

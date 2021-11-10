@@ -1,4 +1,4 @@
-const axios = require('axios');
+// const axios = require('axios');
 const arango = require('arangojs');
 const uuid = require('uuid');
 const { isArangoError } = require('arangojs/error');
@@ -17,6 +17,37 @@ const print = require('../_utils/print');
 //		})
 //		.catch((e) => error(e));
 //};
+
+async function _destroyBlock(socket, block_id, callback) {
+	try {
+		const block_collection = await socket.db.collection('blocks');
+		const document_collection = await socket.db.collection('documents');
+
+		const block = await block_collection.remove(
+			{ _key: block_id },
+			{ returnOld: true},
+		);
+
+		let parent = await document_collection.document({ _key: block.old.parent });
+		parent = await document_collection.update(
+			{ _key: block.old.parent },
+			{ content: parent.content.filter((id) => id !== block_id)},
+			{ returnNew: true},
+		);
+
+		if (block.old && parent.new) callback({ status_code: 200 });
+
+	} catch (e) {
+		callback({ status_code: e.code });
+
+		if (isArangoError(e)) {
+			print.log({ code: e.code, message: e.message });
+			print.error(e.stack);
+		} else {
+			throw e;
+		}
+	}
+}
 
 async function _createBlock(socket, parent_id, callback) {
 	try {
@@ -68,9 +99,11 @@ async function _getBlocks(socket, id_array, callback) {
 
 async function _updateBlock(socket, data, callback) {
 	const { id, left, right } = data;
+
 	try {
 		const collection = await socket.db.collection('blocks');
 		let block = await collection.document(id);
+
 		if (left !== undefined) block = await collection.update(
 			{ _key: block._key },
 			{
@@ -97,15 +130,16 @@ async function _updateBlock(socket, data, callback) {
 		//		console.log(e.response.status, e.response.statusText);
 		//	}
 		//);
-
-		if (right !== undefined) await collection.update(
+		if (right !== undefined) block = await collection.update(
 				{ _key: block._key },
 				{
-					properties: { ...block.properties, left },
+					properties: { ...block.properties, right },
 					updated_on: Date.now(),
 				},
-				{ returnNew: true }
+			{ returnNew: true }
 		); 
+
+		callback(block.new);
 	} catch (e) {
 		if (isArangoError(e)) {
 			print.log({ code: e.code, message: e.message });
@@ -120,8 +154,10 @@ module.exports = (socket) => {
 	const updateBlock = (data, callback) => _updateBlock(socket, data, callback);  
 	const getBlocks = (data, callback) => _getBlocks(socket, data, callback);
 	const createBlock = (parent_id, callback) => _createBlock(socket, parent_id, callback);
-
+	const destroyBlock = (block_id, callback) => _destroyBlock(socket, block_id, callback);
+	
 	socket.on('block:createBlock', createBlock);
 	socket.on('block:getBlocks', getBlocks);
 	socket.on('block:updateBlock', updateBlock);
+	socket.on('block:destroyBlock', destroyBlock);
 };

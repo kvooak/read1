@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+/* eslint no-underscore-dangle: 0 */
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import styled from '@emotion/styled';
@@ -8,12 +9,16 @@ import useDebounce from '../../_custom/Hook/useDebounce';
 import useKeyPress from '../../_custom/Hook/useKeyPress';
 import documentSlice from '../../redux/reducers/documentSlice';
 import StandardInput from '../../_custom/UI/StandardInput';
+import StandardPopover from '../../_custom/UI/StandardPopover';
 
-const RowWrapper = styled.div`
+import BlockMenuInterface from './BlockMenuInterface';
+
+const BlockWrapper = styled.div`
+	z-index: 1400;
   display: flex;
   flex-direction: row;
   width: 100%;
-`;
+`; // z-index of mui Popover is 1300
 
 const InputWrapper = styled.div`
   width: 49.5%;
@@ -27,6 +32,18 @@ const SeparatorWrapper = styled.div`
 export default function DocumentLine(props) {
   const { block } = props;
   const dispatch = useDispatch();
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const handleMouseEnter = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMouseLeave = () => {
+    setAnchorEl(null);
+  };
+
+  const openMenuButton = Boolean(anchorEl);
+  const menuButtonId = openMenuButton ? `menu-button-${block.id}` : undefined;
 
   // send input to service
   const debouncedLeft = useDebounce(block.left, 120);
@@ -58,16 +75,19 @@ export default function DocumentLine(props) {
       id: block.id,
       [event.target.name]: event.target.value,
     };
-    dispatch(documentSlice.actions.UPDATE_LINE(data));
+    dispatch(documentSlice.actions.UPDATE_BLOCK(data));
   };
 
   return (
-    <RowWrapper>
+    <BlockWrapper
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <InputWrapper>
         <StandardInput
           name="left"
           multiline
-          value={block.left}
+          value={block.id}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />
@@ -84,7 +104,28 @@ export default function DocumentLine(props) {
           onKeyDown={handleKeyDown}
         />
       </InputWrapper>
-    </RowWrapper>
+
+      {block.id && (
+      <StandardPopover
+        disableEnforceFocus
+        id={menuButtonId}
+        open={openMenuButton}
+        anchorEl={anchorEl}
+        onClose={handleMouseLeave}
+        anchorOrigin={{
+          vertical: 'center',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'center',
+          horizontal: 'right',
+        }}
+      >
+
+        <BlockMenuInterface blockId={block.id} />
+      </StandardPopover>
+      )}
+    </BlockWrapper>
   );
 }
 

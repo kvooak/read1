@@ -1,4 +1,5 @@
 /* eslint no-underscore-dangle: 0 */
+/* eslint camelcase: 0 */
 /* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -18,18 +19,33 @@ const documentSlice = createSlice({
   initialState,
 
   reducers: {
-    UPDATE_LINE: (state, action) => {
-      const updatedLines = state.lines.map((line) => {
-        if (line.id === action.payload.id) {
-          const updatedLine = {
-            ...line,
+    UPDATE_BLOCK: (state, action) => {
+      const updatedBlocks = state.lines.map((block) => {
+        if (block.id === action.payload.id) {
+          const updatedBlock = {
+            ...block,
             ...action.payload,
           };
-          return updatedLine;
+          return updatedBlock;
         }
-        return line;
+        return block;
       });
-      Object.assign(state.lines, updatedLines);
+      Object.assign(state.lines, updatedBlocks);
+    },
+
+    DESTROY_BLOCK: (state, action) => {
+      const deleted_id = action.payload;
+      const updatedContent = state.identity.content.filter((id) => id !== deleted_id);
+      const updatedLines = state.lines.filter((line) => line.id !== deleted_id);
+
+      Object.assign(state, {
+        ...state,
+        identity: {
+          ...state.identity,
+          content: updatedContent,
+        },
+        lines: updatedLines,
+      });
     },
 
     ADD_BLOCK: (state, action) => {

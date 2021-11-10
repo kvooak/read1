@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';
 import Button from '@mui/material/Button';
 
-const styles = (theme) => ({
+const styles = () => ({
   root: {
     borderRadius: '4px !important',
     transition: '100ms !important',
@@ -19,3 +19,7 @@ export default function StandardButton({ children, ...props }) {
     </StyledButton>
   );
 }
+
+StandardButton.propTypes = {
+  children: PropTypes.instanceOf(Object).isRequired,
+};

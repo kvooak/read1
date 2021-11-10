@@ -33,7 +33,7 @@ const clientSocket = {
         left: block.properties.left,
         right: block.properties.right,
       };
-      store.dispatch(documentSlice.actions.UPDATE_LINE(payload));
+      store.dispatch(documentSlice.actions.UPDATE_BLOCK(payload));
     });
   },
   createBlock: (parent_id) => {
@@ -46,6 +46,19 @@ const clientSocket = {
       }));
 
       store.dispatch(documentSlice.actions.UPDATE_DOC_IDENTITY(parent));
+    });
+  },
+  destroyBlock: (block_id) => {
+    socket.emit('block:destroyBlock', block_id, (res) => {
+      const { status_code } = res;
+      switch (status_code) {
+        case 200:
+          store.dispatch(documentSlice.actions.DESTROY_BLOCK(block_id));
+          break;
+        default:
+          store.dispatch(documentSlice.actions.BLOCK_ERROR(status_code));
+          break;
+      }
     });
   },
 };
