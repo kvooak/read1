@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
+import ClickAwayListener from '@mui/material/ClickAwayListener';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import StandardIconButton from '../../_custom/UI/StandardIconButton';
 import StandardPopover from '../../_custom/UI/StandardPopover';
@@ -38,23 +39,25 @@ export default function BlockMenuInterface(props) {
   return (
     <>
       <MenuButton id={blockId} onClick={toggleMenu} />
-      <StandardPopover
-        disableEnforceFocus
-        id={menuId}
-        open={openMenu}
-        anchorEl={anchorEl}
-        onClose={toggleMenu}
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'right',
-        }}
-      >
-        <BlockMenu blockId={blockId} />
-      </StandardPopover>
+      <ClickAwayListener onClickAway={toggleMenu}>
+        <StandardPopover
+          disableEnforceFocus
+          id={menuId}
+          open={openMenu}
+          anchorEl={anchorEl}
+          onClose={toggleMenu}
+          anchorOrigin={{
+            vertical: 'center',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
+            vertical: 'center',
+            horizontal: 'right',
+          }}
+        >
+          <BlockMenu blockId={blockId} />
+        </StandardPopover>
+      </ClickAwayListener>
     </>
   );
 }

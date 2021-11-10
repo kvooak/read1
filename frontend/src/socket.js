@@ -26,14 +26,15 @@ const clientSocket = {
       store.dispatch(documentSlice.actions.GET_BLOCKS(payload));
     });
   },
-  updateBlock: (data) => {
-    socket.emit('block:updateBlock', data, (block) => {
-      const payload = {
-        id: block._key,
-        left: block.properties.left,
-        right: block.properties.right,
-      };
-      store.dispatch(documentSlice.actions.UPDATE_BLOCK(payload));
+  updateBlock: (data, mode) => {
+    socket.emit(`block:updateBlock${mode}`, data, (block) => {
+      if (block) {
+        const payload = {
+          id: block._key,
+          right: block.properties.right,
+        };
+        store.dispatch(documentSlice.actions.UPDATE_BLOCK(payload));
+      }
     });
   },
   createBlock: (parent_id) => {

@@ -52,14 +52,14 @@ export default function DocumentLine(props) {
     clientSocket.updateBlock({
       left: debouncedLeft,
       id: block.id,
-    });
+    }, '');
   }, [debouncedLeft]);
 
   useEffect(() => {
     clientSocket.updateBlock({
       right: debouncedRight,
       id: block.id,
-    });
+    }, '');
   }, [debouncedRight]);
 
   // prevent input if user presses command shortcut while being in the text field
