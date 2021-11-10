@@ -46,7 +46,7 @@ Blocks.propTypes = {
 export default function DocumentScreen() {
   const dispatch = useDispatch();
   const documentStore = useSelector((state) => state.document);
-  console.log(documentStore.lines);
+
   useEffect(() => {
     dispatch(getDocumentByID('test_doc'));
   }, []);
