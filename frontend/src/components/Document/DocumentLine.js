@@ -9,12 +9,11 @@ import useDebounce from '../../_custom/Hook/useDebounce';
 import useKeyPress from '../../_custom/Hook/useKeyPress';
 import documentSlice from '../../redux/reducers/documentSlice';
 import StandardInput from '../../_custom/UI/StandardInput';
-import StandardPopover from '../../_custom/UI/StandardPopover';
+import StandardPopper from '../../_custom/UI/StandardPopper';
 
 import BlockMenuInterface from './BlockMenuInterface';
 
 const BlockWrapper = styled.div`
-	z-index: 1400;
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -106,24 +105,15 @@ export default function DocumentLine(props) {
       </InputWrapper>
 
       {block.id && (
-      <StandardPopover
-        disableEnforceFocus
-        id={menuButtonId}
-        open={openMenuButton}
-        anchorEl={anchorEl}
-        onClose={handleMouseLeave}
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'right',
-        }}
-      >
+        <StandardPopper
+          id={menuButtonId}
+          open={openMenuButton}
+          anchorEl={anchorEl}
+          placement="left"
+        >
 
-        <BlockMenuInterface blockId={block.id} />
-      </StandardPopover>
+          <BlockMenuInterface blockId={block.id} />
+        </StandardPopper>
       )}
     </BlockWrapper>
   );

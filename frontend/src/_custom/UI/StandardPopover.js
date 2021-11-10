@@ -14,12 +14,11 @@ const styles = () => ({
 });
 
 const StyledPopover = withStyles(styles)(Popover);
-export default function StandardPopover({ children, ...props }) {
+const StandardPopover = React.forwardRef(({ children, ...props }, ref) => {
   const {
     id,
     open,
     anchorEl,
-    onClose,
     anchorOrigin,
     transformOrigin,
     ...rest
@@ -27,10 +26,10 @@ export default function StandardPopover({ children, ...props }) {
 
   return (
     <StyledPopover
+      ref={ref}
       id={id}
       open={open}
       anchorEl={anchorEl}
-      onClose={onClose}
       anchorOrigin={anchorOrigin}
       transformOrigin={transformOrigin}
       {...rest}
@@ -38,7 +37,7 @@ export default function StandardPopover({ children, ...props }) {
       {children}
     </StyledPopover>
   );
-}
+});
 
 StandardPopover.defaultProps = {
   id: undefined,
@@ -52,5 +51,6 @@ StandardPopover.propTypes = {
   anchorEl: PropTypes.instanceOf(Object),
   anchorOrigin: PropTypes.instanceOf(Object).isRequired,
   transformOrigin: PropTypes.instanceOf(Object).isRequired,
-  onClose: PropTypes.func.isRequired,
 };
+
+export default StandardPopover;

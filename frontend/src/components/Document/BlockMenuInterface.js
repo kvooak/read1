@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import styled from '@emotion/styled';
 
-import ClickAwayListener from '@mui/material/ClickAwayListener';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import StandardIconButton from '../../_custom/UI/StandardIconButton';
 import StandardPopover from '../../_custom/UI/StandardPopover';
 
 import BlockMenu from './BlockMenu';
+
+const ButtonWrapper = styled.div`
+	padding-right: 4px;
+`;
 
 const MenuButton = (props) => {
   const { onClick } = props;
@@ -26,6 +30,7 @@ export default function BlockMenuInterface(props) {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const toggleMenu = (event) => {
+    console.log('triggers');
     if (anchorEl) {
       setAnchorEl(null);
     } else {
@@ -38,26 +43,26 @@ export default function BlockMenuInterface(props) {
 
   return (
     <>
-      <MenuButton id={blockId} onClick={toggleMenu} />
-      <ClickAwayListener onClickAway={toggleMenu}>
-        <StandardPopover
-          disableEnforceFocus
-          id={menuId}
-          open={openMenu}
-          anchorEl={anchorEl}
-          onClose={toggleMenu}
-          anchorOrigin={{
-            vertical: 'center',
-            horizontal: 'left',
-          }}
-          transformOrigin={{
-            vertical: 'center',
-            horizontal: 'right',
-          }}
-        >
-          <BlockMenu blockId={blockId} />
-        </StandardPopover>
-      </ClickAwayListener>
+      <ButtonWrapper>
+        <MenuButton id={blockId} onClick={toggleMenu} />
+      </ButtonWrapper>
+
+      <StandardPopover
+        id={menuId}
+        open={openMenu}
+        anchorEl={anchorEl}
+        onClose={toggleMenu}
+        anchorOrigin={{
+          vertical: 'center',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'center',
+          horizontal: 'right',
+        }}
+      >
+        <BlockMenu blockId={blockId} />
+      </StandardPopover>
     </>
   );
 }

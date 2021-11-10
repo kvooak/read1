@@ -21,5 +21,8 @@ export default function StandardButton({ children, ...props }) {
 }
 
 StandardButton.propTypes = {
-  children: PropTypes.instanceOf(Object).isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.instanceOf(Object),
+  ]).isRequired,
 };
