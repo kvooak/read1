@@ -87,7 +87,7 @@ export default function DocumentLine(props) {
         <StandardInput
           name="left"
           multiline
-          value={block.id}
+          value={block.left}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />

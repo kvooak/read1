@@ -61,7 +61,7 @@ export default function DocumentScreen() {
   useKeyCombo(addBlock, 'Shift', 'Enter');
   useEffect(() => {
     if (documentStore.identity._key && !documentStore.identity.content.length) {
-      // addBlock();
+      addBlock();
     }
   }, [documentStore.identity]);
 
