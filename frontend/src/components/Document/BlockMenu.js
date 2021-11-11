@@ -1,26 +1,44 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import styled from '@emotion/styled';
+
 import { withStyles } from '@mui/styles';
 import Paper from '@mui/material/Paper';
 import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
+import Typography from '@mui/material/Typography';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ContentDelete from '@mui/icons-material/Delete';
 import ContentMove from '@mui/icons-material/TrendingFlat';
 import ContentCopy from '@mui/icons-material/ContentCopy';
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
+import Stack from '@mui/material/Stack';
 
+import StandardIconButton from '../../_custom/UI/StandardIconButton';
+import StandardChip from '../../_custom/UI/StandardChip';
 import clientSocket from '../../socket';
 
-const paperStyles = () => ({
+const menuPaperStyles = () => ({
+  root: {
+    width: '200px',
+  },
 });
 
 const menuBlockItemStyles = () => ({
 });
 
-const MenuBlockPaper = withStyles(paperStyles)(Paper);
+const MenuBlockPaper = withStyles(menuPaperStyles)(Paper);
 const MenuBlockItem = withStyles(menuBlockItemStyles)(MenuItem);
+
+const MenuHeaderWrapper = styled.div`
+	padding: 0 1rem 0.5rem 1rem;
+`;
+
+const ButtonWrapper = styled.div`
+	height: 24px;
+`;
 
 export default function BlockMenu(props) {
   const { blockId } = props;
@@ -40,7 +58,44 @@ export default function BlockMenu(props) {
       variant="outlined"
     >
       <MenuList dense>
-        <MenuBlockItem dense onClick={handleDeleteBlock}>
+        <MenuHeaderWrapper>
+          <Typography variant="subtitle2" display="block" gutterBottom>
+            Type:
+            {' '}
+            <b>translation</b>
+          </Typography>
+
+          <Stack direction="row" spacing={1}>
+            <StandardChip
+              label="English"
+              size="small"
+              onClick={() => {}}
+            />
+
+            <ButtonWrapper>
+              <StandardIconButton>
+                <ArrowRightAltIcon
+                  sx={{
+                    marginTop: '-2px',
+                    color: 'rgba(15, 15, 15, 0.4)',
+                  }}
+                />
+              </StandardIconButton>
+            </ButtonWrapper>
+
+            <StandardChip
+              label="German"
+              size="small"
+              onClick={() => {}}
+            />
+          </Stack>
+        </MenuHeaderWrapper>
+
+        <MenuBlockItem
+          dense
+          onClick={handleDeleteBlock}
+          sx={{ borderTop: '1px solid rgba(55,53,47,0.1)' }}
+        >
           <ListItemIcon>
             <ContentDelete fontSize="small" />
           </ListItemIcon>

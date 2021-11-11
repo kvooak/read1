@@ -1,34 +1,47 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
+import Stack from '@mui/material/Stack';
+import AddIcon from '@mui/icons-material/Add';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import StandardIconButton from '../../_custom/UI/StandardIconButton';
 import StandardPopover from '../../_custom/UI/StandardPopover';
 
 import BlockMenu from './BlockMenu';
+import clientSocket from '../../socket';
 
 const InterfaceWrapper = styled.div`
 	padding-right: 4px;
 `;
 
-const MenuButton = (props) => {
-  const { onClick } = props;
+const MenuButtonGroup = (props) => {
+  const { toggleMenu, addBlock } = props;
+
   return (
-    <StandardIconButton onClick={onClick}>
-      <ModeEditIcon fontSize="small" sx={{ color: 'rgba(15, 15, 15, 0.4)' }} />
-    </StandardIconButton>
+    <Stack direction="row">
+      <StandardIconButton onClick={addBlock}>
+        <AddIcon sx={{ color: 'rgba(15, 15, 15, 0.4)' }} />
+      </StandardIconButton>
+      <StandardIconButton onClick={toggleMenu}>
+        <ModeEditIcon sx={{ color: 'rgba(15, 15, 15, 0.4)' }} />
+      </StandardIconButton>
+    </Stack>
   );
 };
 
-MenuButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
+MenuButtonGroup.propTypes = {
+  toggleMenu: PropTypes.func.isRequired,
+  addBlock: PropTypes.func.isRequired,
 };
 
 const BlockMenuInterface = React.forwardRef((props, ref) => {
   const { blockId } = props;
+  const parentId = useSelector((state) => state.document.identity._key);
+
   const [anchorEl, setAnchorEl] = useState(null);
-  const toggleMenu = (event) => {
+  const handleToggleMenu = (event) => {
     if (anchorEl) {
       setAnchorEl(null);
     } else {
@@ -36,18 +49,26 @@ const BlockMenuInterface = React.forwardRef((props, ref) => {
     }
   };
 
+  const handleAddBlock = () => {
+    clientSocket.createBlock({ parent_id: parentId });
+  };
+
   const openMenu = Boolean(anchorEl);
   const menuId = openMenu ? `menu-${blockId}` : undefined;
 
   return (
     <InterfaceWrapper ref={ref}>
-      <MenuButton id={blockId} onClick={toggleMenu} />
+      <MenuButtonGroup
+        id={blockId}
+        toggleMenu={handleToggleMenu}
+        addBlock={handleAddBlock}
+      />
 
       <StandardPopover
         id={menuId}
         open={openMenu}
         anchorEl={anchorEl}
-        onClose={toggleMenu}
+        onClose={handleToggleMenu}
         anchorOrigin={{
           vertical: 'center',
           horizontal: 'left',

@@ -1,14 +1,15 @@
 import styled from '@emotion/styled';
 
 const StandardInputButton = styled.button`
+	height: 100%;
+	padding: 0;
 	outline: none;
 	background: none;
 	border: 1px solid transparent;
 	border-radius: 4px;
 	cursor: pointer;
 	display: flex;
-	align-items: center;
-	padding: 4px;
+	justify-content: flex-start;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	color: rgba(55, 53, 47, 0.8);

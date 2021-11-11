@@ -108,7 +108,9 @@ export default function DocumentLine(props) {
           placement="left"
         >
 
-          <BlockMenuInterface blockId={block.id} />
+          <BlockMenuInterface
+            blockId={block.id}
+          />
         </StandardPopper>
       )}
     </BlockWrapper>

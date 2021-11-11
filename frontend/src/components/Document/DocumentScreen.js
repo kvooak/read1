@@ -22,7 +22,7 @@ const BlocksWrapper = styled.div`
 const ContentWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
-	padding: 0 14rem;
+	padding: 0 16rem;
 `;
 
 const Blocks = (props) => {

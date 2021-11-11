@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
-import StandardButton from '../../_custom/UI/StandardButton';
+import StandardChip from '../../_custom/UI/StandardChip';
 
 const MenuWrapper = styled.div`
   display: flex;
@@ -15,13 +15,11 @@ export default function DocumentMenu(props) {
 
   return (
     <MenuWrapper>
-      <StandardButton
+      <StandardChip
         size="small"
-        variant="outlined"
         onClick={addBlock}
-      >
-        +1 line
-      </StandardButton>
+        label="+1 line"
+      />
     </MenuWrapper>
   );
 }
