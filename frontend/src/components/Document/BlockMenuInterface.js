@@ -50,7 +50,10 @@ const BlockMenuInterface = React.forwardRef((props, ref) => {
   };
 
   const handleAddBlock = () => {
-    clientSocket.createBlock({ parent_id: parentId });
+    clientSocket.createBlock({
+      parent_id: parentId,
+      position: { below: blockId },
+    });
   };
 
   const openMenu = Boolean(anchorEl);

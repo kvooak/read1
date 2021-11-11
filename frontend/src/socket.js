@@ -37,8 +37,8 @@ const clientSocket = {
       }
     });
   },
-  createBlock: ({ parent_id, from_block }) => {
-    socket.emit('block:createBlock', { parent_id, from_block }, (res) => {
+  createBlock: ({ parent_id, position, from_block }) => {
+    socket.emit('block:createBlock', { parent_id, position, from_block }, (res) => {
       const { new_block, parent } = res;
       store.dispatch(documentSlice.actions.ADD_BLOCK({
         id: new_block._key,

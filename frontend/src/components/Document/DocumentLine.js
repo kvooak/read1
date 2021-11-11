@@ -11,6 +11,7 @@ import documentSlice from '../../redux/reducers/documentSlice';
 import StandardInput from '../../_custom/UI/StandardInput';
 import StandardPopper from '../../_custom/UI/StandardPopper';
 
+import BlockUtils from './functions/BlockUtils';
 import BlockMenuInterface from './BlockMenuInterface';
 
 const BlockWrapper = styled.div`
@@ -62,6 +63,8 @@ export default function DocumentLine(props) {
   // prevent input if user presses command shortcut while being in the text field
   const shiftKeyPressed = useKeyPress('Shift');
   const handleKeyDown = (event) => {
+    BlockUtils.checkQuickBlockDelete(event.key, block);
+
     if (shiftKeyPressed && event.key === 'Enter') {
       event.preventDefault();
     }

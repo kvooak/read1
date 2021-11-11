@@ -48,7 +48,10 @@ export default function BlockMenu(props) {
   };
 
   const handleDuplicateBlock = () => {
-    clientSocket.createBlock({ from_block: blockId });
+    clientSocket.createBlock({
+      from_block: blockId,
+      position: { below: blockId },
+    });
   };
 
   return (

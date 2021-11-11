@@ -49,8 +49,9 @@ async function _destroyBlock(socket, block_id, callback) {
 	}
 }
 
-async function _createBlock(socket, { parent_id, from_block }, callback) {
+async function _createBlock(socket, data, callback) {
 	try {
+		const { parent_id, position, from_block } = data;
 		const block_collection = await socket.db.collection('blocks');
 		const document_collection = await socket.db.collection('documents');
 
@@ -58,7 +59,7 @@ async function _createBlock(socket, { parent_id, from_block }, callback) {
 		let root_block;
 		let new_block = {
 			_key: uuid.v4(),
-			type: 'block',
+			type: 'translator',
 			properties: { left: '', right: '' },
 			content: [],
 			updated_on: Date.now(),
@@ -69,25 +70,33 @@ async function _createBlock(socket, { parent_id, from_block }, callback) {
 			root_block = await block_collection.document(from_block);
 			parent = await document_collection.document(root_block.parent);
 			new_block.properties = root_block.properties;
-			new_block.parent = root_block.parent;
 		}
 
-		if (parent_id) {
-			parent = await document_collection.document(parent_id);
-			new_block.parent = parent._key;
+		if (parent_id) parent = await document_collection.document(parent_id);
+
+		new_block.parent = parent._key;
+		
+		let anchor_pos;
+		let new_parent_content = parent.content;
+		if (position) {
+			anchor_pos = new_parent_content.indexOf(position.below);
+			console.log(anchor_pos);
+			new_parent_content.splice(anchor_pos + 1, 0, new_block._key);
+		} else {
+			new_parent_content = [...parent.content, new_block._key]; 
 		}
 
 		new_block = await block_collection.save(new_block, { returnNew: true });
 
 		parent = await document_collection.update(
 			{ _key: parent._key },
-			{ content: [...parent.content, new_block._key] },
+			{ content: new_parent_content },
 			{ returnNew: true }
 		);
 
 		callback({
 			new_block: new_block.new,
-			parent: parent.new
+			parent: parent.new,
 		});
 	} catch (e) {
 		if (isArangoError(e)) {
@@ -107,7 +116,11 @@ async function _getBlocks(socket, id_array, callback) {
 	`;
 	const cursor = await socket.db.query(query);
 	const blocks = await cursor.all();
-	callback(blocks);
+	function mapByID(a, b) {
+		return id_array.indexOf(a._key) - id_array.indexOf(b._key)
+	};
+	const sorted_blocks = blocks.sort(mapByID);
+	callback(sorted_blocks);
 };
 
 async function _updateBlock(socket, data, callback) {
@@ -183,9 +196,7 @@ module.exports = (socket) => {
 	const updateBlock = (data, callback) => _updateBlock(socket, data, callback);  
 	const updateBlockTranslate = (data, callback) => _updateBlockTranslate(socket, data, callback);  
 	const getBlocks = (data, callback) => _getBlocks(socket, data, callback);
-	const createBlock = ({ parent_id, from_block }, callback) => _createBlock(
-		socket, { parent_id, from_block }, callback
-	);
+	const createBlock = (data, callback) => _createBlock(socket, data, callback);
 	const destroyBlock = (block_id, callback) => _destroyBlock(socket, block_id, callback);
 	
 	socket.on('block:createBlock', createBlock);
