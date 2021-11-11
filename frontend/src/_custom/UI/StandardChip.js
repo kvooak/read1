@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';
 import Chip from '@mui/material/Chip';
 
@@ -16,12 +15,6 @@ const StyledChip = withStyles(styles)(Chip);
 
 export default function StandardChip({ children, ...props }) {
   return (
-    <StyledChip {...props}>
-      {children}
-    </StyledChip>
+    <StyledChip {...props} />
   );
 }
-
-StandardChip.propTypes = {
-  children: PropTypes.string.isRequired,
-};

@@ -1,14 +1,13 @@
 /* eslint no-underscore-dangle: 0 */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
 import styled from '@emotion/styled';
 
 import clientSocket from '../../socket';
 import useDebounce from '../../_custom/Hook/useDebounce';
 import useKeyPress from '../../_custom/Hook/useKeyPress';
-import documentSlice from '../../redux/reducers/documentSlice';
-import StandardInput from '../../_custom/UI/StandardInput';
+
+import StandardEditable from '../../_custom/UI/StandardEditable';
 import StandardPopper from '../../_custom/UI/StandardPopper';
 
 import BlockUtils from './functions/BlockUtils';
@@ -29,8 +28,6 @@ const InputWrapper = styled.div`
 
 export default function DocumentLine(props) {
   const { block } = props;
-  const dispatch = useDispatch();
-
   const [anchorEl, setAnchorEl] = useState(null);
   const handleMouseEnter = (event) => {
     setAnchorEl(event.currentTarget);
@@ -43,23 +40,6 @@ export default function DocumentLine(props) {
   const openMenuButton = Boolean(anchorEl);
   const menuButtonId = openMenuButton ? `menu-button-${block.id}` : undefined;
 
-  // send input to service
-  const debouncedLeft = useDebounce(block.left, 120);
-  const debouncedRight = useDebounce(block.right, 120);
-  useEffect(() => {
-    clientSocket.updateBlock({
-      left: debouncedLeft,
-      id: block.id,
-    }, '');
-  }, [debouncedLeft]);
-
-  useEffect(() => {
-    clientSocket.updateBlock({
-      right: debouncedRight,
-      id: block.id,
-    }, '');
-  }, [debouncedRight]);
-
   // prevent input if user presses command shortcut while being in the text field
   const shiftKeyPressed = useKeyPress('Shift');
   const handleKeyDown = (event) => {
@@ -70,13 +50,19 @@ export default function DocumentLine(props) {
     }
   };
 
+  const [buffer, setBuffer] = useState();
+  const debouncedBuffer = useDebounce(buffer, 120);
   const handleChange = (event) => {
-    const data = {
-      id: block.id,
-      [event.target.name]: event.target.value,
-    };
-    dispatch(documentSlice.actions.UPDATE_BLOCK(data));
+    const { name, content } = event.target.dataset;
+    const data = { id: block.id, [name]: content };
+    setBuffer(data);
   };
+
+  useEffect(() => {
+    if (debouncedBuffer) {
+      clientSocket.updateBlock(debouncedBuffer, '');
+    }
+  }, [debouncedBuffer]);
 
   return (
     <BlockWrapper
@@ -84,20 +70,20 @@ export default function DocumentLine(props) {
       onMouseLeave={handleMouseLeave}
     >
       <InputWrapper>
-        <StandardInput
+        <StandardEditable
+          blockId={block.id}
           name="left"
-          multiline
-          value={block.left}
+          content={block.left}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />
       </InputWrapper>
 
       <InputWrapper>
-        <StandardInput
+        <StandardEditable
+          blockId={block.id}
           name="right"
-          multiline
-          value={block.right}
+          content={block.right}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />

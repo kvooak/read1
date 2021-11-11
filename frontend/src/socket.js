@@ -27,13 +27,13 @@ const clientSocket = {
     });
   },
   updateBlock: (data, mode) => {
-    socket.emit(`block:updateBlock${mode}`, data, (block) => {
-      if (block) {
-        const payload = {
-          id: block._key,
-          right: block.properties.right,
-        };
-        store.dispatch(documentSlice.actions.UPDATE_BLOCK(payload));
+    socket.emit(`block:updateBlock${mode}`, data, (res) => {
+      if (res.right) {
+        store.dispatch(documentSlice.actions.UPDATE_BLOCK({
+          id: res._key,
+          left: res.properties.left,
+          right: res.properties.right,
+        }));
       }
     });
   },

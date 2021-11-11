@@ -125,7 +125,6 @@ async function _getBlocks(socket, id_array, callback) {
 
 async function _updateBlock(socket, data, callback) {
 	const { id, left, right } = data;
-
 	try {
 		const collection = await socket.db.collection('blocks');
 		let block = await collection.document(id);
