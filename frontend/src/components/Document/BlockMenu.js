@@ -1,4 +1,6 @@
+/* eslint no-underscore-dangle: 0 */
 import React from 'react';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import styled from '@emotion/styled';
@@ -42,6 +44,7 @@ const ButtonWrapper = styled.div`
 
 export default function BlockMenu(props) {
   const { blockId } = props;
+  const documentStore = useSelector((state) => state.document);
 
   const handleDeleteBlock = () => {
     clientSocket.destroyBlock(blockId);
@@ -49,8 +52,12 @@ export default function BlockMenu(props) {
 
   const handleDuplicateBlock = () => {
     clientSocket.createBlock({
-      from_block: blockId,
-      position: { below: blockId },
+      parent_id: documentStore.identity._key,
+      settings: {
+        type: 'translator',
+        from_block: blockId,
+        position: { below: blockId },
+      },
     });
   };
 

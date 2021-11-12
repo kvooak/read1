@@ -51,36 +51,32 @@ async function _destroyBlock(socket, block_id, callback) {
 
 async function _createBlock(socket, data, callback) {
 	try {
-		const { parent_id, position, from_block } = data;
+		const { parent_id, settings } = data;
 		const block_collection = await socket.db.collection('blocks');
 		const document_collection = await socket.db.collection('documents');
 
-		let parent;
-		let root_block;
+		let parent = await document_collection.document(parent_id);
 		let new_block = {
 			_key: uuid.v4(),
-			type: 'translator',
+			type: settings.type,
 			properties: { left: '', right: '' },
 			content: [],
 			updated_on: Date.now(),
 			created_on: Date.now(),
 		};
-
-		if (from_block) {
-			root_block = await block_collection.document(from_block);
-			parent = await document_collection.document(root_block.parent);
+		
+		let root_block;
+		if (settings.from_block) {
+			root_block = await block_collection.document(settings.from_block);
 			new_block.properties = root_block.properties;
 		}
-
-		if (parent_id) parent = await document_collection.document(parent_id);
 
 		new_block.parent = parent._key;
 		
 		let anchor_pos;
 		let new_parent_content = parent.content;
-		if (position) {
-			anchor_pos = new_parent_content.indexOf(position.below);
-			console.log(anchor_pos);
+		if (settings.position) {
+			anchor_pos = new_parent_content.indexOf(settings.position.below);
 			new_parent_content.splice(anchor_pos + 1, 0, new_block._key);
 		} else {
 			new_parent_content = [...parent.content, new_block._key]; 

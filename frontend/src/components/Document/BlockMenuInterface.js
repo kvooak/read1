@@ -1,3 +1,4 @@
+/* eslint no-underscore-dangle: 0 */
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -38,7 +39,7 @@ MenuButtonGroup.propTypes = {
 
 const BlockMenuInterface = React.forwardRef((props, ref) => {
   const { blockId } = props;
-  const parentId = useSelector((state) => state.document.identity._key);
+  const documentStore = useSelector((state) => state.document);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const handleToggleMenu = (event) => {
@@ -51,8 +52,11 @@ const BlockMenuInterface = React.forwardRef((props, ref) => {
 
   const handleAddBlock = () => {
     clientSocket.createBlock({
-      parent_id: parentId,
-      position: { below: blockId },
+      parent_id: documentStore.identity._key,
+      settings: {
+        type: 'translator',
+        position: { below: blockId },
+      },
     });
   };
 
