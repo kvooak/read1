@@ -27,12 +27,31 @@ const ContentWrapper = styled.div`
 
 const Blocks = (props) => {
   const { blocks } = props;
+
+  const [anchors, setAnchors] = useState([]);
+  useEffect(() => {
+    setAnchors(document.querySelectorAll('[data-anchor="true"]'));
+  }, [blocks]);
+
+  const handleMoveCursorUp = (currentIndex) => {
+    const cursorIndex = currentIndex - 1;
+    const targetBlock = anchors[cursorIndex];
+    const selection = window.getSelection();
+   	 const range = document.createRange();
+   	 selection.removeAllRanges();
+    range.selectNodeContents(targetBlock);
+    range.collapse();
+    selection.addRange(range);
+  };
+
   return (
     <BlocksWrapper>
-      {blocks.map((block) => (
+      {blocks.map((block, index) => (
         <DocumentLine
           key={block.id}
           block={block}
+          index={index}
+          moveCursorUp={handleMoveCursorUp}
         />
       ))}
     </BlocksWrapper>

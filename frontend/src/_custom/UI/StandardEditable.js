@@ -38,6 +38,7 @@ const Editable = styled.div`
 
 export default function StandardEditable(props) {
   const {
+    anchor,
     name,
     blockId,
     content,
@@ -63,6 +64,7 @@ export default function StandardEditable(props) {
     <EditableWrapper id={wrapperId}>
       <Editable
         id={editableId}
+        data-anchor={anchor}
         data-name={name}
         data-content={buffer}
         data-block-id={blockId}
@@ -80,10 +82,12 @@ export default function StandardEditable(props) {
 }
 
 StandardEditable.defaultProps = {
+  anchor: false,
   content: '',
 };
 
 StandardEditable.propTypes = {
+  anchor: PropTypes.bool,
   name: PropTypes.string.isRequired,
   blockId: PropTypes.string.isRequired,
   content: PropTypes.string,

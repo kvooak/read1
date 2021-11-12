@@ -55,10 +55,10 @@ const clientSocket = {
       switch (status_code) {
         case 200:
           store.dispatch(documentSlice.actions.DESTROY_BLOCK(block_id));
-          break;
+          return 0;
         default:
           store.dispatch(documentSlice.actions.BLOCK_ERROR(status_code));
-          break;
+          return 1;
       }
     });
   },

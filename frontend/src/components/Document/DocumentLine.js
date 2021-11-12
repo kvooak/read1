@@ -27,7 +27,7 @@ const InputWrapper = styled.div`
 `;
 
 export default function DocumentLine(props) {
-  const { block } = props;
+  const { block, index, moveCursorUp } = props;
   const [anchorEl, setAnchorEl] = useState(null);
   const handleMouseEnter = (event) => {
     setAnchorEl(event.currentTarget);
@@ -43,7 +43,10 @@ export default function DocumentLine(props) {
   // prevent input if user presses command shortcut while being in the text field
   const shiftKeyPressed = useKeyPress('Shift');
   const handleKeyDown = (event) => {
-    BlockUtils.checkQuickBlockDelete(event.key, block);
+    if (index) { // do nothing if block is first block
+      const blockDeleted = BlockUtils.checkQuickBlockDelete(event.key, block);
+      if (blockDeleted) moveCursorUp(index);
+    }
 
     if (shiftKeyPressed && event.key === 'Enter') {
       event.preventDefault();
@@ -71,6 +74,7 @@ export default function DocumentLine(props) {
     >
       <InputWrapper>
         <StandardEditable
+          anchor
           blockId={block.id}
           name="left"
           content={block.left}
@@ -81,6 +85,7 @@ export default function DocumentLine(props) {
 
       <InputWrapper>
         <StandardEditable
+          anchor={false}
           blockId={block.id}
           name="right"
           content={block.right}
@@ -108,4 +113,6 @@ export default function DocumentLine(props) {
 
 DocumentLine.propTypes = {
   block: PropTypes.instanceOf(Object).isRequired,
+  index: PropTypes.number.isRequired,
+  moveCursorUp: PropTypes.func.isRequired,
 };
