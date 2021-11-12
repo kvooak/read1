@@ -44,7 +44,7 @@ export default function DocumentLine(props) {
   const shiftKeyPressed = useKeyPress('Shift');
   const handleKeyDown = (event) => {
     if (index) { // do nothing if block is first block
-      const blockDeleted = BlockUtils.checkQuickBlockDelete(event.key, block);
+      const blockDeleted = BlockUtils.checkQuickBlockDelete(event, block);
       if (blockDeleted) moveCursorUp(index);
     }
 
