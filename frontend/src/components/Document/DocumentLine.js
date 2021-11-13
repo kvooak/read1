@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
+import striptags from 'striptags';
 
 import clientSocket from '../../socket';
 import useDebounce from '../../_custom/Hook/useDebounce';
@@ -26,18 +27,20 @@ const InputWrapper = styled.div`
 	border-left: 1px solid rgba(55, 53, 47, 0.1);
 `;
 
+const htmlStripper = striptags.init_streaming_mode([], '\n');
+
 export default function DocumentLine(props) {
   const { block, index, moveCursorUp } = props;
   const [buffer, setBuffer] = useState(block);
   const debouncedBuffer = useDebounce(buffer, 120);
   const handleChange = (event) => {
     const { name, content } = event.target.dataset;
-    const data = {
+    const cleanContent = htmlStripper(content);
+    setBuffer({
       ...buffer,
       id: block.id,
-      [name]: content,
-    };
-    setBuffer(data);
+      [name]: cleanContent,
+    });
   };
 
   useEffect(() => {
