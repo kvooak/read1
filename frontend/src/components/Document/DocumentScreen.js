@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 
+import documentActions from '../../redux/actions/documentActions';
+
 import DocumentLine from './DocumentLine';
 import DocumentMenu from './DocumentMenu';
 
@@ -12,8 +14,6 @@ import useActiveElement from '../../_custom/Hook/useActiveElement';
 import useKeyCombo from '../../_custom/Hook/useKeyCombo';
 import Container from '../../_custom/UI/Container';
 import clientSocket from '../../socket';
-
-import { getDocumentByID } from '../../redux/actions/documentActions';
 
 const BlocksWrapper = styled.div`
   display: flex;
@@ -69,9 +69,9 @@ export default function DocumentScreen() {
   const dispatch = useDispatch();
   const documentStore = useSelector((state) => state.document);
 
-	// need to refactor later for better mechanism to detect
-	// when to add a new empty text block at the bottom
-	// direction: create a w:1px h:vh inline-block div at the bottom
+  // need to refactor later for better mechanism to detect
+  // when to add a new empty text block at the bottom
+  // direction: create a w:1px h:vh inline-block div at the bottom
   const activeElement = useActiveElement();
   const debouncedActive = useDebounce(activeElement, 20);
   useEffect(() => {
@@ -84,7 +84,7 @@ export default function DocumentScreen() {
   }, [activeElement, debouncedActive]);
 
   useEffect(() => {
-    dispatch(getDocumentByID('test_doc'));
+    dispatch(documentActions.getDocumentByID('test_doc'));
   }, []);
 
   useEffect(() => {

@@ -28,13 +28,11 @@ const clientSocket = {
   },
   updateBlock: (data, mode) => {
     socket.emit(`block:updateBlock${mode}`, data, (res) => {
-      if (res.right) {
-        store.dispatch(documentSlice.actions.UPDATE_BLOCK({
-          id: res._key,
-          left: res.properties.left,
-          right: res.properties.right,
-        }));
-      }
+      // store.dispatch(documentSlice.actions.UPDATE_BLOCK({
+      //	id: res._key,
+      //	right: res.properties.right,
+      //	left: res.properties.left,
+      // }));
     });
   },
   createBlock: ({ parent_id, settings }) => {

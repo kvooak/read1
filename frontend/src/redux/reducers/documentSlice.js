@@ -3,10 +3,6 @@
 /* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
 
-import {
-  getDocumentByID,
-} from '../actions/documentActions';
-
 const initialState = {
   identity: {},
   lines: [],
@@ -19,6 +15,15 @@ const documentSlice = createSlice({
   initialState,
 
   reducers: {
+    GET_DOC_BY_ID: (state, action) => {
+      Object.assign(state, {
+        ...state,
+        identity: action.payload,
+        error: false,
+        loading: false,
+      });
+    },
+
     BLOCK_ERROR: (state, action) => {
       Object.assign(state.error, action.payload);
     },
@@ -63,18 +68,6 @@ const documentSlice = createSlice({
 
     UPDATE_DOC_IDENTITY: (state, action) => {
       Object.assign(state.identity, action.payload);
-    },
-  },
-
-  extraReducers: {
-    [getDocumentByID.fulfilled]: (state, action) => {
-      Object.assign(state.loading, false);
-      if (action.payload.data._key) {
-        Object.assign(state.identity, action.payload.data);
-        Object.assign(state.error, false);
-      } else {
-        Object.assign(state.error, action.payload);
-      }
     },
   },
 });

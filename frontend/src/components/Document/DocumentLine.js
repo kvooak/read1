@@ -28,36 +28,15 @@ const InputWrapper = styled.div`
 
 export default function DocumentLine(props) {
   const { block, index, moveCursorUp } = props;
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleMouseEnter = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMouseLeave = () => {
-    setAnchorEl(null);
-  };
-
-  const openMenuButton = Boolean(anchorEl);
-  const menuButtonId = openMenuButton ? `menu-button-${block.id}` : undefined;
-
-  // prevent input if user presses command shortcut while being in the text field
-  const shiftKeyPressed = useKeyPress('Shift');
-  const handleKeyDown = (event) => {
-    if (index) { // do nothing if block is first block
-      const blockDeleted = BlockUtils.checkQuickBlockDelete(event, block);
-      if (blockDeleted) moveCursorUp(index);
-    }
-
-    if (shiftKeyPressed && event.key === 'Enter') {
-      event.preventDefault();
-    }
-  };
-
-  const [buffer, setBuffer] = useState();
+  const [buffer, setBuffer] = useState(block);
   const debouncedBuffer = useDebounce(buffer, 120);
   const handleChange = (event) => {
     const { name, content } = event.target.dataset;
-    const data = { id: block.id, [name]: content };
+    const data = {
+      ...buffer,
+      id: block.id,
+      [name]: content,
+    };
     setBuffer(data);
   };
 
@@ -66,6 +45,31 @@ export default function DocumentLine(props) {
       clientSocket.updateBlock(debouncedBuffer, '');
     }
   }, [debouncedBuffer]);
+
+  /* TOGGLE BLOCK MENU */
+  const [anchorEl, setAnchorEl] = useState(null);
+  const handleMouseEnter = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMouseLeave = () => {
+    setAnchorEl(null);
+  };
+  const openMenuButton = Boolean(anchorEl);
+  const menuButtonId = openMenuButton ? `menu-button-${block.id}` : undefined;
+  /* END TOGGLE BLOCK MENU */
+
+  // prevent input if user presses command shortcut while being in the text field
+  const shiftKeyPressed = useKeyPress('Shift');
+  const handleKeyDown = (event) => {
+    if (index) { // do nothing if block is first block
+      const blockDeleted = BlockUtils.checkQuickBlockDelete(event, buffer);
+      if (blockDeleted) moveCursorUp(index);
+    }
+
+    if (shiftKeyPressed && event.key === 'Enter') {
+      event.preventDefault();
+    }
+  };
 
   return (
     <BlockWrapper
@@ -103,7 +107,7 @@ export default function DocumentLine(props) {
         >
 
           <BlockMenuInterface
-            blockId={block.id}
+            blockId={buffer.id}
           />
         </StandardPopper>
       )}
