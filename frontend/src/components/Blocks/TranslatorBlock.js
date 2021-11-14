@@ -6,7 +6,6 @@ import striptags from 'striptags';
 
 import clientSocket from '../../socket';
 import useDebounce from '../../_custom/Hook/useDebounce';
-
 import StandardEditable from '../../_custom/UI/StandardEditable';
 import StandardPopper from '../../_custom/UI/StandardPopper';
 
@@ -23,8 +22,16 @@ const htmlStripper = striptags.init_streaming_mode([], '\n');
 
 const TranslatorBlock = React.forwardRef((props, ref) => {
   const { block, index, moveCursorUp } = props;
+
   const [buffer, setBuffer] = useState(block);
   const debouncedBuffer = useDebounce(buffer, 120);
+
+  useEffect(() => {
+    if (debouncedBuffer) {
+      clientSocket.updateBlock(debouncedBuffer, '');
+    }
+  }, [debouncedBuffer]);
+
   const handleChange = (event) => {
     const { name, content } = event.target.dataset;
     const cleanContent = htmlStripper(content);
@@ -35,11 +42,15 @@ const TranslatorBlock = React.forwardRef((props, ref) => {
     });
   };
 
-  useEffect(() => {
-    if (debouncedBuffer) {
-      clientSocket.updateBlock(debouncedBuffer, '');
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
     }
-  }, [debouncedBuffer]);
+    if (index) { // do nothing if block is first block
+      const blockDeleted = BlockUtils.checkQuickBlockDelete(event, buffer);
+      if (blockDeleted) moveCursorUp(index);
+    }
+  };
 
   /* TOGGLE BLOCK MENU */
   const [anchorEl, setAnchorEl] = useState(null);
@@ -52,14 +63,6 @@ const TranslatorBlock = React.forwardRef((props, ref) => {
   const openMenuButton = Boolean(anchorEl);
   const menuButtonId = openMenuButton ? `menu-button-${block.id}` : undefined;
   /* END TOGGLE BLOCK MENU */
-
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') event.preventDefault();
-    if (index) { // do nothing if block is first block
-      const blockDeleted = BlockUtils.checkQuickBlockDelete(event, buffer);
-      if (blockDeleted) moveCursorUp(index);
-    }
-  };
 
   const blockId = `block-${block.id}`;
 

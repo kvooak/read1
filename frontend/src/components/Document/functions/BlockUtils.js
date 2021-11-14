@@ -19,6 +19,16 @@ const BlockUtils = {
     range.collapse();
     selection.addRange(range);
   },
+
+  addBlockBelow: (parentId, blockId) => {
+    clientSocket.createBlock({
+      parent_id: parentId,
+      settings: {
+        type: 'text',
+        position: { below: blockId },
+      },
+    });
+  },
 };
 
 export default BlockUtils;

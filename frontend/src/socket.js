@@ -22,6 +22,7 @@ const clientSocket = {
         id: block._key,
         left: block.properties.left,
         right: block.properties.right,
+        parent: block.parent,
       }));
       store.dispatch(documentSlice.actions.GET_BLOCKS(payload));
     });

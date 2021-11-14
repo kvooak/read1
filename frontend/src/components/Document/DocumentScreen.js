@@ -8,8 +8,9 @@ import styled from '@emotion/styled';
 
 import clientSocket from '../../socket';
 import documentActions from '../../redux/actions/documentActions';
-
 import useKeyCombo from '../../_custom/Hook/useKeyCombo';
+import useActiveElement from '../../_custom/Hook/useActiveElement';
+
 import TranslatorBlock from '../Blocks/TranslatorBlock';
 import BlockUtils from './functions/BlockUtils';
 import Container from '../../_custom/UI/Container';
@@ -76,10 +77,19 @@ export default function DocumentScreen() {
   const dispatch = useDispatch();
   const documentStore = useSelector((state) => state.document);
   const lastBlockRef = useRef(null);
+  const recentBlockRef = useActiveElement();
 
   useEffect(() => {
     dispatch(documentActions.getDocumentByID('test_doc'));
   }, []);
+
+  useKeyCombo(() => {
+    const recentBlockId = recentBlockRef.dataset.blockId;
+    const parentId = documentStore.identity._key;
+    if (recentBlockId && parentId) {
+      BlockUtils.addBlockBelow(parentId, recentBlockId);
+    }
+  }, ['Enter']);
 
   useEffect(() => {
     const { content } = documentStore.identity;
@@ -112,7 +122,6 @@ export default function DocumentScreen() {
     }
   }, [lastBlockRef.current]);
 
-  useKeyCombo(addBlock, ['Enter']);
   const handleClickToCreate = () => {
     if (bottomBlockNotEmpty) {
       addBlock();
