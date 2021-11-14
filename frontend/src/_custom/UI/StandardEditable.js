@@ -2,11 +2,6 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
-const EditableWrapper = styled.div`
-	height: 100%;
-	display: flex;
-`;
-
 const Editable = styled.div`
 	padding: 6px 8px 8px 8px;
 	line-height: 1.4rem;
@@ -46,7 +41,6 @@ export default function StandardEditable(props) {
     onKeyDown,
   } = props;
 
-  const wrapperId = `editable-wrapper-${blockId}`;
   const editableId = `editable-${blockId}`;
 
   const [proxyEvent, setProxyEvent] = useState();
@@ -61,23 +55,21 @@ export default function StandardEditable(props) {
   }, [proxyEvent]);
 
   return (
-    <EditableWrapper id={wrapperId}>
-      <Editable
-        id={editableId}
-        data-anchor={anchor}
-        data-name={name}
-        data-content={buffer}
-        data-block-id={blockId}
-        contentEditable
-        suppressContentEditableWarning
-        spellCheck={false}
-        onInput={handleChange}
-        onBlur={handleChange}
-        onKeyDown={onKeyDown}
-      >
-        {content}
-      </Editable>
-    </EditableWrapper>
+    <Editable
+      id={editableId}
+      data-anchor={anchor}
+      data-name={name}
+      data-content={buffer}
+      data-block-id={blockId}
+      contentEditable
+      suppressContentEditableWarning
+      spellCheck={false}
+      onInput={handleChange}
+      onBlur={handleChange}
+      onKeyDown={onKeyDown}
+    >
+      {content}
+    </Editable>
   );
 }
 

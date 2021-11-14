@@ -15,21 +15,14 @@ import BlockUtils from './functions/BlockUtils';
 import BlockMenuInterface from './BlockMenuInterface';
 
 const BlockWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
+  display: inline-flex;
   width: 100%;
 	border-bottom: 1px solid rgba(55, 53, 47, 0.1);
-	border-right: 1px solid rgba(55, 53, 47, 0.1);
-`;
-
-const InputWrapper = styled.div`
-  width: 50%;
-	border-left: 1px solid rgba(55, 53, 47, 0.1);
 `;
 
 const htmlStripper = striptags.init_streaming_mode([], '\n');
 
-export default function DocumentLine(props) {
+const DocumentLine = React.forwardRef((props, ref) => {
   const { block, index, moveCursorUp } = props;
   const [buffer, setBuffer] = useState(block);
   const debouncedBuffer = useDebounce(buffer, 120);
@@ -74,52 +67,54 @@ export default function DocumentLine(props) {
     }
   };
 
+  const blockId = `block-${block.id}`;
+
   return (
     <BlockWrapper
+      ref={ref}
+      id={blockId}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <InputWrapper>
-        <StandardEditable
-          anchor
-          blockId={block.id}
-          name="left"
-          content={block.left}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-        />
-      </InputWrapper>
+      <StandardEditable
+        anchor
+        blockId={block.id}
+        name="left"
+        content={block.left}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+      />
 
-      <InputWrapper>
-        <StandardEditable
-          anchor={false}
-          blockId={block.id}
-          name="right"
-          content={block.right}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-        />
-      </InputWrapper>
+      <StandardEditable
+        anchor={false}
+        blockId={block.id}
+        name="right"
+        content={block.right}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+      />
 
       {block.id && (
-        <StandardPopper
-          id={menuButtonId}
-          open={openMenuButton}
-          anchorEl={anchorEl}
-          placement="left"
-        >
+      <StandardPopper
+        id={menuButtonId}
+        open={openMenuButton}
+        anchorEl={anchorEl}
+        placement="left"
+      >
 
-          <BlockMenuInterface
-            blockId={buffer.id}
-          />
-        </StandardPopper>
+        <BlockMenuInterface
+          blockId={buffer.id}
+        />
+      </StandardPopper>
       )}
     </BlockWrapper>
   );
-}
+});
 
 DocumentLine.propTypes = {
   block: PropTypes.instanceOf(Object).isRequired,
   index: PropTypes.number.isRequired,
   moveCursorUp: PropTypes.func.isRequired,
 };
+
+export default DocumentLine;

@@ -1,19 +1,18 @@
 /* eslint no-underscore-dangle: 0 */
-import React, { useEffect, useState } from 'react';
+import React, {
+  useEffect, useMemo, useRef, useState,
+} from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from '@emotion/styled';
 
+import clientSocket from '../../socket';
 import documentActions from '../../redux/actions/documentActions';
 
 import DocumentLine from './DocumentLine';
-import DocumentMenu from './DocumentMenu';
-
-import useDebounce from '../../_custom/Hook/useDebounce';
-import useActiveElement from '../../_custom/Hook/useActiveElement';
+import BlockUtils from './functions/BlockUtils';
 import useKeyCombo from '../../_custom/Hook/useKeyCombo';
 import Container from '../../_custom/UI/Container';
-import clientSocket from '../../socket';
 
 const BlocksWrapper = styled.div`
   display: flex;
@@ -22,15 +21,22 @@ const BlocksWrapper = styled.div`
 `;
 
 const ContentWrapper = styled.div`
+	cursor: text;
 	display: flex;
 	height: 100vh;
 	flex-direction: column;
+	flex-flow: column;
 	padding: 0 16rem;
 `;
 
-const Blocks = (props) => {
-  const { blocks } = props;
+const ClickToCreateZone = styled.div`
+	width: 100%;
+	flex: 1 1 auto;
+	margin-left: auto;
+`;
 
+const Blocks = (props) => {
+  const { blocks, lastBlockRef } = props;
   const [anchors, setAnchors] = useState([]);
   useEffect(() => {
     setAnchors(document.querySelectorAll('[data-anchor="true"]'));
@@ -39,18 +45,14 @@ const Blocks = (props) => {
   const handleMoveCursorUp = (currentIndex) => {
     const cursorIndex = currentIndex - 1;
     const targetBlock = anchors[cursorIndex];
-    const selection = window.getSelection();
-    const range = document.createRange();
-    selection.removeAllRanges();
-    range.selectNodeContents(targetBlock);
-    range.collapse();
-    selection.addRange(range);
+    BlockUtils.focusBlock(targetBlock);
   };
 
   return (
     <BlocksWrapper>
       {blocks.map((block, index) => (
         <DocumentLine
+          ref={index === blocks.length - 1 ? lastBlockRef : undefined}
           key={block.id}
           block={block}
           index={index}
@@ -61,27 +63,19 @@ const Blocks = (props) => {
   );
 };
 
+Blocks.defaultProps = {
+  lastBlockRef: null,
+};
+
 Blocks.propTypes = {
+  lastBlockRef: PropTypes.instanceOf(Object),
   blocks: PropTypes.instanceOf(Array).isRequired,
 };
 
 export default function DocumentScreen() {
   const dispatch = useDispatch();
   const documentStore = useSelector((state) => state.document);
-
-  // need to refactor later for better mechanism to detect
-  // when to add a new empty text block at the bottom
-  // direction: create a w:1px h:vh inline-block div at the bottom
-  const activeElement = useActiveElement();
-  const debouncedActive = useDebounce(activeElement, 20);
-  useEffect(() => {
-    if (!activeElement && !debouncedActive) {
-      clientSocket.createBlock({
-        parent_id: 'test_doc',
-        settings: { type: 'text' },
-      });
-    }
-  }, [activeElement, debouncedActive]);
+  const lastBlockRef = useRef(null);
 
   useEffect(() => {
     dispatch(documentActions.getDocumentByID('test_doc'));
@@ -89,31 +83,60 @@ export default function DocumentScreen() {
 
   useEffect(() => {
     const { content } = documentStore.identity;
-    if (content?.length) clientSocket.getBlocks(content);
+    if (content?.length) {
+      clientSocket.getBlocks(content);
+    }
   }, [documentStore.identity.content]);
 
   const addBlock = () => clientSocket.createBlock({
     parent_id: documentStore.identity._key,
-    settings: {
-      type: 'text',
-    },
+    settings: { type: 'text' },
   });
+
+  const bottomBlockNotEmpty = useMemo(() => {
+    if (!lastBlockRef.current) return true;
+    const bottomBlock = lastBlockRef.current;
+    const hasContent = [...bottomBlock.children].some(
+      (child) => child.dataset.content,
+    );
+    return hasContent;
+  }, [lastBlockRef.current]);
+
+  useEffect(() => {
+    const bottomBlock = lastBlockRef.current;
+    if (bottomBlock) {
+      const anchorBlock = [...bottomBlock.children].find((child) => child.dataset.anchor);
+      BlockUtils.focusBlock(anchorBlock);
+    }
+  }, [lastBlockRef.current]);
+
+  const handleClickToCreate = () => {
+    if (bottomBlockNotEmpty) {
+      addBlock();
+    } else {
+      const anchorBlock = [...lastBlockRef.current.children].find((child) => child.dataset.anchor);
+      BlockUtils.focusBlock(anchorBlock);
+    }
+  };
 
   useKeyCombo(addBlock, 'Shift', 'Enter');
   useEffect(() => {
-    if (documentStore.identity._key && !documentStore.identity.content.length) {
-      addBlock();
-    }
+    if (
+      documentStore.identity._key
+			&& !documentStore.identity.content.length
+    ) addBlock();
   }, [documentStore.identity]);
 
   return (
     <Container>
       <ContentWrapper>
-        <DocumentMenu
-          addBlock={addBlock}
+        <Blocks
+          blocks={documentStore.lines}
+          lastBlockRef={lastBlockRef}
         />
-        <Blocks blocks={documentStore.lines} />
+        <ClickToCreateZone onClick={handleClickToCreate} />
       </ContentWrapper>
+
     </Container>
   );
 }
