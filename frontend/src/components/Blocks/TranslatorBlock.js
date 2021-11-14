@@ -6,13 +6,12 @@ import striptags from 'striptags';
 
 import clientSocket from '../../socket';
 import useDebounce from '../../_custom/Hook/useDebounce';
-import useKeyPress from '../../_custom/Hook/useKeyPress';
 
 import StandardEditable from '../../_custom/UI/StandardEditable';
 import StandardPopper from '../../_custom/UI/StandardPopper';
 
-import BlockUtils from './functions/BlockUtils';
-import BlockMenuInterface from './BlockMenuInterface';
+import BlockUtils from '../Document/functions/BlockUtils';
+import BlockMenuInterface from '../Document/BlockMenuInterface';
 
 const BlockWrapper = styled.div`
   display: inline-flex;
@@ -22,7 +21,7 @@ const BlockWrapper = styled.div`
 
 const htmlStripper = striptags.init_streaming_mode([], '\n');
 
-const DocumentLine = React.forwardRef((props, ref) => {
+const TranslatorBlock = React.forwardRef((props, ref) => {
   const { block, index, moveCursorUp } = props;
   const [buffer, setBuffer] = useState(block);
   const debouncedBuffer = useDebounce(buffer, 120);
@@ -54,16 +53,11 @@ const DocumentLine = React.forwardRef((props, ref) => {
   const menuButtonId = openMenuButton ? `menu-button-${block.id}` : undefined;
   /* END TOGGLE BLOCK MENU */
 
-  // prevent input if user presses command shortcut while being in the text field
-  const shiftKeyPressed = useKeyPress('Shift');
   const handleKeyDown = (event) => {
+    if (event.key === 'Enter') event.preventDefault();
     if (index) { // do nothing if block is first block
       const blockDeleted = BlockUtils.checkQuickBlockDelete(event, buffer);
       if (blockDeleted) moveCursorUp(index);
-    }
-
-    if (shiftKeyPressed && event.key === 'Enter') {
-      event.preventDefault();
     }
   };
 
@@ -111,10 +105,10 @@ const DocumentLine = React.forwardRef((props, ref) => {
   );
 });
 
-DocumentLine.propTypes = {
+TranslatorBlock.propTypes = {
   block: PropTypes.instanceOf(Object).isRequired,
   index: PropTypes.number.isRequired,
   moveCursorUp: PropTypes.func.isRequired,
 };
 
-export default DocumentLine;
+export default TranslatorBlock;

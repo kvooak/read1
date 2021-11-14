@@ -9,9 +9,9 @@ import styled from '@emotion/styled';
 import clientSocket from '../../socket';
 import documentActions from '../../redux/actions/documentActions';
 
-import DocumentLine from './DocumentLine';
-import BlockUtils from './functions/BlockUtils';
 import useKeyCombo from '../../_custom/Hook/useKeyCombo';
+import TranslatorBlock from '../Blocks/TranslatorBlock';
+import BlockUtils from './functions/BlockUtils';
 import Container from '../../_custom/UI/Container';
 
 const BlocksWrapper = styled.div`
@@ -51,7 +51,7 @@ const Blocks = (props) => {
   return (
     <BlocksWrapper>
       {blocks.map((block, index) => (
-        <DocumentLine
+        <TranslatorBlock
           ref={index === blocks.length - 1 ? lastBlockRef : undefined}
           key={block.id}
           block={block}
@@ -105,21 +105,25 @@ export default function DocumentScreen() {
   useEffect(() => {
     const bottomBlock = lastBlockRef.current;
     if (bottomBlock) {
-      const anchorBlock = [...bottomBlock.children].find((child) => child.dataset.anchor);
+      const anchorBlock = [...bottomBlock.children].find(
+        (child) => child.dataset.anchor,
+      );
       BlockUtils.focusBlock(anchorBlock);
     }
   }, [lastBlockRef.current]);
 
+  useKeyCombo(addBlock, ['Enter']);
   const handleClickToCreate = () => {
     if (bottomBlockNotEmpty) {
       addBlock();
     } else {
-      const anchorBlock = [...lastBlockRef.current.children].find((child) => child.dataset.anchor);
+      const anchorBlock = [...lastBlockRef.current.children].find(
+        (child) => child.dataset.anchor,
+      );
       BlockUtils.focusBlock(anchorBlock);
     }
   };
 
-  useKeyCombo(addBlock, 'Shift', 'Enter');
   useEffect(() => {
     if (
       documentStore.identity._key
