@@ -75,7 +75,7 @@ Blocks.propTypes = {
 
 export default function DocumentScreen() {
   const dispatch = useDispatch();
-  const documentStore = useSelector((state) => state.document);
+  const page = useSelector((state) => state.document);
   const lastBlockRef = useRef(null);
   const recentBlockRef = useActiveElement();
 
@@ -85,21 +85,21 @@ export default function DocumentScreen() {
 
   useKeyCombo(() => {
     const recentBlockId = recentBlockRef.dataset.blockId;
-    const parentId = documentStore.identity._key;
+    const parentId = document.identity._key;
     if (recentBlockId && parentId) {
       BlockUtils.addBlockBelow(parentId, recentBlockId);
     }
   }, ['Enter']);
 
   useEffect(() => {
-    const { content } = documentStore.identity;
+    const { content } = page.identity;
     if (content?.length) {
       clientSocket.getBlocks(content);
     }
-  }, [documentStore.identity.content]);
+  }, [page.identity.content]);
 
   const addBlock = () => clientSocket.createBlock({
-    parent_id: documentStore.identity._key,
+    parent_id: page.identity._key,
     settings: { type: 'text' },
   });
 
@@ -135,16 +135,16 @@ export default function DocumentScreen() {
 
   useEffect(() => {
     if (
-      documentStore.identity._key
-			&& !documentStore.identity.content.length
+      page.identity._key
+			&& !page.identity.content.length
     ) addBlock();
-  }, [documentStore.identity]);
+  }, [page.identity]);
 
   return (
     <Container>
       <ContentWrapper>
         <Blocks
-          blocks={documentStore.lines}
+          blocks={page.lines}
           lastBlockRef={lastBlockRef}
         />
         <ClickToCreateZone onClick={handleClickToCreate} />

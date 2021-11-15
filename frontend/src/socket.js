@@ -18,23 +18,12 @@ socket.on('disconnect', () => {
 const clientSocket = {
   getBlocks: (id_array) => {
     socket.emit('block:getBlocks', id_array, (res) => {
-      const payload = res.map((block) => ({
-        id: block._key,
-        left: block.properties.left,
-        right: block.properties.right,
-        parent: block.parent,
-      }));
+      const payload = res.map((block) => ({ ...block, id: block._key }));
       store.dispatch(documentSlice.actions.GET_BLOCKS(payload));
     });
   },
   updateBlock: (data, mode) => {
-    socket.emit(`block:updateBlock${mode}`, data, (res) => {
-      // store.dispatch(documentSlice.actions.UPDATE_BLOCK({
-      //	id: res._key,
-      //	right: res.properties.right,
-      //	left: res.properties.left,
-      // }));
-    });
+    socket.emit(`block:updateBlock${mode}`, data);
   },
   createBlock: ({ parent_id, settings }) => {
     socket.emit('block:createBlock', { parent_id, settings }, (res) => {

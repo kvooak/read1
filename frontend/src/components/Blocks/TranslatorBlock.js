@@ -77,7 +77,7 @@ const TranslatorBlock = React.forwardRef((props, ref) => {
         anchor
         blockId={block.id}
         name="left"
-        content={block.left}
+        content={block.properties.left}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />
@@ -86,7 +86,7 @@ const TranslatorBlock = React.forwardRef((props, ref) => {
         anchor={false}
         blockId={block.id}
         name="right"
-        content={block.right}
+        content={block.properties.right}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />
