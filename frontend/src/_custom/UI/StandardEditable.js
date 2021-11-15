@@ -3,32 +3,32 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
 const Editable = styled.div`
-	padding: 6px 8px 8px 8px;
-	line-height: 1.4rem;
-	min-width: 0;
-	width: 100%;
-	height: 100%;
-	outline: none;
-	word-spacing: 0.05rem;
-	text-indent: 0px;
-	text-shadow: none;
-	text-align: start;
-	cursor: text;
-	overflow-wrap: break-word;
-	white-space: pre-wrap;
-	-webkit-writing-mode: horizontal-tb !important;
-	-webkit-animation-duration: 10ms;
+  padding: 6px 8px 8px 8px;
+  line-height: 1.4rem;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  word-spacing: 0.05rem;
+  text-indent: 0px;
+  text-shadow: none;
+  text-align: start;
+  cursor: text;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  -webkit-writing-mode: horizontal-tb !important;
+  -webkit-animation-duration: 10ms;
   animation-duration: 10ms;
-	font-family: -apple-system,
-		BlinkMacSystemFont,
-		"Segoe UI",
-		Roboto,
-		"Helvetica Neue",
-		Arial,
-		sans-serif,
-		"Apple Color Emoji",
-		"Segoe UI Emoji",
-		"Segoe UI Symbol";
+  font-family: -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol";
 `;
 
 export default function StandardEditable(props) {

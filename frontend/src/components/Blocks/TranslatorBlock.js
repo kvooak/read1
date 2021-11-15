@@ -15,7 +15,7 @@ import BlockMenuInterface from '../Document/BlockMenuInterface';
 const BlockWrapper = styled.div`
   display: inline-flex;
   width: 100%;
-	border-bottom: 1px solid rgba(55, 53, 47, 0.1);
+  border-bottom: 1px solid rgba(55, 53, 47, 0.1);
 `;
 
 const htmlStripper = striptags.init_streaming_mode([], '\n');

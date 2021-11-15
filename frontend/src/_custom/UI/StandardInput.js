@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';
 import InputBase from '@mui/material/InputBase';
 
-const styles = (theme) => ({
+const styles = () => ({
   root: {
     width: '100%',
   },

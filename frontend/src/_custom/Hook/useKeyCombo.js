@@ -8,7 +8,7 @@ export default function useKeyCombo(callback, combo) {
     const sequelString = sequel.join('');
     if (sequelString === comboString) {
       callback();
-    	setSequel([]);
+      setSequel([]);
     }
     return () => {
       if (sequel.length >= 4) setSequel([]);

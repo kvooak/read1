@@ -28,11 +28,11 @@ const clientSocket = {
     });
   },
   updateBlock: (data, mode) => {
-    socket.emit(`block:updateBlock${mode}`, data, (res) => {
+    socket.emit(`block:updateBlock${mode}`, data, () => {
       // store.dispatch(documentSlice.actions.UPDATE_BLOCK({
-      //	id: res._key,
-      //	right: res.properties.right,
-      //	left: res.properties.left,
+      // id: res._key,
+      // right: res.properties.right,
+      // left: res.properties.left,
       // }));
     });
   },

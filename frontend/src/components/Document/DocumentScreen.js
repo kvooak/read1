@@ -22,18 +22,18 @@ const BlocksWrapper = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-	cursor: text;
-	display: flex;
-	height: 100vh;
-	flex-direction: column;
-	flex-flow: column;
-	padding: 0 16rem;
+  cursor: text;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  flex-flow: column;
+  padding: 0 16rem;
 `;
 
 const ClickToCreateZone = styled.div`
-	width: 100%;
-	flex: 1 1 auto;
-	margin-left: auto;
+  width: 100%;
+  flex: 1 1 auto;
+  margin-left: auto;
 `;
 
 const Blocks = (props) => {
@@ -136,7 +136,7 @@ export default function DocumentScreen() {
   useEffect(() => {
     if (
       documentStore.identity._key
-			&& !documentStore.identity.content.length
+      && !documentStore.identity.content.length
     ) addBlock();
   }, [documentStore.identity]);
 

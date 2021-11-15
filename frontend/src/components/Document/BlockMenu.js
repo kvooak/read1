@@ -35,11 +35,11 @@ const MenuBlockPaper = withStyles(menuPaperStyles)(Paper);
 const MenuBlockItem = withStyles(menuBlockItemStyles)(MenuItem);
 
 const MenuHeaderWrapper = styled.div`
-	padding: 0 1rem 0.5rem 1rem;
+  padding: 0 1rem 0.5rem 1rem;
 `;
 
 const ButtonWrapper = styled.div`
-	height: 24px;
+  height: 24px;
 `;
 
 export default function BlockMenu(props) {

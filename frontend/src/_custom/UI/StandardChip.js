@@ -1,4 +1,6 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';
 import Chip from '@mui/material/Chip';
 
@@ -18,3 +20,7 @@ export default function StandardChip({ children, ...props }) {
     <StyledChip {...props} />
   );
 }
+
+StandardChip.propTypes = {
+  children: PropTypes.instanceOf(Object).isRequired,
+};

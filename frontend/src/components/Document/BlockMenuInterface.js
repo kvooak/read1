@@ -14,7 +14,7 @@ import BlockMenu from './BlockMenu';
 import clientSocket from '../../socket';
 
 const InterfaceWrapper = styled.div`
-	padding-right: 4px;
+  padding-right: 4px;
 `;
 
 const MenuButtonGroup = (props) => {
