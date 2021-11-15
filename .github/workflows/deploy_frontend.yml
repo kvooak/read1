@@ -1,0 +1,58 @@
+# https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
+name: Deploy Frontend
+
+on:
+  push:
+    # paths:
+    #   - './frontend'
+    branches:
+      - main
+      - deploy-test
+
+env:
+  NODE_VERSION: 16.x
+
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      REACT_APP_HOST_DOMAIN: read.exchange
+      REACT_APP_HOST_PORT: 443
+      REACT_APP_HOST_PROTOCOL: https
+      REACT_APP_SOCKET_IO_PORT: 8080
+      REACT_APP_SOCKET_IO_PROTOCOL: https
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Node.js
+      uses: actions/setup-node@v2.1.4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - name: Get npm cache directory path
+      id: npm-cache-dir-path
+      run: echo "::set-output name=dir::$(npm cache dir)"
+    - uses: actions/cache@v2.1.4
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-npm-frontend-${{ hashFiles('**/npm.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-npm-frontend-
+    - run: npm install
+    - name: Build
+      run: |
+        npm run build
+    - name: Deploy
+      uses: reggionick/s3-deploy@v3
+      with:
+        folder: ./frontend/build
+        bucket: ${{ secrets.S3_BUCKET }}
+        bucket-region: ${{ secrets.S3_BUCKET_REGION }}
+        dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        invalidation: /
+        delete-removed: true
+        no-cache: true
+        private: true
