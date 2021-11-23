@@ -1,6 +1,7 @@
+import transactionWorks from './transactionWorks';
 import clientSocket from './socket';
 
-const BlockUtils = {
+const BlockFactory = {
   checkQuickBlockDelete: (event, buffer) => {
     const keyCheck = event.key === 'Backspace';
     const emptyBlockCheck = !buffer.left && !buffer.right;
@@ -31,4 +32,4 @@ const BlockUtils = {
   },
 };
 
-export default BlockUtils;
+export default BlockFactory;

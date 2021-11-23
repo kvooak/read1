@@ -5,7 +5,7 @@ import React, {
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
-import BlockUtils from './functions/BlockUtils';
+import BlockFactory from './functions/BlockFactory';
 import TextBlock from '../Blocks/TextBlock';
 
 const PageContentWrapper = styled.div`
@@ -24,7 +24,7 @@ export default function PageContent(props) {
   const handleMoveCursorUp = (currentIndex) => {
     const cursorIndex = currentIndex - 1;
     const targetBlock = anchors[cursorIndex];
-    BlockUtils.focusBlock(targetBlock);
+    BlockFactory.focusBlock(targetBlock);
   };
 
   return (

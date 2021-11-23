@@ -62,7 +62,7 @@ export default function TextBlock(props) {
     >
       <StandardEditable
         anchor
-        content={block.properties.title}
+        content={block.properties.title[0][0]}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />

@@ -11,6 +11,8 @@ import store from './functions/store';
 import { PageContext } from './PageStore';
 import transactionWorks from './functions/transactionWorks';
 
+import useKeyCombo from '../../_custom/Hook/useKeyCombo';
+
 import Container from '../../_custom/UI/Container';
 import PageContent from './PageContent';
 
@@ -76,13 +78,8 @@ export default function DocumentScreen() {
     }
   }, [state.page]);
 
-  // useKeyCombo(() => {
-  //  const recentBlockId = recentBlockRef.dataset.blockId;
-  //  const parentId = state.page._key;
-  //  if (recentBlockId && parentId) {
-  //    BlockUtils.addBlockBelow(parentId, recentBlockId);
-  //  }
-  // }, ['Enter']);
+  useKeyCombo(() => {
+  }, ['Enter']);
 
   return (
     <Container>
