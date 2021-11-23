@@ -3,13 +3,10 @@ const express = require('express');
 const router = express.Router();
 
 const userRouter = require('./users');
-const documentRouter = require('./documents');
-
-router.get('/', (req, res) => {
-  res.status(200).send('-- API --');
-});
+const recordController = require('../controllers/recordController');
 
 router.use('/users', userRouter);
-router.use('/documents', documentRouter);
+router.post('/fetchRecords', recordController.fetchRecords);
+router.post('/saveTransactions', recordController.saveTransactions);
 
 module.exports = router;

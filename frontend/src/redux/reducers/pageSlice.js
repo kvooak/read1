@@ -9,8 +9,8 @@ const initialState = {
   loading: null,
 };
 
-const documentSlice = createSlice({
-  name: 'document',
+const pageSlice = createSlice({
+  name: 'page',
   initialState,
 
   reducers: {
@@ -24,4 +24,4 @@ const documentSlice = createSlice({
   },
 });
 
-export default documentSlice;
+export default pageSlice;

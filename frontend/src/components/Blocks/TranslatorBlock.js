@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import striptags from 'striptags';
 
-import clientSocket from '../../socket';
+import clientSocket from '../Document/functions/socket';
 import useDebounce from '../../_custom/Hook/useDebounce';
 import StandardEditable from '../../_custom/UI/StandardEditable';
 import StandardPopper from '../../_custom/UI/StandardPopper';

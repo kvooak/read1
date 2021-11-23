@@ -11,7 +11,7 @@ import StandardIconButton from '../../_custom/UI/StandardIconButton';
 import StandardPopover from '../../_custom/UI/StandardPopover';
 
 import BlockMenu from './BlockMenu';
-import clientSocket from '../../socket';
+import clientSocket from './functions/socket';
 
 const InterfaceWrapper = styled.div`
 	padding-right: 4px;

@@ -20,7 +20,7 @@ import Stack from '@mui/material/Stack';
 
 import StandardIconButton from '../../_custom/UI/StandardIconButton';
 import StandardChip from '../../_custom/UI/StandardChip';
-import clientSocket from '../../socket';
+import clientSocket from './functions/socket';
 
 const menuPaperStyles = () => ({
   root: {
