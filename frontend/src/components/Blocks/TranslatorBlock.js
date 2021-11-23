@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import striptags from 'striptags';
 
-import clientSocket from '../../socket';
+import clientSocket from '../Document/functions/socket';
 import useDebounce from '../../_custom/Hook/useDebounce';
 import StandardEditable from '../../_custom/UI/StandardEditable';
 import StandardPopper from '../../_custom/UI/StandardPopper';
@@ -77,7 +77,7 @@ const TranslatorBlock = React.forwardRef((props, ref) => {
         anchor
         blockId={block.id}
         name="left"
-        content={block.left}
+        content={block.properties.left}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />
@@ -86,7 +86,7 @@ const TranslatorBlock = React.forwardRef((props, ref) => {
         anchor={false}
         blockId={block.id}
         name="right"
-        content={block.right}
+        content={block.properties.right}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />

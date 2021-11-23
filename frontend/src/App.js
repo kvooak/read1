@@ -5,6 +5,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 // import PrivateRoute from './components/Auth/routes/PrivateRoute';
 import PublicRoute from './components/Auth/routes/PublicRoute';
 
+import PageStore from './components/Document/PageStore';
 import store from './redux/store';
 import themeJSON from './theme.json';
 
@@ -19,7 +20,9 @@ function App() {
         <Router>
           <Suspense fallback={null}>
             <Switch>
-              <PublicRoute path="/" component={DocumentScreen} />
+              <PageStore>
+                <PublicRoute path="/" component={DocumentScreen} />
+              </PageStore>
             </Switch>
           </Suspense>
         </Router>

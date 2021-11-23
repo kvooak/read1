@@ -1,4 +1,4 @@
-import clientSocket from '../../../socket';
+import clientSocket from './socket';
 
 const BlockUtils = {
   checkQuickBlockDelete: (event, buffer) => {
