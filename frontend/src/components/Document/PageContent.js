@@ -5,7 +5,6 @@ import React, {
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
-import BlockFactory from './functions/BlockFactory';
 import TextBlock from '../Blocks/TextBlock';
 
 const PageContentWrapper = styled.div`
@@ -15,18 +14,11 @@ const PageContentWrapper = styled.div`
 `;
 
 export default function PageContent(props) {
-  const { blocks, onChange } = props;
-  const [anchors, setAnchors] = useState([]);
-  useEffect(() => {
-    setAnchors(document.querySelectorAll('[data-anchor="true"]'));
-  }, [blocks]);
+  const { blocks, onChange, onReadKeyCommand } = props;
 
-  const handleMoveCursorUp = (currentIndex) => {
-    const cursorIndex = currentIndex - 1;
-    const targetBlock = anchors[cursorIndex];
-    BlockFactory.focusBlock(targetBlock);
+  const handleMoveCursorUp = () => {
+
   };
-
   return (
     <PageContentWrapper>
       {blocks.map((block) => (
@@ -34,6 +26,7 @@ export default function PageContent(props) {
           key={block.id}
           block={block}
           onChange={onChange}
+          onReadKeyCommand={onReadKeyCommand}
           moveCursorUp={handleMoveCursorUp}
         />
       ))}
@@ -44,4 +37,5 @@ export default function PageContent(props) {
 PageContent.propTypes = {
   blocks: PropTypes.instanceOf(Array).isRequired,
   onChange: PropTypes.func.isRequired,
+  onReadKeyCommand: PropTypes.func.isRequired,
 };

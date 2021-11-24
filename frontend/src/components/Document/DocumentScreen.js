@@ -1,5 +1,6 @@
 /* eslint no-underscore-dangle: 0 */
 import React, {
+  useMemo,
   useState,
   useContext,
   useEffect,
@@ -9,9 +10,9 @@ import styled from '@emotion/styled';
 import api from '../../api/api';
 import store from './functions/store';
 import { PageContext } from './PageStore';
-import transactionWorks from './functions/transactionWorks';
-
-import useKeyCombo from '../../_custom/Hook/useKeyCombo';
+import transWorks from './functions/transactionWorks';
+import blockOperationSet from './functions/blockOperationSet';
+import BlockControl from './functions/BlockControl';
 
 import Container from '../../_custom/UI/Container';
 import PageContent from './PageContent';
@@ -46,18 +47,59 @@ export default function DocumentScreen() {
   const { dispatch, state } = useContext(PageContext);
   const [transactions, setTransactions] = useState([]);
 
-  transactionWorks.backgroundServices.useSaveTransactions({
+  transWorks.backgroundServices.useSaveTransactions({
     transactions,
     setTransactions,
     dispatch,
     store,
   });
 
+  const [contentBackup, setContentBackup] = useState([]);
+  const autoFocusBlockID = useMemo(() => {
+    if (state.page) {
+      const { content } = state.page;
+      let targetID;
+      if (content.length > contentBackup.length) {
+        targetID = content.find((id) => !contentBackup.includes(id));
+      } else {
+        const pos = contentBackup.findIndex((id) => !content.includes(id));
+        targetID = content[pos - 1];
+      }
+      return targetID;
+    }
+  }, [state.page?.content, contentBackup]);
+
+  useEffect(() => {
+    if (autoFocusBlockID) {
+      const targetBlock = document.getElementById(autoFocusBlockID);
+      if (targetBlock) {
+        BlockControl.focusBlock(targetBlock.firstElementChild);
+      }
+    }
+  }, [autoFocusBlockID]);
+
+  const addTransaction = (transaction) => {
+    setTransactions((prev) => [...prev, transaction]);
+  };
+
   const handlePageContentChange = (operations) => {
-    setTransactions((prev) => {
-      const transaction = transactionWorks.createTransaction(operations);
-      return [...prev, transaction];
-    });
+    const transaction = transWorks.createTransaction(operations);
+    addTransaction(transaction);
+  };
+
+  const handleKeyCommand = (event) => {
+    const { key, shiftKey, target } = event;
+    let operations;
+    let transaction;
+
+    if (key === 'Enter' && !shiftKey) {
+      setContentBackup(state.page.content);
+      operations = blockOperationSet.newBlockOps('text', 'test_doc');
+      const [newBlockOp] = operations;
+      dispatch(store.actions.newBlock(newBlockOp));
+      transaction = transWorks.createTransaction(operations);
+      addTransaction(transaction);
+    }
   };
 
   useEffect(() => {
@@ -71,15 +113,12 @@ export default function DocumentScreen() {
   useEffect(() => {
     if (state.page) {
       api.blocks.fetchBlocks(state.page.content).then((res) => {
-        dispatch(store.actions.fetchBlocks(res.data));
+        dispatch(store.actions.blocksFetched(res.data));
       }).catch((e) => {
         dispatch(store.actions.error(e.message));
       });
     }
   }, [state.page]);
-
-  useKeyCombo(() => {
-  }, ['Enter']);
 
   return (
     <Container>
@@ -87,6 +126,7 @@ export default function DocumentScreen() {
         <PageContent
           blocks={state.blocks}
           onChange={handlePageContentChange}
+          onReadKeyCommand={handleKeyCommand}
         />
         <ClickToCreateZone />
       </ContentWrapper>

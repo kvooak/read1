@@ -14,13 +14,13 @@ const fetchPage = (data) => ({
   payload: data,
 });
 
-const fetchBlocks = (data) => ({
-  type: 'fetchBlocks',
+const blocksFetched = (data) => ({
+  type: 'blocksFetched',
   payload: data,
 });
 
-const addBlock = (data) => ({
-  type: 'addBlock',
+const newBlock = (data) => ({
+  type: 'newBlock',
   payload: data,
 });
 
@@ -32,6 +32,7 @@ const setBlock = (data) => ({
 const reducer = (state, action) => {
   const newState = { ...state };
 
+  let newBlockData;
   switch (action.type) {
     case 'fetchPage':
       return {
@@ -39,14 +40,15 @@ const reducer = (state, action) => {
         page: action.payload[0],
       };
 
-    case 'fetchBlocks':
-      return {
-        ...state,
-        blocks: action.payload,
-      };
+    case 'blocksFetched':
+      newState.blocks = action.payload;
+      return newState;
 
-    case 'addBlock':
-      return state;
+    case 'newBlock':
+      newBlockData = action.payload.args;
+      newState.blocks = [...state.blocks, newBlockData];
+      newState.page.content = [...state.page.content, newBlockData.id];
+      return newState;
 
     case 'setBlock':
       return state;
@@ -68,8 +70,8 @@ const store = {
   storeSeed,
   actions: {
     fetchPage,
-    fetchBlocks,
-    addBlock,
+    blocksFetched,
+    newBlock,
     setBlock,
     error,
   },

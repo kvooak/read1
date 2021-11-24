@@ -18,6 +18,7 @@ const Editable = styled.div`
 export default function StandardEditable(props) {
   const {
     anchor,
+    blockId,
     content,
     onChange,
     onKeyDown,
@@ -26,6 +27,7 @@ export default function StandardEditable(props) {
   return (
     <Editable
       data-anchor={anchor}
+      data-block-id={blockId}
       contentEditable
       suppressContentEditableWarning
       spellCheck={false}
@@ -44,6 +46,7 @@ StandardEditable.defaultProps = {
 
 StandardEditable.propTypes = {
   anchor: PropTypes.bool,
+  blockId: PropTypes.string.isRequired,
   content: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   onKeyDown: PropTypes.func.isRequired,

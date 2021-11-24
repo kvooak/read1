@@ -1,7 +1,7 @@
 const arango = require('arangojs');
 const { isArangoError } = require('arangojs/error');
 const print = require('../_utils/print');
-const transactionWorks = require('./functions/transactions');
+const transWorks = require('./functions/transactions');
 
 exports.fetchRecords = async (req, res, next) => {
 	try {
@@ -29,22 +29,18 @@ exports.fetchRecords = async (req, res, next) => {
 
 exports.saveTransactions = async (req, res, next) => {
 	try {
+		const db = req.dbArango;
 		const { transactions } = req.body.request;
 
-		transactions.forEach(async (transaction) => {	
-			const actionSeeds = await Promise.all(
-				transaction.operations.map(
-					async (operation) => transactionWorks.createOperationServing(
-						req.dbArango,
-						operation,
-					),
+		transactions.map(async (transaction) => {
+			const { operations } = transaction;
+			const trans = await transWorks.createTransaction(db);
+			const opShards = await Promise.all(
+				operations.map(
+					async (op) => transWorks.createOpShard(db, trans, op),
 				),
 			);
-			
-			return transactionWorks.createAndCommitTransaction(
-				req.dbArango,
-				actionSeeds,
-			);
+			await transWorks.commitTransaction(trans, opShards);
 		});
 
 		res.status(200).send({});

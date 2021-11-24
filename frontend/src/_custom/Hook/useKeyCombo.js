@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 export default function useKeyCombo(callback, combo) {
   const [sequel, setSequel] = useState([]);
   const comboString = combo.join('');
-
   useEffect(() => {
     const sequelString = sequel.join('');
     if (sequelString === comboString) {

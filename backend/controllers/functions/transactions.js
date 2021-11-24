@@ -1,29 +1,49 @@
-async function createOperationServing(db, operation) {
+async function createOpShard(db, trans, operation) {
 	const { args, command, path, pointer } = operation;
-
 	const collection = await db.collection(pointer.collection);
 	const recordID = pointer.id;
+	let updatedArgs = args;
+	let newProp;
 	let propName;
 	let propValue;
 
 	switch (command) {
 		case 'set':
-		case 'update':
-			let newProp = path.reverse().reduce((proxy, key, index) => {
-				if (index === 0) {
-					proxy[key] = args;
-					return proxy;
-				}
-				return { [key]: proxy };
-			}, {});
+			break;
 
-			[propName, propValue] = Object.entries(newProp)[0];
+		case 'update':
+			break;
+
+		case 'listAtBottom':
+			const record = await trans.step(() => collection.document(recordID));
+			updatedArgs = path.reduce((proxy, key) => {
+				return proxy[key];
+			}, record);
+			updatedArgs.push(args.id);	
 			break;
 
 		default:
 			throw new Error('undefined operation command');
 	}
-	
+
+	if (path.length === 0) {
+		newProp = { '_new': args };
+	} else {
+		newProp = path.reverse().reduce((proxy, key, index) => {
+			if (index === 0) {
+				if (key) {
+					proxy[key] = updatedArgs;
+				} else {
+					proxy = updatedArgs;
+				}
+				return proxy;
+			}
+			return { [key]: proxy };
+		}, {});
+	}
+
+	[propName, propValue] = Object.entries(newProp)[0];
+
 	return {
 		collection,
 		recordID,
@@ -32,28 +52,41 @@ async function createOperationServing(db, operation) {
 	};
 }
 
-async function dbOperation(collection, recordID, propName, propValue) {
-	await collection.update(
-		{ _key: recordID },
-		{ [propName]: propValue },
-	);
+async function dbOperation(trans, {
+	collection,
+	recordID,
+	propName,
+	propValue
+}) {
+	const keyShard = { _key: recordID };
+	let updateData = { [propName]: propValue };
+
+	if (propName === '_new') {
+		updateData = { ...propValue, _key: propValue.id };
+		await trans.step(() => collection.save(updateData));
+	} else {
+		await trans.step(() => collection.update(keyShard, updateData));
+	}
 };
 
-async function createAndCommitTransaction(db, actionSeeds) {
-	const arangoTran = await db.beginTransaction({
-		read: ['blocks'],
-		write: ['blocks'],
+async function createTransaction(db) {
+	const trans = await db.beginTransaction({
+		write: ['blocks', 'documents'],
 	});
 
-	actionSeeds.forEach(async ({ collection, recordID, propName, propValue }) => {
-		await arangoTran.step(() => dbOperation(collection, recordID, propName, propValue));
-	});
+	return trans;
+}
 
-	await arangoTran.commit();		
+async function commitTransaction(trans, operationShards) {
+	await Promise.all(
+		operationShards.map(async (shard) => dbOperation(trans, shard)),
+	);
+	await trans.commit();		
 };
 
 module.exports = {
-	createOperationServing,
+	createOpShard,
 	dbOperation,
-	createAndCommitTransaction,
+	createTransaction,
+	commitTransaction,
 };

@@ -17,10 +17,10 @@ const BlockWrapper = styled.div`
 const htmlStripper = striptags.init_streaming_mode([], '\n');
 
 export default function TextBlock(props) {
-  const { block, onChange } = props;
+  const { block, onChange, onReadKeyCommand } = props;
   const [bufferOperations, setBufferOperations] = useState([]);
 
-  const operations = useDebounce(bufferOperations, 400);
+  const operations = useDebounce(bufferOperations, 200);
   useEffect(() => {
     if (operations.length) onChange(operations);
   }, [operations]);
@@ -54,14 +54,17 @@ export default function TextBlock(props) {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
     }
+    onReadKeyCommand(event);
   };
 
   return (
     <BlockWrapper
-      data-block-id={block.id}
+      id={block.id}
+      onChange={() => console.log('trigger')}
     >
       <StandardEditable
         anchor
+        blockId={block.id}
         content={block.properties.title[0][0]}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
@@ -73,4 +76,5 @@ export default function TextBlock(props) {
 TextBlock.propTypes = {
   block: PropTypes.instanceOf(Object).isRequired,
   onChange: PropTypes.func.isRequired,
+  onReadKeyCommand: PropTypes.func.isRequired,
 };
