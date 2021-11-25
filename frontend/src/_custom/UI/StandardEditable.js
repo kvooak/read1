@@ -22,6 +22,7 @@ export default function StandardEditable(props) {
     content,
     onChange,
     onKeyDown,
+    onKeyUp,
   } = props;
 
   return (
@@ -33,6 +34,7 @@ export default function StandardEditable(props) {
       spellCheck={false}
       onInput={onChange}
       onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
     >
       {content}
     </Editable>
@@ -50,4 +52,5 @@ StandardEditable.propTypes = {
   content: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   onKeyDown: PropTypes.func.isRequired,
+  onKeyUp: PropTypes.func.isRequired,
 };

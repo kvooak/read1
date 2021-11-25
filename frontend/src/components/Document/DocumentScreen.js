@@ -87,18 +87,36 @@ export default function DocumentScreen() {
     addTransaction(transaction);
   };
 
-  const handleKeyCommand = (event) => {
-    const { key, shiftKey, target } = event;
-    let operations;
-    let transaction;
+  const syncTransactionWithStore = (operations, status) => {
+    const [data] = operations;
+    dispatch(store.actions.blockState({ status, data }));
+    const transaction = transWorks.createTransaction(operations);
+    addTransaction(transaction);
+  };
+
+  const handleDownKeyCommand = (event) => {
+    const { key, shiftKey } = event;
 
     if (key === 'Enter' && !shiftKey) {
       setContentBackup(state.page.content);
-      operations = blockOperationSet.newBlockOps('text', 'test_doc');
-      const [newBlockOp] = operations;
-      dispatch(store.actions.newBlock(newBlockOp));
-      transaction = transWorks.createTransaction(operations);
-      addTransaction(transaction);
+      const operations = blockOperationSet.newBlock('text', state.page.id);
+      syncTransactionWithStore(operations, 'new');
+    }
+  };
+
+  const handleUpKeyCommand = (event) => {
+    const { key, target } = event;
+
+    if (key === 'Backspace') {
+      const hasContent = Boolean(event.target.innerHTML);
+      if (!hasContent) {
+        setContentBackup(state.page.content);
+        const operations = blockOperationSet.killBlock(
+          target.dataset.blockId,
+          state.page.id,
+        );
+        syncTransactionWithStore(operations, 'killed');
+      }
     }
   };
 
@@ -126,7 +144,8 @@ export default function DocumentScreen() {
         <PageContent
           blocks={state.blocks}
           onChange={handlePageContentChange}
-          onReadKeyCommand={handleKeyCommand}
+          onReadDownKeyCommand={handleDownKeyCommand}
+          onReadUpKeyCommand={handleUpKeyCommand}
         />
         <ClickToCreateZone />
       </ContentWrapper>

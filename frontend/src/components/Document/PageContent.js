@@ -1,7 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
@@ -14,7 +11,9 @@ const PageContentWrapper = styled.div`
 `;
 
 export default function PageContent(props) {
-  const { blocks, onChange, onReadKeyCommand } = props;
+  const {
+    blocks, onChange, onReadUpKeyCommand, onReadDownKeyCommand,
+  } = props;
 
   const handleMoveCursorUp = () => {
 
@@ -26,7 +25,8 @@ export default function PageContent(props) {
           key={block.id}
           block={block}
           onChange={onChange}
-          onReadKeyCommand={onReadKeyCommand}
+          onReadDownKeyCommand={onReadDownKeyCommand}
+          onReadUpKeyCommand={onReadUpKeyCommand}
           moveCursorUp={handleMoveCursorUp}
         />
       ))}
@@ -37,5 +37,6 @@ export default function PageContent(props) {
 PageContent.propTypes = {
   blocks: PropTypes.instanceOf(Array).isRequired,
   onChange: PropTypes.func.isRequired,
-  onReadKeyCommand: PropTypes.func.isRequired,
+  onReadDownKeyCommand: PropTypes.func.isRequired,
+  onReadUpKeyCommand: PropTypes.func.isRequired,
 };

@@ -1,3 +1,4 @@
+/* eslint no-case-declarations: 0 */
 const initialState = {
   page: null,
   blocks: [],
@@ -19,8 +20,8 @@ const blocksFetched = (data) => ({
   payload: data,
 });
 
-const newBlock = (data) => ({
-  type: 'newBlock',
+const blockState = (data) => ({
+  type: 'blockState',
   payload: data,
 });
 
@@ -32,7 +33,6 @@ const setBlock = (data) => ({
 const reducer = (state, action) => {
   const newState = { ...state };
 
-  let newBlockData;
   switch (action.type) {
     case 'fetchPage':
       return {
@@ -44,10 +44,16 @@ const reducer = (state, action) => {
       newState.blocks = action.payload;
       return newState;
 
-    case 'newBlock':
-      newBlockData = action.payload.args;
-      newState.blocks = [...state.blocks, newBlockData];
-      newState.page.content = [...state.page.content, newBlockData.id];
+    case 'blockState':
+      const { status, data } = action.payload;
+      if (status === 'new') {
+        newState.blocks = [...state.blocks, data.args];
+        newState.page.content = [...state.page.content, data.id];
+      } else if (status === 'killed') {
+        const blockID = data.pointer.id;
+        newState.blocks = state.blocks.filter((block) => block.id !== blockID);
+        newState.page.content = state.page.content.filter((id) => id !== blockID);
+      }
       return newState;
 
     case 'setBlock':
@@ -71,7 +77,7 @@ const store = {
   actions: {
     fetchPage,
     blocksFetched,
-    newBlock,
+    blockState,
     setBlock,
     error,
   },

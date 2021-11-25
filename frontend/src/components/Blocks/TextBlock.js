@@ -17,7 +17,9 @@ const BlockWrapper = styled.div`
 const htmlStripper = striptags.init_streaming_mode([], '\n');
 
 export default function TextBlock(props) {
-  const { block, onChange, onReadKeyCommand } = props;
+  const {
+    block, onChange, onReadDownKeyCommand, onReadUpKeyCommand,
+  } = props;
   const [bufferOperations, setBufferOperations] = useState([]);
 
   const operations = useDebounce(bufferOperations, 200);
@@ -53,10 +55,16 @@ export default function TextBlock(props) {
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
+      onReadDownKeyCommand(event);
     }
-    onReadKeyCommand(event);
   };
 
+  const handleKeyUp = (event) => {
+    if (event.key === 'Backspace') {
+      event.preventDefault();
+      onReadUpKeyCommand(event);
+    }
+  };
   return (
     <BlockWrapper
       id={block.id}
@@ -68,6 +76,7 @@ export default function TextBlock(props) {
         content={block.properties.title[0][0]}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onKeyUp={handleKeyUp}
       />
     </BlockWrapper>
   );
@@ -76,5 +85,6 @@ export default function TextBlock(props) {
 TextBlock.propTypes = {
   block: PropTypes.instanceOf(Object).isRequired,
   onChange: PropTypes.func.isRequired,
-  onReadKeyCommand: PropTypes.func.isRequired,
+  onReadDownKeyCommand: PropTypes.func.isRequired,
+  onReadUpKeyCommand: PropTypes.func.isRequired,
 };

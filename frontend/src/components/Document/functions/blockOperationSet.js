@@ -1,67 +1,71 @@
 import { v4 as uuidv4 } from 'uuid';
 
-const newBlockOps = (type, parent, args) => {
-  let newBlockEmbryo = args;
+const newBlockEmbryo = (id, type, parentID, timeNow) => ({
+  id,
+  type,
+  properties: { title: [['']] },
+  content: [],
+  parent: parentID,
+  alive: true,
+  created_time: timeNow,
+  last_edited_time: timeNow,
+});
+
+const blockUpdate = (collection, id, path, args) => ({
+  pointer: { collection, id },
+  path,
+  command: 'update',
+  args,
+});
+
+const blockSet = (collection, id, path, args) => ({
+  pointer: { collection, id },
+  path,
+  command: 'set',
+  args,
+});
+
+const blockContentList = (collection, id, command, args) => ({
+  pointer: { collection, id },
+  path: ['content'],
+  command,
+  args,
+});
+
+const newBlock = (type, parentID, args) => {
+  let newBlockArgs = args;
   const id = uuidv4();
   const timeNow = Date.now();
 
-  if (!newBlockEmbryo) {
-    newBlockEmbryo = {
-      id,
-      type,
-      properties: {
-        title: [['']],
-      },
-      content: [],
-      parent,
-      alive: true,
-      created_time: timeNow,
-      last_edited_time: timeNow,
-    };
+  if (!newBlockArgs) {
+    newBlockArgs = newBlockEmbryo(id, type, parentID, timeNow);
   }
 
-  const newBlockOp = {
-    pointer: {
-      collection: 'blocks',
-      id: newBlockEmbryo.id,
-    },
-    path: [],
-    command: 'update',
-    args: newBlockEmbryo,
-  };
-
-  const parentBlockListChildOp = {
-    pointer: {
-      collection: 'documents',
-      id: parent,
-    },
-    path: ['content'],
-    command: 'listAtBottom',
-    args: {
-      id: newBlockEmbryo.id,
-    },
-  };
-
-  const parentBlockTimestampOp = {
-    pointer: {
-      collection: 'documents',
-      id: parent,
-    },
-    path: ['last_edited_time'],
-    command: 'set',
-    args: timeNow,
-  };
-
   const ops = [
-    newBlockOp,
-    parentBlockTimestampOp,
-    parentBlockListChildOp,
+    blockUpdate('blocks', newBlockArgs.id, [], newBlockArgs),
+    blockSet('documents', parentID, ['last_edited_time'], timeNow),
+    blockContentList(
+      'documents', parentID, 'listAtBottom', { id: newBlockArgs.id },
+    ),
+  ];
+  return ops;
+};
+
+const killBlock = (blockID, parentID) => {
+  const timeNow = Date.now();
+  const ops = [
+    blockUpdate('blocks', blockID, ['alive'], false),
+    blockSet('documents', parentID, ['last_edited_time'], timeNow),
+    blockContentList(
+      'documents', parentID, 'listRemove', { id: blockID },
+    ),
   ];
   return ops;
 };
 
 const blockOperationSet = {
-  newBlockOps,
+  newBlock,
+  killBlock,
 };
 
 export default blockOperationSet;

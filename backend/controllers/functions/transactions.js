@@ -2,6 +2,7 @@ async function createOpShard(db, trans, operation) {
 	const { args, command, path, pointer } = operation;
 	const collection = await db.collection(pointer.collection);
 	const recordID = pointer.id;
+	let record;
 	let updatedArgs = args;
 	let newProp;
 	let propName;
@@ -15,11 +16,21 @@ async function createOpShard(db, trans, operation) {
 			break;
 
 		case 'listAtBottom':
-			const record = await trans.step(() => collection.document(recordID));
+			record = await trans.step(() => collection.document(recordID));
 			updatedArgs = path.reduce((proxy, key) => {
 				return proxy[key];
 			}, record);
 			updatedArgs.push(args.id);	
+			break;
+
+		case 'listRemove':
+			record = await trans.step(() => collection.document(recordID));
+			updatedArgs = path.reduce((proxy, key) => {
+				return proxy[key];
+			}, record);
+
+			const index = updatedArgs.indexOf(args.id);
+			if (index > -1) updatedArgs.splice(index, 1); 
 			break;
 
 		default:
