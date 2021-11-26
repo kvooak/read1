@@ -51,8 +51,9 @@ const reducer = (state, action) => {
         newState.page.content = [...state.page.content, data.id];
       } else if (status === 'killed') {
         const blockID = data.pointer.id;
-        newState.blocks = state.blocks.filter((block) => block.id !== blockID);
-        newState.page.content = state.page.content.filter((id) => id !== blockID);
+        const index = state.blocks.findIndex((b) => b.id === blockID);
+        newState.blocks.splice(index, 1);
+        newState.page.content.splice(index, 1);
       }
       return newState;
 

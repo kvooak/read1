@@ -1,6 +1,5 @@
 /* eslint no-underscore-dangle: 0 */
 import React, {
-  useMemo,
   useState,
   useContext,
   useEffect,
@@ -12,7 +11,6 @@ import store from './functions/store';
 import { PageContext } from './PageStore';
 import transWorks from './functions/transactionWorks';
 import blockOperationSet from './functions/blockOperationSet';
-import BlockControl from './functions/BlockControl';
 
 import Container from '../../_custom/UI/Container';
 import PageContent from './PageContent';
@@ -54,30 +52,6 @@ export default function DocumentScreen() {
     store,
   });
 
-  const [contentBackup, setContentBackup] = useState([]);
-  const autoFocusBlockID = useMemo(() => {
-    if (state.page) {
-      const { content } = state.page;
-      let targetID;
-      if (content.length > contentBackup.length) {
-        targetID = content.find((id) => !contentBackup.includes(id));
-      } else {
-        const pos = contentBackup.findIndex((id) => !content.includes(id));
-        targetID = content[pos - 1];
-      }
-      return targetID;
-    }
-  }, [state.page?.content, contentBackup]);
-
-  useEffect(() => {
-    if (autoFocusBlockID) {
-      const targetBlock = document.getElementById(autoFocusBlockID);
-      if (targetBlock) {
-        BlockControl.focusBlock(targetBlock.firstElementChild);
-      }
-    }
-  }, [autoFocusBlockID]);
-
   const addTransaction = (transaction) => {
     setTransactions((prev) => [...prev, transaction]);
   };
@@ -95,29 +69,24 @@ export default function DocumentScreen() {
   };
 
   const handleDownKeyCommand = (event) => {
-    const { key, shiftKey } = event;
-
+    const { key, target, shiftKey } = event;
+    let operations;
     if (key === 'Enter' && !shiftKey) {
-      setContentBackup(state.page.content);
-      const operations = blockOperationSet.newBlock('text', state.page.id);
+      operations = blockOperationSet.newBlock('text', state.page.id);
       syncTransactionWithStore(operations, 'new');
-    }
-  };
-
-  const handleUpKeyCommand = (event) => {
-    const { key, target } = event;
-
-    if (key === 'Backspace') {
+    } else if (key === 'Backspace') {
       const hasContent = Boolean(event.target.innerHTML);
       if (!hasContent) {
-        setContentBackup(state.page.content);
-        const operations = blockOperationSet.killBlock(
+        operations = blockOperationSet.killBlock(
           target.dataset.blockId,
           state.page.id,
         );
         syncTransactionWithStore(operations, 'killed');
       }
     }
+  };
+
+  const handleUpKeyCommand = () => {
   };
 
   useEffect(() => {

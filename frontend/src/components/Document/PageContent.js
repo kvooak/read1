@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
+import BlockControl from './functions/BlockControl';
 import TextBlock from '../Blocks/TextBlock';
 
 const PageContentWrapper = styled.div`
@@ -15,9 +16,27 @@ export default function PageContent(props) {
     blocks, onChange, onReadUpKeyCommand, onReadDownKeyCommand,
   } = props;
 
-  const handleMoveCursorUp = () => {
+  const [focused, setFocused] = useState(null);
+  useEffect(() => {
+    if (focused) BlockControl.focusBlock(focused.firstChild);
+  }, [focused]);
 
+  const [refs, setRefs] = useState([]);
+  const handleRegisterRef = (ref) => {
+    setRefs((prev) => [...prev, ref]);
+    setFocused(ref);
   };
+
+  const handleDeregisterRef = (blockID) => {
+    const index = refs.findIndex((ref) => ref.id === blockID);
+    setFocused(refs[index - 1]);
+    setRefs((prev) => {
+      const current = [...prev];
+      current.splice(index, 1);
+      return current;
+    });
+  };
+
   return (
     <PageContentWrapper>
       {blocks.map((block) => (
@@ -25,9 +44,10 @@ export default function PageContent(props) {
           key={block.id}
           block={block}
           onChange={onChange}
+          onMount={handleRegisterRef}
+          onUnmount={handleDeregisterRef}
           onReadDownKeyCommand={onReadDownKeyCommand}
           onReadUpKeyCommand={onReadUpKeyCommand}
-          moveCursorUp={handleMoveCursorUp}
         />
       ))}
     </PageContentWrapper>
