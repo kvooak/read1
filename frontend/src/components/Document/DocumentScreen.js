@@ -11,6 +11,7 @@ import store from './functions/store';
 import { PageContext } from './PageStore';
 import transWorks from './functions/transactionWorks';
 import blockOperationSet from './functions/blockOperationSet';
+import BlockControl from './functions/BlockControl';
 
 import Container from '../../_custom/UI/Container';
 import PageContent from './PageContent';
@@ -52,6 +53,31 @@ export default function DocumentScreen() {
     store,
   });
 
+  const [cursor, setCursor] = useState(null);
+  useEffect(() => {
+    if (cursor) BlockControl.focusBlock(cursor.firstChild);
+  }, [cursor]);
+
+  const handleSetCursor = (ref) => {
+    setCursor(ref);
+  };
+
+  const [refs, setRefs] = useState([]);
+  const handleRegisterRef = (ref) => {
+    setRefs((prev) => [...prev, ref]);
+    setCursor(ref);
+  };
+
+  const handleDeregisterRef = (blockID) => {
+    const index = refs.findIndex((ref) => ref.id === blockID);
+    setCursor(refs[index - 1]);
+    setRefs((prev) => {
+      const current = [...prev];
+      current.splice(index, 1);
+      return current;
+    });
+  };
+
   const addTransaction = (transaction) => {
     setTransactions((prev) => [...prev, transaction]);
   };
@@ -61,9 +87,8 @@ export default function DocumentScreen() {
     addTransaction(transaction);
   };
 
-  const syncTransactionWithStore = (operations, status) => {
-    const [data] = operations;
-    dispatch(store.actions.blockState({ status, data }));
+  const syncTransactionWithStore = (operations) => {
+    dispatch(store.actions.blockState({ operations }));
     const transaction = transWorks.createTransaction(operations);
     addTransaction(transaction);
   };
@@ -72,8 +97,12 @@ export default function DocumentScreen() {
     const { key, target, shiftKey } = event;
     let operations;
     if (key === 'Enter' && !shiftKey) {
-      operations = blockOperationSet.newBlock('text', state.page.id);
-      syncTransactionWithStore(operations, 'new');
+      operations = blockOperationSet.newBlockBelowCursor(
+        'text',
+        cursor.id,
+        state.page.id,
+      );
+      syncTransactionWithStore(operations);
     } else if (key === 'Backspace') {
       const hasContent = Boolean(event.target.innerHTML);
       if (!hasContent) {
@@ -81,7 +110,7 @@ export default function DocumentScreen() {
           target.dataset.blockId,
           state.page.id,
         );
-        syncTransactionWithStore(operations, 'killed');
+        syncTransactionWithStore(operations);
       }
     }
   };
@@ -115,6 +144,9 @@ export default function DocumentScreen() {
           onChange={handlePageContentChange}
           onReadDownKeyCommand={handleDownKeyCommand}
           onReadUpKeyCommand={handleUpKeyCommand}
+          onMount={handleRegisterRef}
+          onUnmount={handleDeregisterRef}
+          onFocus={handleSetCursor}
         />
         <ClickToCreateZone />
       </ContentWrapper>

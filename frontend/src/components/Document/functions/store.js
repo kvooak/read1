@@ -45,15 +45,29 @@ const reducer = (state, action) => {
       return newState;
 
     case 'blockState':
-      const { status, data } = action.payload;
-      if (status === 'new') {
-        newState.blocks = [...state.blocks, data.args];
-        newState.page.content = [...state.page.content, data.id];
-      } else if (status === 'killed') {
-        const blockID = data.pointer.id;
+      const { operations } = action.payload;
+      const [blockOp, listOp] = operations;
+      const { args, command } = listOp;
+
+      if (command === 'listRemove') {
+        const blockID = blockOp.pointer.id;
         const index = state.blocks.findIndex((b) => b.id === blockID);
         newState.blocks.splice(index, 1);
         newState.page.content.splice(index, 1);
+        return newState;
+      }
+
+      if (command === 'listAfter') {
+        const afterIndex = state.blocks.findIndex((b) => b.id === args.after);
+        newState.blocks.splice(afterIndex + 1, 0, blockOp.args);
+        newState.page.content.splice(afterIndex + 1, 0, blockOp.pointer.id);
+        return newState;
+      }
+
+      if (command === 'listAtBottom') {
+        newState.blocks = [...state.blocks, blockOp.args];
+        newState.page.content = [...state.page.content, blockOp.id];
+        return newState;
       }
       return newState;
 

@@ -4,9 +4,19 @@ async function createOpShard(db, trans, operation) {
 	const recordID = pointer.id;
 	let record;
 	let updatedArgs = args;
+	let index;
 	let newProp;
 	let propName;
 	let propValue;
+
+	const serveUpdatedArgs = async () => {
+		record = await trans.step(() => collection.document(recordID));
+		updated = path.reduce((proxy, key) => {
+			return proxy[key];
+		}, record);
+
+		return updated;
+	};
 
 	switch (command) {
 		case 'set':
@@ -14,22 +24,21 @@ async function createOpShard(db, trans, operation) {
 
 		case 'update':
 			break;
+		
+		case 'listAfter':
+			updatedArgs = await serveUpdatedArgs();
+			index = updatedArgs.indexOf(args.after);
+			if (index > -1) updatedArgs.splice(index + 1, 0, args.id);
+			break;
 
 		case 'listAtBottom':
-			record = await trans.step(() => collection.document(recordID));
-			updatedArgs = path.reduce((proxy, key) => {
-				return proxy[key];
-			}, record);
+			updatedArgs = await serveUpdatedArgs();
 			updatedArgs.push(args.id);	
 			break;
 
 		case 'listRemove':
-			record = await trans.step(() => collection.document(recordID));
-			updatedArgs = path.reduce((proxy, key) => {
-				return proxy[key];
-			}, record);
-
-			const index = updatedArgs.indexOf(args.id);
+			updatedArgs = await serveUpdatedArgs();
+			index = updatedArgs.indexOf(args.id);
 			if (index > -1) updatedArgs.splice(index, 1); 
 			break;
 

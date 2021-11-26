@@ -20,6 +20,7 @@ export default function StandardEditable(props) {
     anchor,
     blockId,
     content,
+    onFocus,
     onChange,
     onKeyDown,
     onKeyUp,
@@ -33,6 +34,7 @@ export default function StandardEditable(props) {
       suppressContentEditableWarning
       spellCheck={false}
       onInput={onChange}
+      onFocus={onFocus}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
     >
@@ -51,6 +53,7 @@ StandardEditable.propTypes = {
   blockId: PropTypes.string.isRequired,
   content: PropTypes.string,
   onChange: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
   onKeyDown: PropTypes.func.isRequired,
   onKeyUp: PropTypes.func.isRequired,
 };

@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
-import BlockControl from './functions/BlockControl';
 import TextBlock from '../Blocks/TextBlock';
 
 const PageContentWrapper = styled.div`
@@ -13,29 +12,14 @@ const PageContentWrapper = styled.div`
 
 export default function PageContent(props) {
   const {
-    blocks, onChange, onReadUpKeyCommand, onReadDownKeyCommand,
+    blocks,
+    onChange,
+    onReadUpKeyCommand,
+    onReadDownKeyCommand,
+    onFocus,
+    onMount,
+    onUnmount,
   } = props;
-
-  const [focused, setFocused] = useState(null);
-  useEffect(() => {
-    if (focused) BlockControl.focusBlock(focused.firstChild);
-  }, [focused]);
-
-  const [refs, setRefs] = useState([]);
-  const handleRegisterRef = (ref) => {
-    setRefs((prev) => [...prev, ref]);
-    setFocused(ref);
-  };
-
-  const handleDeregisterRef = (blockID) => {
-    const index = refs.findIndex((ref) => ref.id === blockID);
-    setFocused(refs[index - 1]);
-    setRefs((prev) => {
-      const current = [...prev];
-      current.splice(index, 1);
-      return current;
-    });
-  };
 
   return (
     <PageContentWrapper>
@@ -44,8 +28,9 @@ export default function PageContent(props) {
           key={block.id}
           block={block}
           onChange={onChange}
-          onMount={handleRegisterRef}
-          onUnmount={handleDeregisterRef}
+          onFocus={onFocus}
+          onMount={onMount}
+          onUnmount={onUnmount}
           onReadDownKeyCommand={onReadDownKeyCommand}
           onReadUpKeyCommand={onReadUpKeyCommand}
         />
@@ -59,4 +44,7 @@ PageContent.propTypes = {
   onChange: PropTypes.func.isRequired,
   onReadDownKeyCommand: PropTypes.func.isRequired,
   onReadUpKeyCommand: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+  onMount: PropTypes.func.isRequired,
+  onUnmount: PropTypes.func.isRequired,
 };

@@ -32,7 +32,14 @@ const blockContentList = (collection, id, command, args) => ({
   args,
 });
 
-const newBlock = (type, parentID, args) => {
+const newBlockSharedOp = ({
+  type,
+  cursorID,
+  parentID,
+  args,
+  collection,
+  command,
+}) => {
   let newBlockArgs = args;
   const id = uuidv4();
   const timeNow = Date.now();
@@ -40,14 +47,58 @@ const newBlock = (type, parentID, args) => {
   if (!newBlockArgs) {
     newBlockArgs = newBlockEmbryo(id, type, parentID, timeNow);
   }
-
   const ops = [
-    blockUpdate('blocks', newBlockArgs.id, [], newBlockArgs),
-    blockSet('documents', parentID, ['last_edited_time'], timeNow),
+    blockUpdate(
+      'blocks',
+      newBlockArgs.id,
+      [],
+      newBlockArgs,
+    ),
     blockContentList(
-      'documents', parentID, 'listAtBottom', { id: newBlockArgs.id },
+      collection,
+      parentID,
+      command,
+      {
+        after: cursorID || undefined,
+        id: newBlockArgs.id,
+      },
+    ),
+    blockSet(
+      'documents',
+      parentID,
+      ['last_edited_time'],
+      newBlockArgs.created_time,
     ),
   ];
+  return ops;
+};
+
+const newBlockBelowCursor = (type, cursorID, parentID, args) => {
+  const command = 'listAfter';
+  const collection = 'documents';
+  const ops = newBlockSharedOp({
+    args,
+    cursorID,
+    command,
+    collection,
+    parentID,
+    type,
+  });
+
+  return ops;
+};
+
+const newBlockAtBottom = (type, parentID, args) => {
+  const command = 'listAtBottom';
+  const collection = 'documents';
+  const ops = newBlockSharedOp({
+    args,
+    command,
+    collection,
+    parentID,
+    type,
+  });
+
   return ops;
 };
 
@@ -55,16 +106,17 @@ const killBlock = (blockID, parentID) => {
   const timeNow = Date.now();
   const ops = [
     blockUpdate('blocks', blockID, ['alive'], false),
-    blockSet('documents', parentID, ['last_edited_time'], timeNow),
     blockContentList(
       'documents', parentID, 'listRemove', { id: blockID },
     ),
+    blockSet('documents', parentID, ['last_edited_time'], timeNow),
   ];
   return ops;
 };
 
 const blockOperationSet = {
-  newBlock,
+  newBlockBelowCursor,
+  newBlockAtBottom,
   killBlock,
 };
 
