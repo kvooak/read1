@@ -7,7 +7,6 @@ const newBlockEmbryo = (id, type, parentID, timeNow) => ({
   content: [],
   parent: parentID,
   alive: true,
-  created_time: timeNow,
   last_edited_time: timeNow,
 });
 
@@ -44,13 +43,16 @@ const newBlockSharedOp = ({
   const id = uuidv4();
   const timeNow = Date.now();
 
+  newBlockArgs.id = id;
+  newBlockArgs.created_time = timeNow;
   if (!newBlockArgs) {
     newBlockArgs = newBlockEmbryo(id, type, parentID, timeNow);
   }
+
   const ops = [
     blockUpdate(
       'blocks',
-      newBlockArgs.id,
+      id,
       [],
       newBlockArgs,
     ),
@@ -60,14 +62,14 @@ const newBlockSharedOp = ({
       command,
       {
         after: cursorID || undefined,
-        id: newBlockArgs.id,
+        id,
       },
     ),
     blockSet(
       'documents',
       parentID,
       ['last_edited_time'],
-      newBlockArgs.created_time,
+      timeNow,
     ),
   ];
   return ops;

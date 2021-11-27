@@ -41,14 +41,19 @@ const ButtonWrapper = styled.div`
 `;
 
 export default function BlockMenu(props) {
-  const { block } = props;
+  const { block, onAdd, onKill } = props;
 
   const handleDeleteBlock = () => {
-    console.log('delete', block);
+    onKill(block.id);
   };
 
   const handleDuplicateBlock = () => {
-    console.log('duplicate', block);
+    const embryo = { ...block };
+    embryo.id = undefined;
+    embryo._id = undefined;
+    embryo._key = undefined;
+    embryo._rev = undefined;
+    onAdd(embryo);
   };
 
   return (
@@ -65,6 +70,7 @@ export default function BlockMenu(props) {
             <b>{block.type}</b>
           </Typography>
 
+          {block.type === 'translator' && (
           <Stack direction="row" spacing={1}>
             <StandardChip
               label="English"
@@ -89,6 +95,7 @@ export default function BlockMenu(props) {
               onClick={() => {}}
             />
           </Stack>
+          )}
         </MenuHeaderWrapper>
 
         <MenuBlockItem
@@ -122,4 +129,6 @@ export default function BlockMenu(props) {
 
 BlockMenu.propTypes = {
   block: PropTypes.instanceOf(Object).isRequired,
+  onAdd: PropTypes.func.isRequired,
+  onKill: PropTypes.func.isRequired,
 };

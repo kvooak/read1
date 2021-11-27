@@ -39,6 +39,8 @@ export default function TextBlock(props) {
     onReadDownKeyCommand,
   } = props;
 
+  const content = block.properties.title[0][0];
+
   const blockRef = useRef(block.id);
   useEffect(() => {
     if (blockRef.current) onMount(blockRef.current);
@@ -51,9 +53,18 @@ export default function TextBlock(props) {
     if (operations.length) onChange(operations);
   }, [operations]);
 
+  const [placeholder, setPlaceholder] = useState(' ');
+  const handleFocus = () => {
+    setPlaceholder('Type : for options');
+  };
+
+  const handleBlur = () => {
+    setPlaceholder(' ');
+  };
+
   const handleChange = (event) => {
-    const content = event.currentTarget.innerHTML;
-    const cleanContent = htmlStripper(content);
+    const { innerHTML } = event.currentTarget;
+    const cleanContent = htmlStripper(innerHTML);
     const contentOperation = {
       pointer: {
         collection: 'blocks',
@@ -90,10 +101,13 @@ export default function TextBlock(props) {
     >
       <StandardEditable
         anchor
+        placeholder={placeholder}
         blockId={block.id}
-        content={block.properties.title[0][0]}
+        content={content}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
       />
     </BlockWrapper>
   );

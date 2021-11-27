@@ -37,7 +37,7 @@ MenuButtonGroup.propTypes = {
 };
 
 export default function BlockMenuInterface(props) {
-  const { block } = props;
+  const { block, onKill, onAdd } = props;
 
   const [anchorEl, setAnchorEl] = useState(null);
   const handleToggleMenu = (event) => {
@@ -73,7 +73,11 @@ export default function BlockMenuInterface(props) {
           horizontal: 'right',
         }}
       >
-        <BlockMenu block={block} />
+        <BlockMenu
+          block={block}
+          onKill={onKill}
+          onAdd={onAdd}
+        />
       </StandardPopover>
     </InterfaceWrapper>
   );
@@ -85,4 +89,6 @@ BlockMenuInterface.defaultProps = {
 
 BlockMenuInterface.propTypes = {
   block: PropTypes.instanceOf(Object),
+  onAdd: PropTypes.func.isRequired,
+  onKill: PropTypes.func.isRequired,
 };
