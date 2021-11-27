@@ -43,11 +43,12 @@ const newBlockSharedOp = ({
   const id = uuidv4();
   const timeNow = Date.now();
 
-  newBlockArgs.id = id;
-  newBlockArgs.created_time = timeNow;
   if (!newBlockArgs) {
     newBlockArgs = newBlockEmbryo(id, type, parentID, timeNow);
   }
+
+  newBlockArgs.id = id;
+  newBlockArgs.created_time = timeNow;
 
   const ops = [
     blockUpdate(

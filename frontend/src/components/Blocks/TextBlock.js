@@ -64,7 +64,7 @@ export default function TextBlock(props) {
 
   const handleChange = (event) => {
     const { innerHTML } = event.currentTarget;
-    const cleanContent = htmlStripper(innerHTML);
+    const cleanContent = htmlStripper(innerHTML).trim();
     const contentOperation = {
       pointer: {
         collection: 'blocks',
