@@ -1,3 +1,6 @@
+const print = require('../../_utils/print');
+const { isArangoError } = require('arangojs/error');
+
 async function createOpShard(db, trans, operation) {
 	const { args, command, path, pointer } = operation;
 	const collection = await db.collection(pointer.collection);
@@ -10,12 +13,21 @@ async function createOpShard(db, trans, operation) {
 	let propValue;
 
 	const serveUpdatedArgs = async () => {
-		record = await trans.step(() => collection.document(recordID));
-		updated = path.reduce((proxy, key) => {
-			return proxy[key];
-		}, record);
+		try {
+			record = await trans.step(() => collection.document(recordID));
+			updated = path.reduce((proxy, key) => {
+				return proxy[key];
+			}, record);
 
-		return updated;
+			return updated;
+		} catch (e) {
+			print.log(`Error at ${serveUpdatedArgs.name}`)
+			print.log({ recordID, record, updated, });
+			if (isArangoError(e)) {
+				print.log({ code: e.code, message: e.message });
+			}
+			throw e;
+		}
 	};
 
 	switch (command) {
@@ -78,30 +90,58 @@ async function dbOperation(trans, {
 	propName,
 	propValue
 }) {
-	const keyShard = { _key: recordID };
-	let updateData = { [propName]: propValue };
+	try {
+		const keyShard = { _key: recordID };
+		let updateData = { [propName]: propValue };
 
-	if (propName === '_new') {
-		updateData = { ...propValue, _key: propValue.id };
-		await trans.step(() => collection.save(updateData));
-	} else {
-		await trans.step(() => collection.update(keyShard, updateData));
+		if (propName === '_new') {
+			updateData = { ...propValue, _key: propValue.id };
+			await trans.step(() => collection.save(updateData));
+		} else {
+			await trans.step(() => collection.update(keyShard, updateData));
+		}
+	} catch (e) {
+		print.log(`Error at ${dbOperation.name}`)
+		print.log({ recordID, propName, propValue, collection: collection.name });
+		if (isArangoError(e)) {
+			print.log({ code: e.code, message: e.message });
+			print.error(e.stack);
+		}
+		throw e;
 	}
 };
 
 async function createTransaction(db) {
-	const trans = await db.beginTransaction({
-		write: ['blocks', 'documents'],
-	});
+	try {
+		const trans = await db.beginTransaction({
+			write: ['blocks', 'documents'],
+		});
 
-	return trans;
+		return trans;
+	} catch (e) {
+		print.log(`Error at ${createTransaction.name}`)
+		print.log({ trans });
+		if (isArangoError(e)) {
+			print.log({ code: e.code, message: e.message });
+		}
+		throw e;
+	}
 }
 
 async function commitTransaction(trans, operationShards) {
-	await Promise.all(
-		operationShards.map(async (shard) => dbOperation(trans, shard)),
-	);
-	await trans.commit();		
+	try {
+		await Promise.all(
+			operationShards.map(async (shard) => dbOperation(trans, shard)),
+		);
+		await trans.commit();		
+	} catch (e) {
+		print.log(`Error at ${commitTransaction.name}`)
+		print.log({ trans, operationShards });
+		if (isArangoError(e)) {
+			print.log({ code: e.code, message: e.message });
+		}
+		throw e;
+	}
 };
 
 module.exports = {

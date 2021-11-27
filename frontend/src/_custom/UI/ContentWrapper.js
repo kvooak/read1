@@ -9,9 +9,6 @@ const Root = styled('div')(({ theme }) => ({
   alignItems: 'stretch',
 
   cursor: 'text',
-
-  height: '100vh',
-  paddingBottom: '20vh',
   color: 'rgb(55, 53, 47)',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
 

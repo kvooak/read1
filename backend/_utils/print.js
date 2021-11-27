@@ -11,32 +11,16 @@ const timestamp = () => {
 const originalConsole = console;
 
 module.exports = {
-  log: (text) => {
-    if (Array.isArray(text)) {
-      originalConsole.log(timestamp(), ...text);
-    } else {
-      originalConsole.log(timestamp(), text);
-    }
+  log: (...args) => {
+  	originalConsole.log(timestamp(), args);
   },
-  info: (text) => {
-    if (Array.isArray(text)) {
-      originalConsole.info(timestamp(), ...text);
-    } else {
-      originalConsole.info(timestamp(), text);
-    }
+  info: (...args) => {
+    originalConsole.info(timestamp(), args);
   },
-  warn: (text) => {
-    if (Array.isArray(text)) {
-      originalConsole.warn(timestamp(), ...text);
-    } else {
-      originalConsole.warn(timestamp(), text);
-    }
+  warn: (...args) => {
+    originalConsole.warn(timestamp(), args);
   },
-  error: (text) => {
-    if (Array.isArray(text)) {
-      originalConsole.error(timestamp(), ...text);
-    } else {
-      originalConsole.error(timestamp(), text);
-    }
+  error: (...args) => {
+   	originalConsole.error(timestamp(), args);
   },
 };

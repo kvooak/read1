@@ -1,19 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import api from '../../../api/api';
 
 const useSaveTransactions = ({
-  transactions,
-  setTransactions,
-  dispatch,
-  store,
-}) => {
+  transactions, setTransactions, dispatch, store,
+}, delay) => {
+  const [debounced, setDebounced] = useState([]);
+  useEffect(() => {
+    const handler = setTimeout(() => setDebounced(transactions), delay);
+    return () => { clearTimeout(handler); };
+  }, [transactions]);
+
   useEffect(() => {
     let ignore = false;
-    if (transactions.length) {
+    if (debounced.length) {
       const saveService = async () => {
-        const result = await api.meta.saveTransactions(transactions);
+        const result = await api.meta.saveTransactions(debounced);
         if (result.error) {
           dispatch(store.actions.error(result.error));
         }
@@ -23,7 +26,7 @@ const useSaveTransactions = ({
       if (!ignore) saveService();
     }
     return () => { ignore = true; };
-  }, [transactions]);
+  }, [debounced]);
 };
 
 const backgroundServices = ({

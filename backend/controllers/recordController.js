@@ -21,7 +21,6 @@ exports.fetchRecords = async (req, res, next) => {
 	} catch (e) {
 		if (isArangoError(e)) {
 			print({ code: e.code, message: e.message });
-			print.error(e.stack);
 		}
 		next(e);
 	}
@@ -45,10 +44,11 @@ exports.saveTransactions = async (req, res, next) => {
 
 		res.status(200).send({});
 	} catch (e) {
+		print.log(`Error at ${saveTransactions.name}`)
 		if (isArangoError(e)) {
 			print.log({ code: e.code, message: e.message });
-			print.error(e.stack);
 		}
 		next(e);
+		throw e;
 	}
 };

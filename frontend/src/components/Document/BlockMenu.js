@@ -1,6 +1,5 @@
 /* eslint no-underscore-dangle: 0 */
 import React from 'react';
-import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import styled from '@emotion/styled';
@@ -63,7 +62,7 @@ export default function BlockMenu(props) {
           <Typography variant="subtitle2" display="block" gutterBottom>
             Type:
             {' '}
-            <b>translation</b>
+            <b>{block.type}</b>
           </Typography>
 
           <Stack direction="row" spacing={1}>

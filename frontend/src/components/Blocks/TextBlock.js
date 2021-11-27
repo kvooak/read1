@@ -17,7 +17,7 @@ const BlockWrapper = React.forwardRef((props, ref) => {
   const { children, id } = props;
 
   return (
-    <Wrapper id={id} ref={ref}>
+    <Wrapper className="block" id={id} ref={ref}>
       {children}
     </Wrapper>
   );
@@ -34,11 +34,9 @@ export default function TextBlock(props) {
   const {
     block,
     onChange,
-    onFocus,
     onMount,
     onUnmount,
     onReadDownKeyCommand,
-    onReadUpKeyCommand,
   } = props;
 
   const blockRef = useRef(block.id);
@@ -52,10 +50,6 @@ export default function TextBlock(props) {
   useEffect(() => {
     if (operations.length) onChange(operations);
   }, [operations]);
-
-  const handleFocus = () => {
-    onFocus(blockRef.current);
-  };
 
   const handleChange = (event) => {
     const content = event.currentTarget.innerHTML;
@@ -89,12 +83,6 @@ export default function TextBlock(props) {
     onReadDownKeyCommand(event);
   };
 
-  const handleKeyUp = (event) => {
-    if (event.key === 'Backspace') {
-      event.preventDefault();
-      onReadUpKeyCommand(event);
-    }
-  };
   return (
     <BlockWrapper
       ref={blockRef}
@@ -105,9 +93,7 @@ export default function TextBlock(props) {
         blockId={block.id}
         content={block.properties.title[0][0]}
         onChange={handleChange}
-        onFocus={handleFocus}
         onKeyDown={handleKeyDown}
-        onKeyUp={handleKeyUp}
       />
     </BlockWrapper>
   );
@@ -116,9 +102,7 @@ export default function TextBlock(props) {
 TextBlock.propTypes = {
   block: PropTypes.instanceOf(Object).isRequired,
   onChange: PropTypes.func.isRequired,
-  onFocus: PropTypes.func.isRequired,
   onMount: PropTypes.func.isRequired,
   onUnmount: PropTypes.func.isRequired,
   onReadDownKeyCommand: PropTypes.func.isRequired,
-  onReadUpKeyCommand: PropTypes.func.isRequired,
 };

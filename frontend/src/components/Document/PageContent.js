@@ -13,9 +13,7 @@ export default function PageContent(props) {
   const {
     blocks,
     onChange,
-    onReadUpKeyCommand,
     onReadDownKeyCommand,
-    onFocus,
     onMount,
     onUnmount,
   } = props;
@@ -29,11 +27,9 @@ export default function PageContent(props) {
           key={block.id}
           block={block}
           onChange={onChange}
-          onFocus={onFocus}
           onMount={onMount}
           onUnmount={onUnmount}
           onReadDownKeyCommand={onReadDownKeyCommand}
-          onReadUpKeyCommand={onReadUpKeyCommand}
         />
       ))}
     </BlocksWrapper>
@@ -44,8 +40,6 @@ PageContent.propTypes = {
   blocks: PropTypes.instanceOf(Array).isRequired,
   onChange: PropTypes.func.isRequired,
   onReadDownKeyCommand: PropTypes.func.isRequired,
-  onReadUpKeyCommand: PropTypes.func.isRequired,
-  onFocus: PropTypes.func.isRequired,
   onMount: PropTypes.func.isRequired,
   onUnmount: PropTypes.func.isRequired,
 };

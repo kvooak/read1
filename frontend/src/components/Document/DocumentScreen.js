@@ -4,7 +4,6 @@ import React, {
   useContext,
   useEffect,
 } from 'react';
-import styled from '@emotion/styled';
 
 import api from '../../api/api';
 import store from './functions/store';
@@ -12,18 +11,13 @@ import { PageContext } from './PageStore';
 import transWorks from './functions/transactionWorks';
 import blockOperationSet from './functions/blockOperationSet';
 import BlockControl from './functions/BlockControl';
+import useActiveElement from '../../_custom/Hook/useActiveElement';
 
 import Container from '../../_custom/UI/Container';
 import ContentWrapper from '../../_custom/UI/ContentWrapper';
 import PageContent from './PageContent';
 import StandardPopper from '../../_custom/UI/StandardPopper';
 import BlockMenuInterface from './BlockMenuInterface';
-
-const ClickToCreateZone = styled.div`
-	width: 100%;
-	flex: 1 1 auto;
-	margin-left: auto;
-`;
 
 export default function DocumentScreen() {
   const { dispatch, state } = useContext(PageContext);
@@ -34,16 +28,12 @@ export default function DocumentScreen() {
     setTransactions,
     dispatch,
     store,
-  });
+  }, 0);
 
   const [cursor, setCursor] = useState(null);
   useEffect(() => {
     if (cursor) BlockControl.focusBlock(cursor.firstChild);
   }, [cursor]);
-
-  const handleSetCursor = (ref) => {
-    setCursor(ref);
-  };
 
   const [refs, setRefs] = useState([]);
   const handleRegisterRef = (ref) => {
@@ -51,15 +41,28 @@ export default function DocumentScreen() {
     setCursor(ref);
   };
 
-  const [hover, setHover] = useState(null);
+  const activeElement = useActiveElement();
   useEffect(() => {
+    if (activeElement.dataset.blockId) {
+      setCursor(activeElement.parentElement);
+    }
+  }, [activeElement]);
+
+  const [hover, setHover] = useState(null);
+  const [hoverData, setHoverData] = useState(null);
+  useEffect(() => {
+    if (hover) {
+      const { id } = hover;
+      const block = state.blocks.find((b) => b.id === id);
+      setHoverData(block);
+    }
   }, [hover]);
 
   const handleMouseMove = (event) => {
     const { pageY } = event;
     const hoverIndex = refs.findIndex((ref) => (
       pageY >= ref.offsetTop
-			&& pageY <= ref.offsetTop + ref.clientHeight
+    	&& pageY <= ref.offsetTop + ref.clientHeight
     ));
     setHover(refs[hoverIndex]);
   };
@@ -90,6 +93,7 @@ export default function DocumentScreen() {
   };
 
   const handleDownKeyCommand = (event) => {
+    setHover(null);
     const { key, target, shiftKey } = event;
     let operations;
     if (key === 'Enter' && !shiftKey) {
@@ -109,9 +113,6 @@ export default function DocumentScreen() {
         syncTransactionWithStore(operations);
       }
     }
-  };
-
-  const handleUpKeyCommand = () => {
   };
 
   useEffect(() => {
@@ -139,14 +140,11 @@ export default function DocumentScreen() {
           blocks={state.blocks}
           onChange={handlePageContentChange}
           onReadDownKeyCommand={handleDownKeyCommand}
-          onReadUpKeyCommand={handleUpKeyCommand}
           onMount={handleRegisterRef}
           onUnmount={handleDeregisterRef}
-          onFocus={handleSetCursor}
         />
-
-        <ClickToCreateZone />
       </ContentWrapper>
+
       {hover && (
         <StandardPopper
           id={hover.id}
@@ -154,7 +152,7 @@ export default function DocumentScreen() {
           anchorEl={hover}
           placement="left-end"
         >
-          <BlockMenuInterface block={hover} />
+          <BlockMenuInterface block={hoverData} />
         </StandardPopper>
       )}
     </Container>

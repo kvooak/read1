@@ -79,6 +79,10 @@ export default function BlockMenuInterface(props) {
   );
 }
 
+BlockMenuInterface.defaultProps = {
+  block: {},
+};
+
 BlockMenuInterface.propTypes = {
-  block: PropTypes.instanceOf(Object).isRequired,
+  block: PropTypes.instanceOf(Object),
 };
