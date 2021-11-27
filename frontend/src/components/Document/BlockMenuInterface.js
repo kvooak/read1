@@ -17,11 +17,14 @@ const InterfaceWrapper = styled.div`
 `;
 
 const MenuButtonGroup = (props) => {
-  const { toggleMenu, addBlock } = props;
+  const { toggleMenu, onAdd } = props;
+  const handleAddEmptyBlock = () => {
+    onAdd();
+  };
 
   return (
     <Stack direction="row">
-      <StandardIconButton onClick={addBlock}>
+      <StandardIconButton onClick={handleAddEmptyBlock}>
         <AddIcon sx={{ color: 'rgba(15, 15, 15, 0.2)' }} />
       </StandardIconButton>
       <StandardIconButton onClick={toggleMenu}>
@@ -33,7 +36,7 @@ const MenuButtonGroup = (props) => {
 
 MenuButtonGroup.propTypes = {
   toggleMenu: PropTypes.func.isRequired,
-  addBlock: PropTypes.func.isRequired,
+  onAdd: PropTypes.func.isRequired,
 };
 
 export default function BlockMenuInterface(props) {
@@ -48,7 +51,14 @@ export default function BlockMenuInterface(props) {
     }
   };
 
-  const handleAddBlock = () => {
+  const handleOnKill = (blockID) => {
+    onKill(blockID);
+    setAnchorEl(null);
+  };
+
+  const handleOnAdd = (args) => {
+    onAdd(args);
+    setAnchorEl(null);
   };
 
   const openMenu = Boolean(anchorEl);
@@ -57,7 +67,7 @@ export default function BlockMenuInterface(props) {
     <InterfaceWrapper>
       <MenuButtonGroup
         toggleMenu={handleToggleMenu}
-        addBlock={handleAddBlock}
+        onAdd={handleOnAdd}
       />
 
       <StandardPopover
@@ -75,8 +85,8 @@ export default function BlockMenuInterface(props) {
       >
         <BlockMenu
           block={block}
-          onKill={onKill}
-          onAdd={onAdd}
+          onKill={handleOnKill}
+          onAdd={handleOnAdd}
         />
       </StandardPopover>
     </InterfaceWrapper>

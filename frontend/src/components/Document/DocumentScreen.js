@@ -93,6 +93,7 @@ export default function DocumentScreen() {
   };
 
   const handleKillBlock = (blockID) => {
+    setHover(null);
     const operations = blockOperationSet.killBlock(blockID, state.page.id);
     syncTransactionWithStore(operations);
   };
@@ -108,7 +109,6 @@ export default function DocumentScreen() {
   };
 
   const handleDownKeyCommand = (event) => {
-    setHover(null);
     const { key, target, shiftKey } = event;
     if (key === 'Enter' && !shiftKey) {
       handleNewBlockBelowCursor();
