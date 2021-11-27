@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-const StandardInputButton = styled.button`
+const StandardIconButton = styled.button`
   height: 100%;
   padding: 0;
   outline: none;
@@ -20,4 +20,4 @@ const StandardInputButton = styled.button`
   transition: 0.05s;
 `;
 
-export default StandardInputButton;
+export default StandardIconButton;

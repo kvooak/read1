@@ -20,7 +20,6 @@ import Stack from '@mui/material/Stack';
 
 import StandardIconButton from '../../_custom/UI/StandardIconButton';
 import StandardChip from '../../_custom/UI/StandardChip';
-import clientSocket from './functions/socket';
 
 const menuPaperStyles = () => ({
   root: {
@@ -43,22 +42,14 @@ const ButtonWrapper = styled.div`
 `;
 
 export default function BlockMenu(props) {
-  const { blockId } = props;
-  const documentStore = useSelector((state) => state.document);
+  const { block } = props;
 
   const handleDeleteBlock = () => {
-    clientSocket.destroyBlock(blockId);
+    console.log('delete', block);
   };
 
   const handleDuplicateBlock = () => {
-    clientSocket.createBlock({
-      parent_id: documentStore.identity._key,
-      settings: {
-        type: 'translator',
-        from_block: blockId,
-        position: { below: blockId },
-      },
-    });
+    console.log('duplicate', block);
   };
 
   return (
@@ -131,5 +122,5 @@ export default function BlockMenu(props) {
 }
 
 BlockMenu.propTypes = {
-  blockId: PropTypes.string.isRequired,
+  block: PropTypes.instanceOf(Object).isRequired,
 };

@@ -1,6 +1,5 @@
 /* eslint no-underscore-dangle: 0 */
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
@@ -11,10 +10,10 @@ import StandardIconButton from '../../_custom/UI/StandardIconButton';
 import StandardPopover from '../../_custom/UI/StandardPopover';
 
 import BlockMenu from './BlockMenu';
-import clientSocket from './functions/socket';
 
 const InterfaceWrapper = styled.div`
-  padding-right: 4px;
+	padding: 3px 6px 3px 2px;
+	line-height: 1.5;
 `;
 
 const MenuButtonGroup = (props) => {
@@ -23,10 +22,10 @@ const MenuButtonGroup = (props) => {
   return (
     <Stack direction="row">
       <StandardIconButton onClick={addBlock}>
-        <AddIcon sx={{ color: 'rgba(15, 15, 15, 0.4)' }} />
+        <AddIcon sx={{ color: 'rgba(15, 15, 15, 0.2)' }} />
       </StandardIconButton>
       <StandardIconButton onClick={toggleMenu}>
-        <ModeEditIcon sx={{ color: 'rgba(15, 15, 15, 0.4)' }} />
+        <ModeEditIcon sx={{ color: 'rgba(15, 15, 15, 0.2)' }} />
       </StandardIconButton>
     </Stack>
   );
@@ -37,9 +36,8 @@ MenuButtonGroup.propTypes = {
   addBlock: PropTypes.func.isRequired,
 };
 
-const BlockMenuInterface = React.forwardRef((props, ref) => {
-  const { blockId } = props;
-  const documentStore = useSelector((state) => state.document);
+export default function BlockMenuInterface(props) {
+  const { block } = props;
 
   const [anchorEl, setAnchorEl] = useState(null);
   const handleToggleMenu = (event) => {
@@ -51,28 +49,18 @@ const BlockMenuInterface = React.forwardRef((props, ref) => {
   };
 
   const handleAddBlock = () => {
-    clientSocket.createBlock({
-      parent_id: documentStore.identity._key,
-      settings: {
-        type: 'translator',
-        position: { below: blockId },
-      },
-    });
   };
 
   const openMenu = Boolean(anchorEl);
-  const menuId = openMenu ? `menu-${blockId}` : undefined;
 
   return (
-    <InterfaceWrapper ref={ref}>
+    <InterfaceWrapper>
       <MenuButtonGroup
-        id={blockId}
         toggleMenu={handleToggleMenu}
         addBlock={handleAddBlock}
       />
 
       <StandardPopover
-        id={menuId}
         open={openMenu}
         anchorEl={anchorEl}
         onClose={handleToggleMenu}
@@ -85,14 +73,12 @@ const BlockMenuInterface = React.forwardRef((props, ref) => {
           horizontal: 'right',
         }}
       >
-        <BlockMenu blockId={blockId} />
+        <BlockMenu block={block} />
       </StandardPopover>
     </InterfaceWrapper>
   );
-});
+}
 
 BlockMenuInterface.propTypes = {
-  blockId: PropTypes.string.isRequired,
+  block: PropTypes.instanceOf(Object).isRequired,
 };
-
-export default BlockMenuInterface;

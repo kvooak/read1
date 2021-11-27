@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Popper from '@mui/material/Popper';
 
-const StandardPopper = React.forwardRef(({ children, ...props }, ref) => {
+export default function StandardPopper({ children, ...props }) {
   const {
     id,
     open,
@@ -14,8 +14,7 @@ const StandardPopper = React.forwardRef(({ children, ...props }, ref) => {
 
   return (
     <Popper
-      ref={ref}
-      id={id}
+      data-block-id={id}
       open={open}
       anchorEl={anchorEl}
       placement={placement}
@@ -24,19 +23,12 @@ const StandardPopper = React.forwardRef(({ children, ...props }, ref) => {
       {children}
     </Popper>
   );
-});
-
-StandardPopper.defaultProps = {
-  id: undefined,
-  anchorEl: null,
-};
+}
 
 StandardPopper.propTypes = {
   children: PropTypes.instanceOf(Object).isRequired,
-  id: PropTypes.string,
+  id: PropTypes.string.isRequired,
   placement: PropTypes.string.isRequired,
   open: PropTypes.bool.isRequired,
-  anchorEl: PropTypes.instanceOf(Object),
+  anchorEl: PropTypes.instanceOf(Object).isRequired,
 };
-
-export default StandardPopper;

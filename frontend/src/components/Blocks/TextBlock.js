@@ -8,10 +8,9 @@ import useDebounce from '../../_custom/Hook/useDebounce';
 import StandardEditable from '../../_custom/UI/StandardEditable';
 
 const Wrapper = styled.div`
-  display: inline-flex;
+	display: inline-flex;
+  flex: 1;
   width: 100%;
-	border: 1px solid black;
-	margin: 1px 0;
 `;
 
 const BlockWrapper = React.forwardRef((props, ref) => {

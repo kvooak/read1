@@ -1,7 +1,28 @@
-import styled from '@emotion/styled';
+import * as React from 'react';
+import PropTypes from 'prop-types';
+import { styled } from '@mui/material/styles';
 
-const Container = styled.div`
-  padding: 2rem 2rem 0 10rem;
-`;
+const Root = styled('div')(({ theme }) => ({
+  background: 'rgba(247, 246, 243, 0.4)',
+  [theme.breakpoints.down('md')]: {
+    paddingTop: theme.spacing(1),
+  },
+  [theme.breakpoints.up('md')]: {
+    paddingTop: theme.spacing(1),
+  },
+  [theme.breakpoints.up('lg')]: {
+    paddingTop: theme.spacing(1),
+  },
+}));
 
-export default Container;
+export default function Container({ children }) {
+  return (
+    <Root>
+      {children}
+    </Root>
+  );
+}
+
+Container.propTypes = {
+  children: PropTypes.node.isRequired,
+};

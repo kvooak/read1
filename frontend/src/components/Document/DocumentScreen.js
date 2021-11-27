@@ -14,27 +14,10 @@ import blockOperationSet from './functions/blockOperationSet';
 import BlockControl from './functions/BlockControl';
 
 import Container from '../../_custom/UI/Container';
+import ContentWrapper from '../../_custom/UI/ContentWrapper';
 import PageContent from './PageContent';
-
-const ContentWrapper = styled.div`
-	cursor: text;
-	display: flex;
-	height: 100vh;
-	flex-direction: column;
-	flex-flow: column;
-	padding: 0 16rem;
-	color: rgb(55, 53, 47);
-	font-family: -apple-system,
-		BlinkMacSystemFont,
-		"Segoe UI",
-		Roboto,
-		"Helvetica Neue",
-		Arial,
-		sans-serif,
-		"Apple Color Emoji",
-		"Segoe UI Emoji",
-		"Segoe UI Symbol";
-`;
+import StandardPopper from '../../_custom/UI/StandardPopper';
+import BlockMenuInterface from './BlockMenuInterface';
 
 const ClickToCreateZone = styled.div`
 	width: 100%;
@@ -66,6 +49,19 @@ export default function DocumentScreen() {
   const handleRegisterRef = (ref) => {
     setRefs((prev) => [...prev, ref]);
     setCursor(ref);
+  };
+
+  const [hover, setHover] = useState(null);
+  useEffect(() => {
+  }, [hover]);
+
+  const handleMouseMove = (event) => {
+    const { pageY } = event;
+    const hoverIndex = refs.findIndex((ref) => (
+      pageY >= ref.offsetTop
+			&& pageY <= ref.offsetTop + ref.clientHeight
+    ));
+    setHover(refs[hoverIndex]);
   };
 
   const handleDeregisterRef = (blockID) => {
@@ -138,7 +134,7 @@ export default function DocumentScreen() {
 
   return (
     <Container>
-      <ContentWrapper>
+      <ContentWrapper onMouseMove={handleMouseMove}>
         <PageContent
           blocks={state.blocks}
           onChange={handlePageContentChange}
@@ -148,8 +144,19 @@ export default function DocumentScreen() {
           onUnmount={handleDeregisterRef}
           onFocus={handleSetCursor}
         />
+
         <ClickToCreateZone />
       </ContentWrapper>
+      {hover && (
+        <StandardPopper
+          id={hover.id}
+          open={Boolean(hover)}
+          anchorEl={hover}
+          placement="left-end"
+        >
+          <BlockMenuInterface block={hover} />
+        </StandardPopper>
+      )}
     </Container>
   );
 }

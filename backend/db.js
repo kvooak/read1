@@ -1,7 +1,5 @@
 const arangojs = require('arangojs')
 
-const print = require('./_utils/print');
-
 const dbArangoConnect = async () => {
   const ARANGO_DB_URL = process.env.ARANGO_DB_URL || 'http://127.0.0.1:8529';
   const ARANGO_DB_USER = process.env.ARANGO_DB_USER || 'root';
@@ -25,7 +23,6 @@ const dbArangoConnect = async () => {
   };
 
   const connected = await connect();
-  print.log(`ARANGO CONNECTED ${ARANGO_DB_URL} ${ARANGO_DB_USER} ${ARANGO_DB_NAME}`);
   return connected;
 };
 

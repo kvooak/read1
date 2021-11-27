@@ -4,10 +4,9 @@ import styled from '@emotion/styled';
 
 import TextBlock from '../Blocks/TextBlock';
 
-const PageContentWrapper = styled.div`
+const BlocksWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 24px;
 `;
 
 export default function PageContent(props) {
@@ -22,7 +21,9 @@ export default function PageContent(props) {
   } = props;
 
   return (
-    <PageContentWrapper>
+    <BlocksWrapper
+      className="blocks-wrapper"
+    >
       {blocks.map((block) => (
         <TextBlock
           key={block.id}
@@ -35,7 +36,7 @@ export default function PageContent(props) {
           onReadUpKeyCommand={onReadUpKeyCommand}
         />
       ))}
-    </PageContentWrapper>
+    </BlocksWrapper>
   );
 }
 
