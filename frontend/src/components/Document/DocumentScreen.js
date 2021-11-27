@@ -92,26 +92,29 @@ export default function DocumentScreen() {
     addTransaction(transaction);
   };
 
+  const handleKillBlock = (blockID) => {
+    const operations = blockOperationSet.killBlock(blockID, state.page.id);
+    syncTransactionWithStore(operations);
+  };
+
+  const handleNewBlockBelowCursor = (args) => {
+    const operations = blockOperationSet.newBlockBelowCursor(
+      'text',
+      cursor.id,
+      state.page.id,
+      args,
+    );
+    syncTransactionWithStore(operations);
+  };
+
   const handleDownKeyCommand = (event) => {
     setHover(null);
     const { key, target, shiftKey } = event;
-    let operations;
     if (key === 'Enter' && !shiftKey) {
-      operations = blockOperationSet.newBlockBelowCursor(
-        'text',
-        cursor.id,
-        state.page.id,
-      );
-      syncTransactionWithStore(operations);
+      handleNewBlockBelowCursor();
     } else if (key === 'Backspace') {
       const hasContent = Boolean(event.target.innerHTML);
-      if (!hasContent) {
-        operations = blockOperationSet.killBlock(
-          target.dataset.blockId,
-          state.page.id,
-        );
-        syncTransactionWithStore(operations);
-      }
+      if (!hasContent) handleKillBlock(target.dataset.blockId);
     }
   };
 
@@ -152,7 +155,11 @@ export default function DocumentScreen() {
           anchorEl={hover}
           placement="left-end"
         >
-          <BlockMenuInterface block={hoverData} />
+          <BlockMenuInterface
+            block={hoverData}
+            onKill={handleKillBlock}
+            onAdd={handleNewBlockBelowCursor}
+          />
         </StandardPopper>
       )}
     </Container>
