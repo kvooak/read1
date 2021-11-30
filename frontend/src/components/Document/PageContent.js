@@ -11,17 +11,11 @@ const BlocksWrapper = styled.div`
 
 export default function PageContent(props) {
   const {
-    blocks,
-    onChange,
-    onReadDownKeyCommand,
-    onMount,
-    onUnmount,
+    blocks, onChange, onReadDownKeyCommand, onMount, onUnmount,
   } = props;
 
   return (
-    <BlocksWrapper
-      className="blocks-wrapper"
-    >
+    <BlocksWrapper className="blocks-wrapper">
       {blocks.map((block) => (
         <TextBlock
           key={block.id}

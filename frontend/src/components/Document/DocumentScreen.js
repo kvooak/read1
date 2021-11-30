@@ -1,9 +1,5 @@
 /* eslint no-underscore-dangle: 0 */
-import React, {
-  useState,
-  useContext,
-  useEffect,
-} from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 
 import api from '../../api/api';
 import store from './functions/store';
@@ -24,12 +20,15 @@ export default function DocumentScreen() {
   const { dispatch, state } = useContext(PageContext);
   const [transactions, setTransactions] = useState([]);
 
-  transWorks.backgroundServices.useSaveTransactions({
-    transactions,
-    setTransactions,
-    dispatch,
-    store,
-  }, 0);
+  transWorks.backgroundServices.useSaveTransactions(
+    {
+      transactions,
+      setTransactions,
+      dispatch,
+      store,
+    },
+    0,
+  );
 
   const [cursor, setCursor] = useState(null);
   useEffect(() => {
@@ -53,7 +52,7 @@ export default function DocumentScreen() {
   }, [hover]);
 
   const findBlockRefByID = (id) => {
-    const ref = refs.find((r) => (r.id === id));
+    const ref = refs.find((r) => r.id === id);
     return ref;
   };
 
@@ -84,9 +83,9 @@ export default function DocumentScreen() {
   }, [activeElement]);
 
   const findBlockRefByVerticalMousePos = (pos) => {
-    const block = refs.find((ref) => (
-      pos >= ref.offsetTop && pos <= ref.offsetTop + ref.clientHeight
-    ));
+    const block = refs.find(
+      (ref) => pos >= ref.offsetTop && pos <= ref.offsetTop + ref.clientHeight,
+    );
     return block;
   };
 
@@ -166,20 +165,26 @@ export default function DocumentScreen() {
   };
 
   useEffect(() => {
-    api.pages.getPageByID('test_doc').then((res) => {
-      dispatch(store.actions.fetchPage(res.data));
-    }).catch((e) => {
-      dispatch(store.actions.error(e.message));
-    });
+    api.pages
+      .getPageByID('test_doc')
+      .then((res) => {
+        dispatch(store.actions.fetchPage(res.data));
+      })
+      .catch((e) => {
+        dispatch(store.actions.error(e.message));
+      });
   }, []);
 
   useEffect(() => {
     if (state.page) {
-      api.blocks.fetchBlocks(state.page.content).then((res) => {
-        dispatch(store.actions.blocksFetched(res.data));
-      }).catch((e) => {
-        dispatch(store.actions.error(e.message));
-      });
+      api.blocks
+        .fetchBlocks(state.page.content)
+        .then((res) => {
+          dispatch(store.actions.blocksFetched(res.data));
+        })
+        .catch((e) => {
+          dispatch(store.actions.error(e.message));
+        });
     }
   }, [state.page]);
 
@@ -217,9 +222,7 @@ export default function DocumentScreen() {
           anchorEl={typeSearchBlock}
           placement="bottom-start"
         >
-          <BlockTypeSearchInterface
-            searchQuery={searchQuery}
-          />
+          <BlockTypeSearchInterface searchQuery={searchQuery} />
         </StandardPopper>
       )}
     </Container>

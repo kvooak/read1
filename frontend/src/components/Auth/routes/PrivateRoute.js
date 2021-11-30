@@ -7,18 +7,19 @@ import { Route, Redirect } from 'react-router-dom';
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
   const reduxUserValue = useSelector((state) => state.read_exchange_user.value);
-  const reduxUserLoading = useSelector((state) => state.read_exchange_user.loading);
+  const reduxUserLoading = useSelector(
+    (state) => state.read_exchange_user.loading,
+  );
 
   return (
     <Route
       {...rest}
-      render={(props) => (
-        reduxUserLoading
-          ? null
-          : reduxUserValue.is_signed_in && reduxUserValue.email_verified
-            ? <Component {...props} />
-            : <Redirect to="/signin" />
-      )}
+      render={(props) => (reduxUserLoading ? null : reduxUserValue.is_signed_in
+          && reduxUserValue.email_verified ? (
+            <Component {...props} />
+        ) : (
+          <Redirect to="/signin" />
+        ))}
     />
   );
 };

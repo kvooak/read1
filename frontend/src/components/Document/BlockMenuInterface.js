@@ -12,8 +12,8 @@ import StandardPopover from '../../_custom/UI/StandardPopover';
 import BlockMenu from './BlockMenu';
 
 const InterfaceWrapper = styled.div`
-	padding: 3px 6px 3px 2px;
-	line-height: 1.5;
+  padding: 3px 6px 3px 2px;
+  line-height: 1.5;
 `;
 
 const MenuButtonGroup = (props) => {
@@ -65,10 +65,7 @@ export default function BlockMenuInterface(props) {
 
   return (
     <InterfaceWrapper>
-      <MenuButtonGroup
-        toggleMenu={handleToggleMenu}
-        onAdd={handleOnAdd}
-      />
+      <MenuButtonGroup toggleMenu={handleToggleMenu} onAdd={handleOnAdd} />
 
       <StandardPopover
         open={openMenu}
@@ -83,11 +80,7 @@ export default function BlockMenuInterface(props) {
           horizontal: 'right',
         }}
       >
-        <BlockMenu
-          block={block}
-          onKill={handleOnKill}
-          onAdd={handleOnAdd}
-        />
+        <BlockMenu block={block} onKill={handleOnKill} onAdd={handleOnAdd} />
       </StandardPopover>
     </InterfaceWrapper>
   );
