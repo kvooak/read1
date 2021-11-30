@@ -8,7 +8,7 @@ const http_port = 8081;
 const firebaseAdmin = require('firebase-admin');
 const serviceAccount = require('./constants/read-exchange-1-firebase-adminsdk-ytboj-a76d1387e1.json');
 firebaseAdmin.initializeApp({
-  credential: firebaseAdmin.credential.cert(serviceAccount)
+  credential: firebaseAdmin.credential.cert(serviceAccount),
 });
 
 const dotenv = require('dotenv');
@@ -23,12 +23,12 @@ const indexRouter = require('./routes/index');
 
 dotenv.config();
 
-app.use(cors({
-	origin: [
-    'http://localhost:3000',
-  ],
-  optionsSuccessStatus: 200,
-}));
+app.use(
+  cors({
+    origin: ['http://localhost:3000'],
+    optionsSuccessStatus: 200,
+  })
+);
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -45,4 +45,6 @@ app.use(async (req, res, next) => {
 app.use('/api/v1', indexRouter);
 
 app.listen(http_port, () => print.log(`http listening on :${http_port}`));
-io.server.listen(io.port, () => print.log(`socket.io listening on :${io.port}`));
+io.server.listen(io.port, () =>
+  print.log(`socket.io listening on :${io.port}`)
+);

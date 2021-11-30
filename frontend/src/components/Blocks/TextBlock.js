@@ -32,11 +32,7 @@ const htmlStripper = striptags.init_streaming_mode([], '');
 
 export default function TextBlock(props) {
   const {
-    block,
-    onChange,
-    onMount,
-    onUnmount,
-    onReadDownKeyCommand,
+    block, onChange, onMount, onUnmount, onReadDownKeyCommand,
   } = props;
 
   const content = block.properties.title[0][0];
@@ -95,10 +91,7 @@ export default function TextBlock(props) {
   };
 
   return (
-    <BlockWrapper
-      ref={blockRef}
-      id={block.id}
-    >
+    <BlockWrapper ref={blockRef} id={block.id}>
       <StandardEditable
         anchor
         placeholder={placeholder}

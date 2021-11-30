@@ -26,8 +26,7 @@ const menuPaperStyles = () => ({
   },
 });
 
-const menuBlockItemStyles = () => ({
-});
+const menuBlockItemStyles = () => ({});
 
 const MenuBlockPaper = withStyles(menuPaperStyles)(Paper);
 const MenuBlockItem = withStyles(menuBlockItemStyles)(MenuItem);
@@ -57,11 +56,7 @@ export default function BlockMenu(props) {
   };
 
   return (
-    <MenuBlockPaper
-      square
-      elevation={0}
-      variant="outlined"
-    >
+    <MenuBlockPaper square elevation={0} variant="outlined">
       <MenuList dense>
         <MenuHeaderWrapper>
           <Typography variant="subtitle2" display="block" gutterBottom>
@@ -71,30 +66,22 @@ export default function BlockMenu(props) {
           </Typography>
 
           {block.type === 'translator' && (
-          <Stack direction="row" spacing={1}>
-            <StandardChip
-              label="English"
-              size="small"
-              onClick={() => {}}
-            />
+            <Stack direction="row" spacing={1}>
+              <StandardChip label="English" size="small" onClick={() => {}} />
 
-            <ButtonWrapper>
-              <StandardIconButton>
-                <ArrowRightAltIcon
-                  sx={{
-                    marginTop: '-2px',
-                    color: 'rgba(15, 15, 15, 0.4)',
-                  }}
-                />
-              </StandardIconButton>
-            </ButtonWrapper>
+              <ButtonWrapper>
+                <StandardIconButton>
+                  <ArrowRightAltIcon
+                    sx={{
+                      marginTop: '-2px',
+                      color: 'rgba(15, 15, 15, 0.4)',
+                    }}
+                  />
+                </StandardIconButton>
+              </ButtonWrapper>
 
-            <StandardChip
-              label="German"
-              size="small"
-              onClick={() => {}}
-            />
-          </Stack>
+              <StandardChip label="German" size="small" onClick={() => {}} />
+            </Stack>
           )}
         </MenuHeaderWrapper>
 

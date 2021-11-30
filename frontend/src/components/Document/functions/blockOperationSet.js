@@ -51,27 +51,12 @@ const newBlockSharedOp = ({
   newBlockArgs.created_time = timeNow;
 
   const ops = [
-    blockUpdate(
-      'blocks',
+    blockUpdate('blocks', id, [], newBlockArgs),
+    blockContentList(collection, parentID, command, {
+      after: cursorID || undefined,
       id,
-      [],
-      newBlockArgs,
-    ),
-    blockContentList(
-      collection,
-      parentID,
-      command,
-      {
-        after: cursorID || undefined,
-        id,
-      },
-    ),
-    blockSet(
-      'documents',
-      parentID,
-      ['last_edited_time'],
-      timeNow,
-    ),
+    }),
+    blockSet('documents', parentID, ['last_edited_time'], timeNow),
   ];
   return ops;
 };
@@ -109,9 +94,7 @@ const killBlock = (blockID, parentID) => {
   const timeNow = Date.now();
   const ops = [
     blockUpdate('blocks', blockID, ['alive'], false),
-    blockContentList(
-      'documents', parentID, 'listRemove', { id: blockID },
-    ),
+    blockContentList('documents', parentID, 'listRemove', { id: blockID }),
     blockSet('documents', parentID, ['last_edited_time'], timeNow),
   ];
   return ops;

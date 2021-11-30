@@ -3,13 +3,18 @@ import { v4 as uuidv4 } from 'uuid';
 
 import api from '../../../api/api';
 
-const useSaveTransactions = ({
-  transactions, setTransactions, dispatch, store,
-}, delay) => {
+const useSaveTransactions = (
+  {
+    transactions, setTransactions, dispatch, store,
+  },
+  delay,
+) => {
   const [debounced, setDebounced] = useState([]);
   useEffect(() => {
     const handler = setTimeout(() => setDebounced(transactions), delay);
-    return () => { clearTimeout(handler); };
+    return () => {
+      clearTimeout(handler);
+    };
   }, [transactions]);
 
   useEffect(() => {
@@ -25,13 +30,15 @@ const useSaveTransactions = ({
 
       if (!ignore) saveService();
     }
-    return () => { ignore = true; };
+    return () => {
+      ignore = true;
+    };
   }, [debounced]);
 };
 
-const backgroundServices = ({
+const backgroundServices = {
   useSaveTransactions,
-});
+};
 
 const createTransaction = (operations) => ({
   id: uuidv4(),
