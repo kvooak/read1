@@ -18,6 +18,7 @@ import ContentWrapper from '../../_custom/UI/ContentWrapper';
 import PageContent from './PageContent';
 import StandardPopper from '../../_custom/UI/StandardPopper';
 import BlockMenuInterface from './BlockMenuInterface';
+import BlockTypeSearchInterface from './BlockTypeSearchInterface';
 
 export default function DocumentScreen() {
   const { dispatch, state } = useContext(PageContext);
@@ -41,13 +42,6 @@ export default function DocumentScreen() {
     setCursor(ref);
   };
 
-  const activeElement = useActiveElement();
-  useEffect(() => {
-    if (activeElement.dataset.blockId) {
-      setCursor(activeElement.parentElement);
-    }
-  }, [activeElement]);
-
   const [hover, setHover] = useState(null);
   const [hoverData, setHoverData] = useState(null);
   useEffect(() => {
@@ -58,13 +52,48 @@ export default function DocumentScreen() {
     }
   }, [hover]);
 
+  const findBlockRefByID = (id) => {
+    const ref = refs.find((r) => (r.id === id));
+    return ref;
+  };
+
+  const [searchQuery, setSearchQuery] = useState(null);
+  const [typeSearchBlockID, setTypeSearchBlockID] = useState(null);
+  const [typeSearchBlock, setTypeSearchBlock] = useState(null);
+  useEffect(() => {
+    if (typeSearchBlockID) {
+      const block = findBlockRefByID(typeSearchBlockID);
+      setTypeSearchBlock(block);
+    }
+  }, [typeSearchBlockID]);
+
+  useEffect(() => {
+    if (!searchQuery || searchQuery?.length > 10) {
+      setSearchQuery(null);
+      setTypeSearchBlockID(null);
+      setTypeSearchBlock(null);
+    }
+  }, [searchQuery]);
+
+  const activeElement = useActiveElement();
+  useEffect(() => {
+    setTypeSearchBlockID(null);
+    if (activeElement.dataset.blockId) {
+      setCursor(activeElement.parentElement);
+    }
+  }, [activeElement]);
+
+  const findBlockRefByVerticalMousePos = (pos) => {
+    const block = refs.find((ref) => (
+      pos >= ref.offsetTop && pos <= ref.offsetTop + ref.clientHeight
+    ));
+    return block;
+  };
+
   const handleMouseMove = (event) => {
     const { pageY } = event;
-    const hoverIndex = refs.findIndex((ref) => (
-      pageY >= ref.offsetTop
-    	&& pageY <= ref.offsetTop + ref.clientHeight
-    ));
-    setHover(refs[hoverIndex]);
+    const block = findBlockRefByVerticalMousePos(pageY);
+    setHover(block);
   };
 
   const handleDeregisterRef = (blockID) => {
@@ -108,13 +137,31 @@ export default function DocumentScreen() {
     syncTransactionWithStore(operations);
   };
 
+  const handleTypeSearchInput = (key) => {
+    setSearchQuery((prev) => {
+      let newString = prev;
+      if (!newString) return `:${key}`;
+      if (key === 'Backspace') return newString.slice(0, -1);
+      newString += key;
+      return newString;
+    });
+  };
+
   const handleDownKeyCommand = (event) => {
     const { key, target, shiftKey } = event;
+
+    if (typeSearchBlockID) handleTypeSearchInput(key);
     if (key === 'Enter' && !shiftKey) {
       handleNewBlockBelowCursor();
-    } else if (key === 'Backspace') {
+      return;
+    }
+    if (key === 'Backspace') {
       const hasContent = Boolean(event.target.innerHTML);
       if (!hasContent) handleKillBlock(target.dataset.blockId);
+      return;
+    }
+    if (key === ':' && !typeSearchBlockID) {
+      setTypeSearchBlockID(target.dataset.blockId);
     }
   };
 
@@ -159,6 +206,19 @@ export default function DocumentScreen() {
             block={hoverData}
             onKill={handleKillBlock}
             onAdd={handleNewBlockBelowCursor}
+          />
+        </StandardPopper>
+      )}
+
+      {typeSearchBlock && (
+        <StandardPopper
+          id={typeSearchBlock.id}
+          open={Boolean(typeSearchBlockID)}
+          anchorEl={typeSearchBlock}
+          placement="bottom-start"
+        >
+          <BlockTypeSearchInterface
+            searchQuery={searchQuery}
           />
         </StandardPopper>
       )}

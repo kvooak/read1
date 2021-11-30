@@ -8,7 +8,7 @@ import useDebounce from '../../_custom/Hook/useDebounce';
 import StandardEditable from '../../_custom/UI/StandardEditable';
 
 const Wrapper = styled.div`
-	display: inline-flex;
+  display: inline-flex;
   flex: 1;
   width: 100%;
 `;
@@ -28,7 +28,7 @@ BlockWrapper.propTypes = {
   id: PropTypes.string.isRequired,
 };
 
-const htmlStripper = striptags.init_streaming_mode([], '\n');
+const htmlStripper = striptags.init_streaming_mode([], '');
 
 export default function TextBlock(props) {
   const {
@@ -64,7 +64,7 @@ export default function TextBlock(props) {
 
   const handleChange = (event) => {
     const { innerHTML } = event.currentTarget;
-    const cleanContent = htmlStripper(innerHTML).trim();
+    const cleanContent = htmlStripper(innerHTML);
     const contentOperation = {
       pointer: {
         collection: 'blocks',
