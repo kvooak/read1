@@ -58,8 +58,7 @@ const reducer = (state, action) => {
       }
 
       if (command === 'listAfter') {
-        const afterIndex = state.blocks.findIndex((b) => b.id === args.after);
-        newState.blocks.splice(afterIndex + 1, 0, blockOp.args);
+        const afterIndex = state.blocks.findIndex((b) => b.id === args.after);newState.blocks.splice(afterIndex + 1, 0, blockOp.args);
         newState.page.content.splice(afterIndex + 1, 0, blockOp.pointer.id);
         return newState;
       }
