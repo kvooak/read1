@@ -20,7 +20,11 @@ export default function DocumentScreen() {
   const { dispatch, state } = useContext(PageContext);
   const [transactions, setTransactions] = useState([]);
 
-  transWorks.backgroundServices.useSaveTransactions(
+  const { createTransaction } = transWorks;
+  const { useSaveTransactions } = transWorks.backgroundServices;
+  const { killBlock, newBlockBelowCursor, setBlockType } = blockOperationSet;
+
+  useSaveTransactions(
     {
       transactions,
       setTransactions,
@@ -66,17 +70,24 @@ export default function DocumentScreen() {
     }
   }, [typeSearchBlockID]);
 
+  const typeSearchCancel = () => {
+    setSearchQuery(null);
+    setTypeSearchBlockID(null);
+    setTypeSearchBlock(null);
+  };
+
+  const handleTypeSearchCancel = () => {
+    typeSearchCancel();
+  };
+
   useEffect(() => {
     if (!searchQuery || searchQuery?.length > 10) {
-      setSearchQuery(null);
-      setTypeSearchBlockID(null);
-      setTypeSearchBlock(null);
+      typeSearchCancel();
     }
   }, [searchQuery]);
 
   const activeElement = useActiveElement();
   useEffect(() => {
-    setTypeSearchBlockID(null);
     if (activeElement.dataset.blockId) {
       setCursor(activeElement.parentElement);
     }
@@ -110,30 +121,36 @@ export default function DocumentScreen() {
   };
 
   const handlePageContentChange = (operations) => {
-    const transaction = transWorks.createTransaction(operations);
+    const transaction = createTransaction(operations);
     addTransaction(transaction);
   };
 
   const syncTransactionWithStore = (operations) => {
+    // update frontend changes
     dispatch(store.actions.blockState({ operations }));
-    const transaction = transWorks.createTransaction(operations);
+    // regardless request state
+    const transaction = createTransaction(operations);
     addTransaction(transaction);
   };
 
+  const [operations, setOperations] = useState([]);
+  useEffect(() => {
+    if (operations.length) {
+      syncTransactionWithStore(operations);
+    }
+  }, [operations]);
+
   const handleKillBlock = (blockID) => {
     setHover(null);
-    const operations = blockOperationSet.killBlock(blockID, state.page.id);
-    syncTransactionWithStore(operations);
+    setOperations(killBlock(blockID, state.page.id));
   };
 
   const handleNewBlockBelowCursor = (args) => {
-    const operations = blockOperationSet.newBlockBelowCursor(
-      'text',
-      cursor.id,
-      state.page.id,
-      args,
-    );
-    syncTransactionWithStore(operations);
+    setOperations(newBlockBelowCursor(cursor.id, state.page.id, args));
+  };
+
+  const handleBlockTypeSelect = (type) => {
+    setOperations(setBlockType(typeSearchBlockID, state.page.id, type));
   };
 
   const handleTypeSearchInput = (key) => {
@@ -222,7 +239,11 @@ export default function DocumentScreen() {
           anchorEl={typeSearchBlock}
           placement="bottom-start"
         >
-          <BlockTypeSearchInterface searchQuery={searchQuery} />
+          <BlockTypeSearchInterface
+            searchQuery={searchQuery}
+            onTypeSelect={handleBlockTypeSelect}
+            onSearchCancel={handleTypeSearchCancel}
+          />
         </StandardPopper>
       )}
     </Container>

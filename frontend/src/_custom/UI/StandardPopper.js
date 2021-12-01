@@ -4,13 +4,7 @@ import PropTypes from 'prop-types';
 import Popper from '@mui/material/Popper';
 
 export default function StandardPopper({ children, ...props }) {
-  const {
-    id,
-    open,
-    anchorEl,
-    placement,
-    ...rest
-  } = props;
+  const { id, open, anchorEl, placement, ...rest } = props;
 
   return (
     <Popper

@@ -1,102 +1,114 @@
 import { v4 as uuidv4 } from 'uuid';
 
-const newBlockEmbryo = (id, type, parentID, timeNow) => ({
-  id,
-  type,
-  properties: { title: [['']] },
-  content: [],
-  parent: parentID,
-  alive: true,
-  last_edited_time: timeNow,
-});
+const newBlockEmbryo = (id, parentID) => {
+  const timeNow = Date.now();
+  return {
+    id,
+    type: 'text',
+    properties: { title: [['']] },
+    content: [],
+    parent: parentID,
+    alive: true,
+    last_edited_time: timeNow,
+  };
+};
 
-const blockUpdate = (collection, id, path, args) => ({
-  pointer: { collection, id },
+const blockUpdate = (id, path, args) => ({
+  pointer: { collection: 'blocks', id },
   path,
   command: 'update',
   args,
 });
 
-const blockSet = (collection, id, path, args) => ({
-  pointer: { collection, id },
+const blockSet = (id, path, args) => ({
+  pointer: { collection: 'blocks', id },
   path,
   command: 'set',
   args,
 });
 
-const blockContentList = (collection, id, command, args) => ({
-  pointer: { collection, id },
+const documentSet = (id, path, args) => ({
+  pointer: { collection: 'documents', id },
+  path,
+  command: 'set',
+  args,
+});
+
+const blockContentList = (id, command, args) => ({
+  pointer: { collection: 'documents', id },
   path: ['content'],
   command,
   args,
 });
 
-const newBlockSharedOp = ({
-  type,
-  cursorID,
-  parentID,
-  args,
-  collection,
-  command,
-}) => {
+const setBlockLastUpdated = (blockID) => {
+  const timeNow = Date.now();
+  return documentSet(blockID, ['last_edited_time'], timeNow);
+};
+
+const newBlockSharedOp = ({ cursorID, parentID, args, command }) => {
   let newBlockArgs = args;
   const id = uuidv4();
   const timeNow = Date.now();
 
   if (!newBlockArgs) {
-    newBlockArgs = newBlockEmbryo(id, type, parentID, timeNow);
+    newBlockArgs = newBlockEmbryo(id, parentID);
   }
 
   newBlockArgs.id = id;
   newBlockArgs.created_time = timeNow;
 
-  const ops = [
-    blockUpdate('blocks', id, [], newBlockArgs),
-    blockContentList(collection, parentID, command, {
-      after: cursorID || undefined,
-      id,
-    }),
-    blockSet('documents', parentID, ['last_edited_time'], timeNow),
-  ];
+  const contentListArgs = { after: cursorID || undefined, id };
+  const setParentContentList = blockContentList(
+    parentID,
+    command,
+    contentListArgs,
+  );
+  const setParentLastUpdated = setBlockLastUpdated(parentID);
+  const setNewBlock = blockSet(id, [], newBlockArgs);
+  const ops = [setNewBlock, setParentContentList, setParentLastUpdated];
   return ops;
 };
 
-const newBlockBelowCursor = (type, cursorID, parentID, args) => {
+const newBlockBelowCursor = (cursorID, parentID, args) => {
   const command = 'listAfter';
-  const collection = 'documents';
   const ops = newBlockSharedOp({
     args,
     cursorID,
-    command,
-    collection,
     parentID,
-    type,
+    command,
   });
 
   return ops;
 };
 
-const newBlockAtBottom = (type, parentID, args) => {
+const newBlockAtBottom = (parentID, args) => {
   const command = 'listAtBottom';
-  const collection = 'documents';
   const ops = newBlockSharedOp({
     args,
     command,
-    collection,
     parentID,
-    type,
   });
 
   return ops;
 };
 
 const killBlock = (blockID, parentID) => {
-  const timeNow = Date.now();
-  const ops = [
-    blockUpdate('blocks', blockID, ['alive'], false),
-    blockContentList('documents', parentID, 'listRemove', { id: blockID }),
-    blockSet('documents', parentID, ['last_edited_time'], timeNow),
-  ];
+  const setParentLastUpdated = setBlockLastUpdated(parentID);
+  const updateBlock = blockUpdate(blockID, ['alive'], false);
+  const updateParentContentList = blockContentList(
+    parentID,
+    'listRemove',
+    { id: blockID },
+  );
+  const ops = [updateBlock, updateParentContentList, setParentLastUpdated];
+  return ops;
+};
+
+const setBlockType = (blockID, parentID, type) => {
+  const setParentLastUpdated = setBlockLastUpdated(parentID);
+  const setBlock = blockSet(blockID, ['type'], type);
+  const ops = [setBlock, setParentLastUpdated];
   return ops;
 };
 
@@ -104,6 +116,7 @@ const blockOperationSet = {
   newBlockBelowCursor,
   newBlockAtBottom,
   killBlock,
+  setBlockType,
 };
 
 export default blockOperationSet;

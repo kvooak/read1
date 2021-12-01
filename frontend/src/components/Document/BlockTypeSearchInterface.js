@@ -8,6 +8,7 @@ import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
 
 import blockTypes from './constants/blockTypes';
 
@@ -24,10 +25,6 @@ const typerSearchResultItemStyles = () => ({});
 
 const TypeSearchPaper = withStyles(typeSearchPaperStyles)(Paper);
 const TypeItemWrapper = withStyles(typerSearchResultItemStyles)(MenuItem);
-const InterfaceWrapper = styled.div`
-  padding: 3px 6px 3px 2px;
-  line-height: 1.5;
-`;
 const NoMatchWrapper = styled.div`
   padding: 0px 6px;
 `;
@@ -39,8 +36,11 @@ const NoMatchText = () => {
 };
 const TypeItem = (props) => {
   const { type, onClick } = props;
+  const handleOnClick = () => {
+    onClick(type.id);
+  };
   return (
-    <TypeItemWrapper dense onClick={onClick}>
+    <TypeItemWrapper dense onClick={handleOnClick}>
       <ListItemIcon>{type.icon}</ListItemIcon>
       <ListItemText primary={type.title} secondary={type.subTitle} />
     </TypeItemWrapper>
@@ -53,39 +53,48 @@ TypeItem.propTypes = {
 };
 
 export default function BlockTypeSearchInterface(props) {
-  const { searchQuery } = props;
+  const { searchQuery, onTypeSelect, onSearchCancel } = props;
 
   const [types, setTypes] = useState(blockTypes);
   useEffect(() => {
     if (searchQuery) {
       const searchString = searchQuery.substring(1);
-      const results = blockTypes.filter((type) => type.id.includes(searchString));
+      const results = blockTypes.filter(
+        (type) => type.id.includes(searchString),
+      );
       setTypes(results);
       return;
     }
     setTypes(blockTypes);
   }, [searchQuery]);
 
-  const handleTypeSelection = () => {};
+  const handleTypeSelect = (type) => {
+    onTypeSelect(type);
+    onSearchCancel();
+  };
+
+  const handleClose = () => {
+    onSearchCancel();
+  };
 
   return (
-    <InterfaceWrapper>
-      <TypeSearchPaper square elevation={0} variant="outlined">
+    <TypeSearchPaper square elevation={0} variant="outlined">
+      <ClickAwayListener onClickAway={handleClose}>
         <MenuList dense>
           {types.length ? (
             types.map((type) => (
               <TypeItem
                 key={type.id}
                 type={type}
-                onClick={handleTypeSelection}
+                onClick={handleTypeSelect}
               />
             ))
           ) : (
             <NoMatchText />
           )}
         </MenuList>
-      </TypeSearchPaper>
-    </InterfaceWrapper>
+      </ClickAwayListener>
+    </TypeSearchPaper>
   );
 }
 
@@ -95,4 +104,6 @@ BlockTypeSearchInterface.defaultProps = {
 
 BlockTypeSearchInterface.propTypes = {
   searchQuery: PropTypes.string,
+  onTypeSelect: PropTypes.func.isRequired,
+  onSearchCancel: PropTypes.func.isRequired,
 };
