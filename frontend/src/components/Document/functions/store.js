@@ -30,6 +30,21 @@ const setBlock = (data) => ({
   payload: data,
 });
 
+/* HELPER FUNCTIONS */
+const updatePropBranch = (path, value) => {
+  const branch = path.reverse().reduce((reduce, key, index) => {
+    const proxy = { ...reduce };
+    if (index === 0) {
+      proxy[key] = value;
+      return proxy;
+    }
+    return { [key]: proxy };
+  }, {});
+  const [propName, propValue] = Object.entries(branch)[0];
+  return [propName, propValue];
+};
+/* END HELPER FUNCTIONS */
+
 const reducer = (state, action) => {
   const newState = { ...state };
 
@@ -46,19 +61,29 @@ const reducer = (state, action) => {
 
     case 'blockState':
       const { operations } = action.payload;
-      console.log(operations);
       const [blockOp, effectOp] = operations;
       const { args, command } = effectOp;
       const blockID = blockOp.pointer.id;
+      const targetIndex = state.blocks.findIndex((b) => b.id === blockID);
 
+      // effect command = 'set' means the block operation
+      // is a normal update operation that doesn't change
+      // the 'content' property of parent document.
+      // so only 'last_updated_time' property of parent
+      // got changed by a 'set' operation
       if (command === 'set') {
         const target = newState.blocks.find((b) => b.id === blockID);
-        console.log(target);
+        const [propName, propValue] = updatePropBranch(
+          blockOp.path,
+          blockOp.args,
+        );
+        target[propName] = propValue;
+        newState.blocks[targetIndex] = target;
+        return newState;
       }
       if (command === 'listRemove') {
-        const index = state.blocks.findIndex((b) => b.id === blockID);
-        newState.blocks.splice(index, 1);
-        newState.page.content.splice(index, 1);
+        newState.blocks.splice(targetIndex, 1);
+        newState.page.content.splice(targetIndex, 1);
         return newState;
       }
       if (command === 'listAfter') {

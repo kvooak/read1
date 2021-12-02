@@ -52,7 +52,7 @@ export default function BlockMenu(props) {
     embryo._id = undefined;
     embryo._key = undefined;
     embryo._rev = undefined;
-    onAdd(embryo);
+    onAdd(block.id, embryo);
   };
 
   return (
@@ -103,7 +103,10 @@ export default function BlockMenu(props) {
           <ListItemText>Duplicate</ListItemText>
         </MenuBlockItem>
 
-        <MenuBlockItem dense sx={{ borderTop: '1px solid rgba(55,53,47,0.1)' }}>
+        <MenuBlockItem
+          dense
+          sx={{ borderTop: '1px solid rgba(55,53,47,0.1)' }}
+        >
           <ListItemIcon>
             <ContentMove fontSize="small" />
           </ListItemIcon>

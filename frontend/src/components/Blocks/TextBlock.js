@@ -32,7 +32,12 @@ const htmlStripper = striptags.init_streaming_mode([], '');
 
 export default function TextBlock(props) {
   const {
-    block, onChange, onMount, onUnmount, onReadDownKeyCommand,
+    block,
+    onChange,
+    onMount,
+    onFocus,
+    onReadDownKeyCommand,
+    styles,
   } = props;
 
   const content = block.properties.title[0][0];
@@ -40,7 +45,6 @@ export default function TextBlock(props) {
   const blockRef = useRef(block.id);
   useEffect(() => {
     if (blockRef.current) onMount(blockRef.current);
-    return () => onUnmount(block.id);
   }, [blockRef.current]);
 
   const [bufferOperations, setBufferOperations] = useState([]);
@@ -50,8 +54,26 @@ export default function TextBlock(props) {
   }, [operations]);
 
   const [placeholder, setPlaceholder] = useState(' ');
-  const handleFocus = () => {
-    setPlaceholder('Type : for options');
+  const handleFocus = (event) => {
+    let text = 'Type : for options';
+    switch (block.type) {
+      case 'text':
+        break;
+      case 'header':
+        text = 'Header 1';
+        break;
+      case 'sub_header':
+        text = 'Header 2';
+        break;
+      case 'sub_sub_header':
+        text = 'Header 3';
+        break;
+      default:
+        text = ' ';
+        break;
+    }
+    setPlaceholder(text);
+    onFocus(event);
   };
 
   const handleBlur = () => {
@@ -96,6 +118,7 @@ export default function TextBlock(props) {
         anchor
         placeholder={placeholder}
         blockId={block.id}
+        styles={styles}
         content={content}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
@@ -110,6 +133,7 @@ TextBlock.propTypes = {
   block: PropTypes.instanceOf(Object).isRequired,
   onChange: PropTypes.func.isRequired,
   onMount: PropTypes.func.isRequired,
-  onUnmount: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
   onReadDownKeyCommand: PropTypes.func.isRequired,
+  styles: PropTypes.instanceOf(Object).isRequired,
 };
