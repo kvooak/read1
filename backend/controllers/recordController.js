@@ -30,14 +30,15 @@ exports.saveTransactions = async (req, res, next) => {
   try {
     const db = req.dbArango;
     const { transactions } = req.body.request;
+    const { createOpShard, createTransaction, commitTransaction } = transWorks;
 
     transactions.map(async (transaction) => {
       const { operations } = transaction;
-      const trans = await transWorks.createTransaction(db);
+      const trans = await createTransaction(db);
       const opShards = await Promise.all(
-        operations.map(async (op) => transWorks.createOpShard(db, trans, op))
+        operations.map(async (op) => createOpShard(db, trans, op)),
       );
-      await transWorks.commitTransaction(trans, opShards);
+      await commitTransaction(trans, opShards);
     });
 
     res.status(200).send({});
