@@ -1,81 +1,105 @@
 const print = require('../../_utils/print');
 const { isArangoError } = require('arangojs/error');
 
+// At the moment the list logics only apply to 'content' prop of a block
+// when adding or removing child blocks etc.
+const createSeedFromList = (record, path) => {
+  try {
+    let value;
+    if (!path.length) {
+      value = record;
+    } else {
+      value = path.reduce((proxy, key) => proxy[key], record);
+    }
+    return { value, path };
+  } catch (e) {
+    print.log(`Error at ${serveBranchSeed.name}`);
+    print.log({ record, path });
+    throw e;
+  }
+};
+
+const createSimpleSeed = (args, path) => {
+  try {
+    return { value: args, path };
+  } catch (e) {
+    print.log(`Error at ${createSimpleSeed.name}`);
+    print.log({ args, path });
+    throw e;
+  }
+}
+
+const updatePropBranch = (seed) => {
+  try {
+    const { value, path } = seed;
+    let newProp;
+    if (!path.length) {
+      newProp = { _new: value };
+    } else {
+      newProp = path.reverse().reduce((proxy, key, index) => {
+        if (index === 0) {
+          if (key) {
+            proxy[key] = value;
+          } else {
+            proxy = value;
+          }
+          return proxy;
+        }
+        return { [key]: proxy };
+      }, {});
+    }
+    const [propName, propValue] = Object.entries(newProp)[0];
+    return [propName, propValue];
+  } catch (e) {
+    print.log(`Error at ${createNewPropBranch.name}`);
+    print.log({ seed });
+    throw e;
+  }
+};
+
 async function createOpShard(db, trans, operation) {
   const { args, command, path, pointer } = operation;
   const collection = await db.collection(pointer.collection);
   const recordID = pointer.id;
   let record;
-  let updatedArgs = args;
   let index;
-  let newProp;
-  let propName;
-  let propValue;
-
-  const serveUpdatedArgs = async () => {
-    try {
-      record = await trans.step(() => collection.document(recordID));
-      updated = path.reduce((proxy, key) => {
-        return proxy[key];
-      }, record);
-
-      return updated;
-    } catch (e) {
-      print.log(`Error at ${serveUpdatedArgs.name}`);
-      print.log({ recordID, record, updated });
-      if (isArangoError(e)) {
-        print.log({ code: e.code, message: e.message });
-      }
-      throw e;
-    }
-  };
+  let seed;
+  // if path === [] => this is a new block.
+  // so set record = args otherwise collection.document() returns error
+  if (path.length) {
+    record = await trans.step(() => collection.document(recordID));
+  } else {
+    record = args;
+  }
 
   switch (command) {
     case 'set':
-      break;
-
     case 'update':
+      seed = createSimpleSeed(args, path);
       break;
 
     case 'listAfter':
-      updatedArgs = await serveUpdatedArgs();
-      index = updatedArgs.indexOf(args.after);
-      if (index > -1) updatedArgs.splice(index + 1, 0, args.id);
+      seed = createSeedFromList(record, path);
+      index = seed.value.indexOf(args.after);
+      if (index > -1) seed.value.splice(index + 1, 0, args.id);
       break;
 
     case 'listAtBottom':
-      updatedArgs = await serveUpdatedArgs();
-      updatedArgs.push(args.id);
+      seed = createSeedFromList(record, path);
+      seed.value.push(record.id);
       break;
 
     case 'listRemove':
-      updatedArgs = await serveUpdatedArgs();
-      index = updatedArgs.indexOf(args.id);
-      if (index > -1) updatedArgs.splice(index, 1);
+      seed = createSeedFromList(record, path);
+      index = seed.value.indexOf(args.id);
+      if (index > -1) seed.value.splice(index, 1);
       break;
 
     default:
       throw new Error('undefined operation command');
   }
 
-  if (path.length === 0) {
-    newProp = { _new: args };
-  } else {
-    newProp = path.reverse().reduce((proxy, key, index) => {
-      if (index === 0) {
-        if (key) {
-          proxy[key] = updatedArgs;
-        } else {
-          proxy = updatedArgs;
-        }
-        return proxy;
-      }
-      return { [key]: proxy };
-    }, {});
-  }
-
-  [propName, propValue] = Object.entries(newProp)[0];
-
+  const [propName, propValue] = updatePropBranch(seed);
   return {
     collection,
     recordID,
@@ -84,11 +108,9 @@ async function createOpShard(db, trans, operation) {
   };
 }
 
-async function dbOperation(
-  trans,
-  { collection, recordID, propName, propValue }
-) {
+async function dbOperation(trans, shard) {
   try {
+    const { collection, recordID, propName, propValue } = shard;
     const keyShard = { _key: recordID };
     let updateData = { [propName]: propValue };
 
@@ -100,7 +122,7 @@ async function dbOperation(
     }
   } catch (e) {
     print.log(`Error at ${dbOperation.name}`);
-    print.log({ recordID, propName, propValue, collection: collection.name });
+    print.log({ shard });
     if (isArangoError(e)) {
       print.log({ code: e.code, message: e.message });
       print.error(e.stack);
@@ -129,7 +151,7 @@ async function createTransaction(db) {
 async function commitTransaction(trans, operationShards) {
   try {
     await Promise.all(
-      operationShards.map(async (shard) => dbOperation(trans, shard))
+      operationShards.map(async (shard) => dbOperation(trans, shard)),
     );
     await trans.commit();
   } catch (e) {
