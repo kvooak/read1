@@ -7,7 +7,6 @@ import { PageContext } from './PageStore';
 import transWorks from './functions/transactionWorks';
 import blockOperationSet from './functions/blockOperationSet';
 import BlockControl from './functions/BlockControl';
-import useActiveElement from '../../_custom/Hook/useActiveElement';
 
 import Container from '../../_custom/UI/Container';
 import ContentWrapper from '../../_custom/UI/ContentWrapper';
@@ -23,6 +22,7 @@ export default function DocumentScreen() {
   const { createTransaction } = transWorks;
   const { useSaveTransactions } = transWorks.backgroundServices;
   const { killBlock, newBlockBelowCursor, setBlockType } = blockOperationSet;
+  const pageID = state.page?.id;
 
   useSaveTransactions(
     {
@@ -36,13 +36,35 @@ export default function DocumentScreen() {
 
   const [cursor, setCursor] = useState(null);
   useEffect(() => {
-    if (cursor) BlockControl.focusBlock(cursor.firstChild);
+    if (cursor) {
+      const editable = cursor.querySelector('.editable');
+      BlockControl.focusBlock(editable);
+    }
   }, [cursor]);
+
+  const handleBlockFocus = (event) => {
+    const { target } = event;
+    setCursor(target.closest('.block'));
+  };
 
   const [refs, setRefs] = useState([]);
   const handleRegisterRef = (ref) => {
-    setRefs((prev) => [...prev, ref]);
+    setRefs((prev) => {
+      const isNew = !prev.find((r) => r.id === ref.id);
+      if (isNew) return [...prev, ref];
+      return prev;
+    });
     setCursor(ref);
+  };
+
+  const handleMoveCursorUp = (blockID) => {
+    setRefs((prev) => {
+      const current = [...prev];
+      const index = current.findIndex((ref) => ref.id === blockID);
+      current.splice(index, 1);
+      setCursor(current[index - 1]);
+      return current;
+    });
   };
 
   const [hover, setHover] = useState(null);
@@ -86,13 +108,6 @@ export default function DocumentScreen() {
     }
   }, [searchQuery]);
 
-  const activeElement = useActiveElement();
-  useEffect(() => {
-    if (activeElement.dataset.blockId) {
-      setCursor(activeElement.parentElement);
-    }
-  }, [activeElement]);
-
   const findBlockRefByVerticalMousePos = (pos) => {
     const block = refs.find(
       (ref) => pos >= ref.offsetTop && pos <= ref.offsetTop + ref.clientHeight,
@@ -104,16 +119,6 @@ export default function DocumentScreen() {
     const { pageY } = event;
     const block = findBlockRefByVerticalMousePos(pageY);
     setHover(block);
-  };
-
-  const handleDeregisterRef = (blockID) => {
-    const index = refs.findIndex((ref) => ref.id === blockID);
-    setCursor(refs[index - 1]);
-    setRefs((prev) => {
-      const current = [...prev];
-      current.splice(index, 1);
-      return current;
-    });
   };
 
   const addTransaction = (transaction) => {
@@ -142,42 +147,47 @@ export default function DocumentScreen() {
 
   const handleKillBlock = (blockID) => {
     setHover(null);
-    setOperations(killBlock(blockID, state.page.id));
+    setOperations(killBlock(blockID, pageID));
+    handleMoveCursorUp(blockID);
   };
 
-  const handleNewBlockBelowCursor = (args) => {
-    setOperations(newBlockBelowCursor(cursor.id, state.page.id, args));
+  const handleNewBlockBelowCursor = (cursorID, args) => {
+    setOperations(newBlockBelowCursor(cursorID, pageID, args));
   };
 
   const handleBlockTypeSelect = (type) => {
-    setOperations(setBlockType(typeSearchBlockID, state.page.id, type));
+    setOperations(setBlockType(typeSearchBlockID, pageID, type));
   };
 
   const handleTypeSearchInput = (key) => {
     setSearchQuery((prev) => {
       let newString = prev;
-      if (!newString) return `:${key}`;
+      if (!newString) return `#${key}`;
       if (key === 'Backspace') return newString.slice(0, -1);
       newString += key;
       return newString;
     });
   };
 
+  const handleAddBlockFromMenu = (blockID, args) => {
+    handleNewBlockBelowCursor(blockID, args);
+  };
+
   const handleDownKeyCommand = (event) => {
     const { key, target, shiftKey } = event;
-
+    const blockID = target.dataset.blockId;
     if (typeSearchBlockID) handleTypeSearchInput(key);
     if (key === 'Enter' && !shiftKey) {
-      handleNewBlockBelowCursor();
+      handleNewBlockBelowCursor(blockID);
       return;
     }
     if (key === 'Backspace') {
       const hasContent = Boolean(event.target.innerHTML);
-      if (!hasContent) handleKillBlock(target.dataset.blockId);
+      if (!hasContent) handleKillBlock(blockID);
       return;
     }
-    if (key === ':' && !typeSearchBlockID) {
-      setTypeSearchBlockID(target.dataset.blockId);
+    if (key === '#' && !typeSearchBlockID) {
+      setTypeSearchBlockID(blockID);
     }
   };
 
@@ -212,8 +222,8 @@ export default function DocumentScreen() {
           blocks={state.blocks}
           onChange={handlePageContentChange}
           onReadDownKeyCommand={handleDownKeyCommand}
+          onFocus={handleBlockFocus}
           onMount={handleRegisterRef}
-          onUnmount={handleDeregisterRef}
         />
       </ContentWrapper>
 
@@ -222,12 +232,12 @@ export default function DocumentScreen() {
           id={hover.id}
           open={Boolean(hover)}
           anchorEl={hover}
-          placement="left-end"
+          placement="left-start"
         >
           <BlockMenuInterface
             block={hoverData}
             onKill={handleKillBlock}
-            onAdd={handleNewBlockBelowCursor}
+            onAdd={handleAddBlockFromMenu}
           />
         </StandardPopper>
       )}

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
-import TextBlock from '../Blocks/TextBlock';
+import BlockRenderer from './BlockRenderer';
 
 const BlocksWrapper = styled.div`
   display: flex;
@@ -11,18 +11,22 @@ const BlocksWrapper = styled.div`
 
 export default function PageContent(props) {
   const {
-    blocks, onChange, onReadDownKeyCommand, onMount, onUnmount,
+    blocks,
+    onChange,
+    onReadDownKeyCommand,
+    onMount,
+    onFocus,
   } = props;
 
   return (
     <BlocksWrapper className="blocks-wrapper">
       {blocks.map((block) => (
-        <TextBlock
+        <BlockRenderer
           key={block.id}
           block={block}
           onChange={onChange}
           onMount={onMount}
-          onUnmount={onUnmount}
+          onFocus={onFocus}
           onReadDownKeyCommand={onReadDownKeyCommand}
         />
       ))}
@@ -34,6 +38,6 @@ PageContent.propTypes = {
   blocks: PropTypes.instanceOf(Array).isRequired,
   onChange: PropTypes.func.isRequired,
   onReadDownKeyCommand: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
   onMount: PropTypes.func.isRequired,
-  onUnmount: PropTypes.func.isRequired,
 };

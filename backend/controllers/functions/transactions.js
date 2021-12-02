@@ -27,7 +27,7 @@ const createSimpleSeed = (args, path) => {
     print.log({ args, path });
     throw e;
   }
-}
+};
 
 const updatePropBranch = (seed) => {
   try {
@@ -36,13 +36,10 @@ const updatePropBranch = (seed) => {
     if (!path.length) {
       newProp = { _new: value };
     } else {
-      newProp = path.reverse().reduce((proxy, key, index) => {
+      newProp = path.reverse().reduce((reducer, key, index) => {
+        const proxy = { ...reducer };
         if (index === 0) {
-          if (key) {
-            proxy[key] = value;
-          } else {
-            proxy = value;
-          }
+          proxy[key] = value;
           return proxy;
         }
         return { [key]: proxy };

@@ -46,7 +46,12 @@ const setBlockLastUpdated = (blockID) => {
   return documentSet(blockID, ['last_edited_time'], timeNow);
 };
 
-const newBlockSharedOp = ({ cursorID, parentID, args, command }) => {
+const newBlockSharedOp = ({
+  cursorID,
+  parentID,
+  args,
+  command,
+}) => {
   let newBlockArgs = args;
   const id = uuidv4();
   const timeNow = Date.now();

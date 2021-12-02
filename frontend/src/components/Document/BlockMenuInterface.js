@@ -17,9 +17,9 @@ const InterfaceWrapper = styled.div`
 `;
 
 const MenuButtonGroup = (props) => {
-  const { toggleMenu, onAdd } = props;
+  const { blockID, toggleMenu, onAdd } = props;
   const handleAddEmptyBlock = () => {
-    onAdd();
+    onAdd(blockID);
   };
 
   return (
@@ -35,6 +35,7 @@ const MenuButtonGroup = (props) => {
 };
 
 MenuButtonGroup.propTypes = {
+  blockID: PropTypes.string.isRequired,
   toggleMenu: PropTypes.func.isRequired,
   onAdd: PropTypes.func.isRequired,
 };
@@ -56,8 +57,8 @@ export default function BlockMenuInterface(props) {
     setAnchorEl(null);
   };
 
-  const handleOnAdd = (args) => {
-    onAdd(args);
+  const handleOnAdd = (...args) => {
+    onAdd(...args);
     setAnchorEl(null);
   };
 
@@ -65,7 +66,11 @@ export default function BlockMenuInterface(props) {
 
   return (
     <InterfaceWrapper>
-      <MenuButtonGroup toggleMenu={handleToggleMenu} onAdd={handleOnAdd} />
+      <MenuButtonGroup
+        blockID={block.id}
+        toggleMenu={handleToggleMenu}
+        onAdd={handleOnAdd}
+      />
 
       <StandardPopover
         open={openMenu}
