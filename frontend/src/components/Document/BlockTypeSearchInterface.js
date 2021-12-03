@@ -57,12 +57,12 @@ export default function BlockTypeSearchInterface(props) {
 
   const [types, setTypes] = useState(blockTypes);
   useEffect(() => {
-    if (searchQuery) {
+    if (searchQuery !== '') {
       const searchString = searchQuery.substring(1);
-      const results = blockTypes.filter(
+      const result = blockTypes.filter(
         (type) => type.id.includes(searchString),
       );
-      setTypes(results);
+      setTypes(result);
       return;
     }
     setTypes(blockTypes);
@@ -73,6 +73,15 @@ export default function BlockTypeSearchInterface(props) {
     onSearchCancel();
   };
 
+  const handleListKeyDown = (event) => {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      onSearchCancel();
+    } else if (event.key === 'Escape') {
+      onSearchCancel();
+    }
+  };
+
   const handleClose = () => {
     onSearchCancel();
   };
@@ -80,14 +89,10 @@ export default function BlockTypeSearchInterface(props) {
   return (
     <TypeSearchPaper square elevation={0} variant="outlined">
       <ClickAwayListener onClickAway={handleClose}>
-        <MenuList dense>
+        <MenuList dense onKeyDown={handleListKeyDown}>
           {types.length ? (
             types.map((type) => (
-              <TypeItem
-                key={type.id}
-                type={type}
-                onClick={handleTypeSelect}
-              />
+              <TypeItem key={type.id} type={type} onClick={handleTypeSelect} />
             ))
           ) : (
             <NoMatchText />

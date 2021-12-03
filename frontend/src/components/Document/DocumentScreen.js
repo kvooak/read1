@@ -1,12 +1,10 @@
-/* eslint no-underscore-dangle: 0 */
-import React, { useState, useContext, useEffect } from 'react';
-
+/* eslint no-underscore-dangle: 2 */
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import api from '../../api/api';
 import store from './functions/store';
 import { PageContext } from './PageStore';
 import transWorks from './functions/transactionWorks';
 import blockOperationSet from './functions/blockOperationSet';
-import BlockControl from './functions/BlockControl';
 
 import Container from '../../_custom/UI/Container';
 import ContentWrapper from '../../_custom/UI/ContentWrapper';
@@ -14,33 +12,31 @@ import PageContent from './PageContent';
 import StandardPopper from '../../_custom/UI/StandardPopper';
 import BlockMenuInterface from './BlockMenuInterface';
 import BlockTypeSearchInterface from './BlockTypeSearchInterface';
+import useFocusBlock from '../../_custom/Hook/Blocks/useFocusBlock';
+import useSaveTransactions from '../../_custom/Hook/Transactions/useSaveTransactions';
+import useConditionalKeyInput from '../../_custom/Hook/useConditionalKeyInput';
 
 export default function DocumentScreen() {
   const { dispatch, state } = useContext(PageContext);
   const [transactions, setTransactions] = useState([]);
 
   const { createTransaction } = transWorks;
-  const { useSaveTransactions } = transWorks.backgroundServices;
   const { killBlock, newBlockBelowCursor, setBlockType } = blockOperationSet;
   const pageID = state.page?.id;
 
-  useSaveTransactions(
-    {
-      transactions,
-      setTransactions,
-      dispatch,
-      store,
-    },
-    0,
-  );
-
   const [cursor, setCursor] = useState(null);
+  useFocusBlock(cursor);
+
+  const transactionResult = useSaveTransactions(transactions, 0);
+  const clearTransactions = useCallback(() => {
+    const { error } = transactionResult;
+    if (error) dispatch(store.actions.error(error));
+    setTransactions([]);
+  }, [transactionResult]);
+
   useEffect(() => {
-    if (cursor) {
-      const editable = cursor.querySelector('.editable');
-      BlockControl.focusBlock(editable);
-    }
-  }, [cursor]);
+    if (transactionResult) clearTransactions();
+  }, [transactionResult]);
 
   const handleBlockFocus = (event) => {
     const { target } = event;
@@ -82,18 +78,21 @@ export default function DocumentScreen() {
     return ref;
   };
 
-  const [searchQuery, setSearchQuery] = useState(null);
+  const [listenToTypeSearch, setListenToTypeSearch] = useState(false);
+  const searchQuery = useConditionalKeyInput(listenToTypeSearch);
+
   const [typeSearchBlockID, setTypeSearchBlockID] = useState(null);
   const [typeSearchBlock, setTypeSearchBlock] = useState(null);
   useEffect(() => {
     if (typeSearchBlockID) {
       const block = findBlockRefByID(typeSearchBlockID);
       setTypeSearchBlock(block);
+      setListenToTypeSearch(true);
     }
   }, [typeSearchBlockID]);
 
   const typeSearchCancel = () => {
-    setSearchQuery(null);
+    setListenToTypeSearch(false);
     setTypeSearchBlockID(null);
     setTypeSearchBlock(null);
   };
@@ -159,16 +158,6 @@ export default function DocumentScreen() {
     setOperations(setBlockType(typeSearchBlockID, pageID, type));
   };
 
-  const handleTypeSearchInput = (key) => {
-    setSearchQuery((prev) => {
-      let newString = prev;
-      if (!newString) return `#${key}`;
-      if (key === 'Backspace') return newString.slice(0, -1);
-      newString += key;
-      return newString;
-    });
-  };
-
   const handleAddBlockFromMenu = (blockID, args) => {
     handleNewBlockBelowCursor(blockID, args);
   };
@@ -176,7 +165,7 @@ export default function DocumentScreen() {
   const handleDownKeyCommand = (event) => {
     const { key, target, shiftKey } = event;
     const blockID = target.dataset.blockId;
-    if (typeSearchBlockID) handleTypeSearchInput(key);
+
     if (key === 'Enter' && !shiftKey) {
       handleNewBlockBelowCursor(blockID);
       return;
@@ -186,7 +175,7 @@ export default function DocumentScreen() {
       if (!hasContent) handleKillBlock(blockID);
       return;
     }
-    if (key === '#' && !typeSearchBlockID) {
+    if (key === '#') {
       setTypeSearchBlockID(blockID);
     }
   };
