@@ -57,7 +57,7 @@ export default function BlockMenu(props) {
 
   return (
     <MenuBlockPaper square elevation={0} variant="outlined">
-      <MenuList dense>
+      <MenuList autoFocus dense>
         <MenuHeaderWrapper>
           <Typography variant="subtitle2" display="block" gutterBottom>
             Type:
