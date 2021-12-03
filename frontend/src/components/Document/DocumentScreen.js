@@ -14,7 +14,6 @@ import BlockMenuInterface from './BlockMenuInterface';
 import BlockTypeSearchInterface from './BlockTypeSearchInterface';
 import useFocusBlock from '../../_custom/Hook/Blocks/useFocusBlock';
 import useSaveTransactions from '../../_custom/Hook/Transactions/useSaveTransactions';
-import useConditionalKeyInput from '../../_custom/Hook/useConditionalKeyInput';
 
 export default function DocumentScreen() {
   const { dispatch, state } = useContext(PageContext);
@@ -78,34 +77,19 @@ export default function DocumentScreen() {
     return ref;
   };
 
-  const [listenToTypeSearch, setListenToTypeSearch] = useState(false);
-  const searchQuery = useConditionalKeyInput(listenToTypeSearch);
-
   const [typeSearchBlockID, setTypeSearchBlockID] = useState(null);
   const [typeSearchBlock, setTypeSearchBlock] = useState(null);
   useEffect(() => {
     if (typeSearchBlockID) {
       const block = findBlockRefByID(typeSearchBlockID);
       setTypeSearchBlock(block);
-      setListenToTypeSearch(true);
     }
   }, [typeSearchBlockID]);
 
-  const typeSearchCancel = () => {
-    setListenToTypeSearch(false);
+  const handleTypeSearchCancel = () => {
     setTypeSearchBlockID(null);
     setTypeSearchBlock(null);
   };
-
-  const handleTypeSearchCancel = () => {
-    typeSearchCancel();
-  };
-
-  useEffect(() => {
-    if (!searchQuery || searchQuery?.length > 10) {
-      typeSearchCancel();
-    }
-  }, [searchQuery]);
 
   const findBlockRefByVerticalMousePos = (pos) => {
     const block = refs.find(
@@ -239,7 +223,6 @@ export default function DocumentScreen() {
           placement="bottom-start"
         >
           <BlockTypeSearchInterface
-            searchQuery={searchQuery}
             onTypeSelect={handleBlockTypeSelect}
             onSearchCancel={handleTypeSearchCancel}
           />
