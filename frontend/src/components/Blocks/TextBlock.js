@@ -59,10 +59,10 @@ export default function TextBlock(props) {
   const isDragHandleInit = block.id === blockWithHandleID;
 
   const content = block.properties.title[0][0];
-  const blockRef = useRef(block.id);
+  const [blockRef, setBlockRef] = useState(null);
   useEffect(() => {
-    if (blockRef.current) onMount(blockRef.current);
-  }, [blockRef.current]);
+    if (blockRef) onMount(blockRef);
+  }, [blockRef]);
 
   const [bufferOperations, setBufferOperations] = useState([]);
   const operations = useDebounce(bufferOperations, 200);
@@ -130,18 +130,21 @@ export default function TextBlock(props) {
   };
 
   const originalIndex = findBlock(block.id).index;
-  const [{ opacity }, drag, preview] = useDrag(() => ({
-    type: 'block',
-    item: { id: block.id, originalIndex },
-    collect: (monitor) => ({
-      opacity: monitor.isDragging() ? 0.4 : 1,
+  const [{ opacity }, drag, preview] = useDrag(
+    () => ({
+      type: 'block',
+      item: { id: block.id, originalIndex },
+      collect: (monitor) => ({
+        opacity: monitor.isDragging() ? 0.4 : 1,
+      }),
+      end: (target, monitor) => {
+        const { id } = target;
+        const didCancel = monitor.didDrop();
+        if (!didCancel) moveBlock(id, originalIndex);
+      },
     }),
-    end: (target, monitor) => {
-      const { id } = target;
-      const didCancel = monitor.didDrop();
-      if (!didCancel) moveBlock(id, originalIndex);
-    },
-  }), [block.id, originalIndex, moveBlock]);
+    [block.id, originalIndex, moveBlock],
+  );
 
   const [, drop] = useDrop(
     () => ({
@@ -177,17 +180,16 @@ export default function TextBlock(props) {
   const [dragHandleRef, setDragHandleRef] = useState(null);
   const handleDragHandleRef = (node) => {
     setDragHandleRef(node);
-    return null;
+    setBlockRef(node);
+    if (isDragHandleInit) return drag(drop(node));
+    return node;
   };
   useEffect(() => {
     dispatch(store.actions.blockDragHandleReceived({ drag, drop }));
   }, [dragHandleRef]);
 
   const Block = (
-    <BlockWrapper ref={blockRef} id={block.id}>
-      {isDragHandleInit && (
-        <div ref={handleDragHandleRef} style={handleStyle} />
-      )}
+    <BlockWrapper ref={handleDragHandleRef} id={block.id}>
       <div ref={preview} style={{ opacity, width: '100%' }}>
         {Editable}
       </div>
