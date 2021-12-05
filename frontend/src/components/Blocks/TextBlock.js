@@ -3,7 +3,7 @@ import React, { useEffect, useContext, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import striptags from 'striptags';
-import { useDrag } from 'react-dnd';
+import { useDrag, useDrop } from 'react-dnd';
 
 import store from '../Document/functions/store';
 import { PageContext } from '../Document/PageStore';
@@ -12,8 +12,8 @@ import StandardEditable from '../../_custom/UI/StandardEditable';
 
 const handleStyle = {
   backgroundColor: 'green',
-  width: '10px',
-  height: '10px',
+  width: '0px',
+  height: '0px',
   display: 'flex',
   cursor: 'move',
   position: 'absolute',
@@ -44,17 +44,25 @@ const htmlStripper = striptags.init_streaming_mode([], '');
 
 export default function TextBlock(props) {
   const { useSelector, dispatch } = useContext(PageContext);
-  const { block, onChange, onMount, onFocus, onReadDownKeyCommand, styles } =
-    props;
+  const {
+    block,
+    findBlock,
+    onChange,
+    moveBlock,
+    onMount,
+    onFocus,
+    onReadDownKeyCommand,
+    styles,
+  } = props;
 
-  const hoveredBlock = useSelector((state) => state.settings.hoveredBlockData);
-  const isHovered = hoveredBlock?.id === block.id;
+  const { blockWithHandleID } = useSelector((state) => state.settings);
+  const isDragHandleInit = block.id === blockWithHandleID;
 
   const content = block.properties.title[0][0];
   const blockRef = useRef(block.id);
   useEffect(() => {
-    if (blockRef.current && !isHovered) onMount(blockRef.current);
-  }, [blockRef.current, isHovered]);
+    if (blockRef.current) onMount(blockRef.current);
+  }, [blockRef.current]);
 
   const [bufferOperations, setBufferOperations] = useState([]);
   const operations = useDebounce(bufferOperations, 200);
@@ -121,12 +129,36 @@ export default function TextBlock(props) {
     setPlaceholder(' ');
   };
 
+  const originalIndex = findBlock(block.id).index;
   const [{ opacity }, drag, preview] = useDrag(() => ({
     type: 'block',
+    item: { id: block.id, originalIndex },
     collect: (monitor) => ({
       opacity: monitor.isDragging() ? 0.4 : 1,
     }),
-  }));
+    end: (target, monitor) => {
+      const { id } = target;
+      const didCancel = monitor.didDrop();
+      if (!didCancel) moveBlock(id, originalIndex);
+    },
+  }), [block.id, originalIndex, moveBlock]);
+
+  const [, drop] = useDrop(
+    () => ({
+      accept: 'block',
+      canDrop: () => false,
+      hover(target) {
+        // target = the block being dropped on
+        const { id } = target;
+        if (id !== block.id) {
+          const { index } = findBlock(block.id);
+          // move the hovered block to index of current block
+          moveBlock(id, index);
+        }
+      },
+    }),
+    [findBlock, moveBlock],
+  );
 
   const Editable = (
     <StandardEditable
@@ -143,26 +175,22 @@ export default function TextBlock(props) {
   );
 
   const [dragHandleRef, setDragHandleRef] = useState(null);
-  useEffect(() => {
-    dispatch(store.actions.blockDragHandlerReceived(dragHandleRef));
-  }, [dragHandleRef]);
-  const handleDragHandleRef = (...args) => {
-    setDragHandleRef(...args);
-    return drag(...args);
+  const handleDragHandleRef = (node) => {
+    setDragHandleRef(node);
+    return null;
   };
+  useEffect(() => {
+    dispatch(store.actions.blockDragHandleReceived({ drag, drop }));
+  }, [dragHandleRef]);
 
   const Block = (
     <BlockWrapper ref={blockRef} id={block.id}>
-      {isHovered ? (
-        <>
-          <div ref={handleDragHandleRef} style={handleStyle} />
-          <div ref={preview} style={{ opacity, width: '100%' }}>
-            {Editable}
-          </div>
-        </>
-      ) : (
-        <>{Editable}</>
+      {isDragHandleInit && (
+        <div ref={handleDragHandleRef} style={handleStyle} />
       )}
+      <div ref={preview} style={{ opacity, width: '100%' }}>
+        {Editable}
+      </div>
     </BlockWrapper>
   );
 

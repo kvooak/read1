@@ -1,5 +1,7 @@
 /* eslint no-underscore-dangle: 2 */
 import React, { useState, useContext, useEffect, useCallback } from 'react';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DndProvider } from 'react-dnd';
 
 import api from '../../api/api';
 import store from './functions/store';
@@ -16,7 +18,7 @@ import useFocusBlock from '../../_custom/Hook/Blocks/useFocusBlock';
 import useSaveTransactions from '../../_custom/Hook/Transactions/useSaveTransactions';
 
 export default function DocumentScreen() {
-  const { dispatch, state, useSelector } = useContext(PageContext);
+  const { dispatch, state } = useContext(PageContext);
   const [transactions, setTransactions] = useState([]);
 
   const { createTransaction } = transWorks;
@@ -63,7 +65,6 @@ export default function DocumentScreen() {
   };
 
   const [hover, setHover] = useState(null);
-  const dragHandlerRef = useSelector((s) => s.settings.blockDragHandler);
   useEffect(() => {
     if (hover) {
       const { id } = hover;
@@ -191,13 +192,14 @@ export default function DocumentScreen() {
   return (
     <Container>
       <ContentWrapper onMouseMove={handleMouseMove}>
-        <PageContent
-          blocks={state.blocks}
-          onChange={handlePageContentChange}
-          onReadDownKeyCommand={handleDownKeyCommand}
-          onFocus={handleBlockFocus}
-          onMount={handleRegisterRef}
-        />
+        <DndProvider backend={HTML5Backend}>
+          <PageContent
+            onChange={handlePageContentChange}
+            onReadDownKeyCommand={handleDownKeyCommand}
+            onFocus={handleBlockFocus}
+            onMount={handleRegisterRef}
+          />
+        </DndProvider>
       </ContentWrapper>
 
       {hover && (
@@ -208,7 +210,6 @@ export default function DocumentScreen() {
           placement="left-start"
         >
           <BlockMenuInterface
-            dragHandlerRef={dragHandlerRef}
             onKill={handleKillBlock}
             onAdd={handleAddBlockFromMenu}
           />

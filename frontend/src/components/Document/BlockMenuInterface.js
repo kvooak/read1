@@ -6,8 +6,10 @@ import styled from '@emotion/styled';
 import Stack from '@mui/material/Stack';
 import AddIcon from '@mui/icons-material/Add';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 import { PageContext } from './PageStore';
+import store from './functions/store';
 import StandardIconButton from '../../_custom/UI/StandardIconButton';
 import StandardPopover from '../../_custom/UI/StandardPopover';
 
@@ -15,13 +17,29 @@ import BlockMenu from './BlockMenu';
 
 const InterfaceWrapper = styled.div`
   padding: 3px 6px 3px 2px;
-  line-height: 1.5;
+  line-height: 1.3;
 `;
 
 const MenuButtonGroup = (props) => {
-  const { blockID, toggleMenu, onAdd } = props;
+  const { dispatch, useSelector } = useContext(PageContext);
+  const { blockID, onMenuToggle, onAdd } = props;
+
+  const dragHandler = useSelector((s) => s.settings.blockDragHandle);
   const handleAddEmptyBlock = () => {
     onAdd(blockID);
+  };
+
+  const handleInitDragHandle = () => {
+    dispatch(store.actions.blockWithHandleID(blockID));
+  };
+
+  const handleClearDragHandle = () => {
+    dispatch(store.actions.blockWithHandleID(null));
+  };
+
+  const handleDragProxy = (node) => {
+    const { drag, drop } = dragHandler;
+    return drag(drop(node));
   };
 
   return (
@@ -29,8 +47,16 @@ const MenuButtonGroup = (props) => {
       <StandardIconButton onClick={handleAddEmptyBlock}>
         <AddIcon sx={{ color: 'rgba(15, 15, 15, 0.2)' }} />
       </StandardIconButton>
-      <StandardIconButton onClick={toggleMenu}>
+      <StandardIconButton onClick={onMenuToggle}>
         <ModeEditIcon sx={{ color: 'rgba(15, 15, 15, 0.2)' }} />
+      </StandardIconButton>
+      <StandardIconButton
+        ref={handleDragProxy}
+        onMouseOver={handleInitDragHandle}
+        onMouseLeave={handleClearDragHandle}
+        cursor="move"
+      >
+        <DragIndicatorIcon sx={{ color: 'rgba(15, 15, 15, 0.2)' }} />
       </StandardIconButton>
     </Stack>
   );
@@ -38,7 +64,7 @@ const MenuButtonGroup = (props) => {
 
 MenuButtonGroup.propTypes = {
   blockID: PropTypes.string.isRequired,
-  toggleMenu: PropTypes.func.isRequired,
+  onMenuToggle: PropTypes.func.isRequired,
   onAdd: PropTypes.func.isRequired,
 };
 
@@ -48,7 +74,9 @@ export default function BlockMenuInterface(props) {
 
   const block = useSelector((state) => state.settings.hoveredBlockData);
   const [anchorEl, setAnchorEl] = useState(null);
-  const handleToggleMenu = (event) => {
+  const openMenu = Boolean(anchorEl);
+
+  const handleOnMenuToggle = (event) => {
     if (anchorEl) {
       setAnchorEl(null);
     } else {
@@ -66,20 +94,18 @@ export default function BlockMenuInterface(props) {
     setAnchorEl(null);
   };
 
-  const openMenu = Boolean(anchorEl);
-
   return (
     <InterfaceWrapper>
       <MenuButtonGroup
         blockID={block.id}
-        toggleMenu={handleToggleMenu}
+        onMenuToggle={handleOnMenuToggle}
         onAdd={handleOnAdd}
       />
 
       <StandardPopover
         open={openMenu}
         anchorEl={anchorEl}
-        onClose={handleToggleMenu}
+        onClose={handleOnMenuToggle}
         anchorOrigin={{
           vertical: 'center',
           horizontal: 'left',

@@ -5,7 +5,8 @@ const initialState = {
   error: null,
   settings: {
     hoveredBlockData: null,
-    blockDragHandler: null,
+    blockDragHandle: null,
+    blockWithHandleID: null,
   },
 };
 
@@ -34,8 +35,13 @@ const blockHovered = (data) => ({
   payload: data,
 });
 
-const blockDragHandlerReceived = (data) => ({
-  type: 'blockDragHandlerReceived',
+const blockWithHandleID = (data) => ({
+  type: 'blockWithHandleID',
+  payload: data,
+});
+
+const blockDragHandleReceived = (data) => ({
+  type: 'blockDragHandleReceived',
   payload: data,
 });
 
@@ -73,8 +79,12 @@ const reducer = (state, action) => {
       newState.settings.hoveredBlockData = action.payload;
       return newState;
 
-    case 'blockDragHandlerReceived':
-      newState.settings.blockDragHandler = action.payload;
+    case 'blockWithHandleID':
+      newState.settings.blockWithHandleID = action.payload;
+      return newState;
+
+    case 'blockDragHandleReceived':
+      newState.settings.blockDragHandle = action.payload;
       return newState;
 
     case 'blocksFetched':
@@ -144,7 +154,8 @@ const store = {
     blocksFetched,
     blockState,
     blockHovered,
-    blockDragHandlerReceived,
+    blockDragHandleReceived,
+    blockWithHandleID,
     setBlock,
     error,
   },
