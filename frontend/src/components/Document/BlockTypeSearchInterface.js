@@ -10,6 +10,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 
+import useConditionalKeyInput from '../../_custom/Hook/useConditionalKeyInput';
 import blockTypes from './constants/blockTypes';
 
 const typeSearchPaperStyles = () => ({
@@ -53,20 +54,28 @@ TypeItem.propTypes = {
 };
 
 export default function BlockTypeSearchInterface(props) {
-  const { searchQuery, onTypeSelect, onSearchCancel } = props;
+  const { onTypeSelect, onSearchCancel } = props;
+
+  const [listenToTypeSearch, setListenToTypeSearch] = useState(true);
+  const searchQuery = useConditionalKeyInput(listenToTypeSearch);
+
+  useEffect(() => {
+    setListenToTypeSearch(true);
+    return () => setListenToTypeSearch(false);
+  }, []);
 
   const [types, setTypes] = useState(blockTypes);
   useEffect(() => {
-    if (searchQuery !== '') {
+    if (searchQuery.length > 10) {
+      onSearchCancel();
+    } else if (searchQuery.length === 0) {
+      setTypes(blockTypes);
+    } else {
       const searchString = searchQuery.substring(1);
-      const result = blockTypes.filter(
-        (type) => type.id.includes(searchString),
-      );
+      const result = blockTypes.filter((t) => t.id.includes(searchString));
       setTypes(result);
-      return;
     }
-    setTypes(blockTypes);
-  }, [searchQuery]);
+  }, [searchQuery.length]);
 
   const handleTypeSelect = (type) => {
     onTypeSelect(type);
@@ -103,12 +112,7 @@ export default function BlockTypeSearchInterface(props) {
   );
 }
 
-BlockTypeSearchInterface.defaultProps = {
-  searchQuery: '',
-};
-
 BlockTypeSearchInterface.propTypes = {
-  searchQuery: PropTypes.string,
   onTypeSelect: PropTypes.func.isRequired,
   onSearchCancel: PropTypes.func.isRequired,
 };

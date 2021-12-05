@@ -1,11 +1,11 @@
 /* eslint no-underscore-dangle: 2 */
 import React, { useState, useContext, useEffect, useCallback } from 'react';
+
 import api from '../../api/api';
 import store from './functions/store';
 import { PageContext } from './PageStore';
 import transWorks from './functions/transactionWorks';
 import blockOperationSet from './functions/blockOperationSet';
-
 import Container from '../../_custom/UI/Container';
 import ContentWrapper from '../../_custom/UI/ContentWrapper';
 import PageContent from './PageContent';
@@ -14,10 +14,9 @@ import BlockMenuInterface from './BlockMenuInterface';
 import BlockTypeSearchInterface from './BlockTypeSearchInterface';
 import useFocusBlock from '../../_custom/Hook/Blocks/useFocusBlock';
 import useSaveTransactions from '../../_custom/Hook/Transactions/useSaveTransactions';
-import useConditionalKeyInput from '../../_custom/Hook/useConditionalKeyInput';
 
 export default function DocumentScreen() {
-  const { dispatch, state } = useContext(PageContext);
+  const { dispatch, state, useSelector } = useContext(PageContext);
   const [transactions, setTransactions] = useState([]);
 
   const { createTransaction } = transWorks;
@@ -64,12 +63,12 @@ export default function DocumentScreen() {
   };
 
   const [hover, setHover] = useState(null);
-  const [hoverData, setHoverData] = useState(null);
+  const dragHandlerRef = useSelector((s) => s.settings.blockDragHandler);
   useEffect(() => {
     if (hover) {
       const { id } = hover;
-      const block = state.blocks.find((b) => b.id === id);
-      setHoverData(block);
+      const blockData = state.blocks.find((b) => b.id === id);
+      dispatch(store.actions.blockHovered(blockData));
     }
   }, [hover]);
 
@@ -77,35 +76,6 @@ export default function DocumentScreen() {
     const ref = refs.find((r) => r.id === id);
     return ref;
   };
-
-  const [listenToTypeSearch, setListenToTypeSearch] = useState(false);
-  const searchQuery = useConditionalKeyInput(listenToTypeSearch);
-
-  const [typeSearchBlockID, setTypeSearchBlockID] = useState(null);
-  const [typeSearchBlock, setTypeSearchBlock] = useState(null);
-  useEffect(() => {
-    if (typeSearchBlockID) {
-      const block = findBlockRefByID(typeSearchBlockID);
-      setTypeSearchBlock(block);
-      setListenToTypeSearch(true);
-    }
-  }, [typeSearchBlockID]);
-
-  const typeSearchCancel = () => {
-    setListenToTypeSearch(false);
-    setTypeSearchBlockID(null);
-    setTypeSearchBlock(null);
-  };
-
-  const handleTypeSearchCancel = () => {
-    typeSearchCancel();
-  };
-
-  useEffect(() => {
-    if (!searchQuery || searchQuery?.length > 10) {
-      typeSearchCancel();
-    }
-  }, [searchQuery]);
 
   const findBlockRefByVerticalMousePos = (pos) => {
     const block = refs.find(
@@ -118,6 +88,20 @@ export default function DocumentScreen() {
     const { pageY } = event;
     const block = findBlockRefByVerticalMousePos(pageY);
     setHover(block);
+  };
+
+  const [typeSearchBlockID, setTypeSearchBlockID] = useState(null);
+  const [typeSearchBlock, setTypeSearchBlock] = useState(null);
+  useEffect(() => {
+    if (typeSearchBlockID) {
+      const block = findBlockRefByID(typeSearchBlockID);
+      setTypeSearchBlock(block);
+    }
+  }, [typeSearchBlockID]);
+
+  const handleTypeSearchCancel = () => {
+    setTypeSearchBlockID(null);
+    setTypeSearchBlock(null);
   };
 
   const addTransaction = (transaction) => {
@@ -224,7 +208,7 @@ export default function DocumentScreen() {
           placement="left-start"
         >
           <BlockMenuInterface
-            block={hoverData}
+            dragHandlerRef={dragHandlerRef}
             onKill={handleKillBlock}
             onAdd={handleAddBlockFromMenu}
           />
@@ -239,7 +223,6 @@ export default function DocumentScreen() {
           placement="bottom-start"
         >
           <BlockTypeSearchInterface
-            searchQuery={searchQuery}
             onTypeSelect={handleBlockTypeSelect}
             onSearchCancel={handleTypeSearchCancel}
           />

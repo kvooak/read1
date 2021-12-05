@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import PropTypes from 'prop-types';
 import TextBlock from '../Blocks/TextBlock';
 import blockStyles from './constants/blockStyles';
 
@@ -34,11 +33,3 @@ export default function BlockRenderer(props) {
 
   return blockComponent;
 }
-
-BlockRenderer.propTypes = {
-  block: PropTypes.instanceOf(Object).isRequired,
-  onChange: PropTypes.func.isRequired,
-  onReadDownKeyCommand: PropTypes.func.isRequired,
-  onFocus: PropTypes.func.isRequired,
-  onMount: PropTypes.func.isRequired,
-};
