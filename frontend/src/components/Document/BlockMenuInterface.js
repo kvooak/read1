@@ -1,11 +1,13 @@
 /* eslint no-underscore-dangle: 0 */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
 import Stack from '@mui/material/Stack';
 import AddIcon from '@mui/icons-material/Add';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
+
+import { PageContext } from './PageStore';
 import StandardIconButton from '../../_custom/UI/StandardIconButton';
 import StandardPopover from '../../_custom/UI/StandardPopover';
 
@@ -41,8 +43,10 @@ MenuButtonGroup.propTypes = {
 };
 
 export default function BlockMenuInterface(props) {
-  const { block, onKill, onAdd } = props;
+  const { useSelector } = useContext(PageContext);
+  const { onKill, onAdd } = props;
 
+  const block = useSelector((state) => state.settings.hoveredBlockData);
   const [anchorEl, setAnchorEl] = useState(null);
   const handleToggleMenu = (event) => {
     if (anchorEl) {
@@ -91,12 +95,7 @@ export default function BlockMenuInterface(props) {
   );
 }
 
-BlockMenuInterface.defaultProps = {
-  block: {},
-};
-
 BlockMenuInterface.propTypes = {
-  block: PropTypes.instanceOf(Object),
   onAdd: PropTypes.func.isRequired,
   onKill: PropTypes.func.isRequired,
 };

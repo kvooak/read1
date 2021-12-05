@@ -3,6 +3,10 @@ const initialState = {
   page: null,
   blocks: [],
   error: null,
+  settings: {
+    hoveredBlockData: null,
+    blockDragHandler: null,
+  },
 };
 
 const error = (data) => ({
@@ -22,6 +26,16 @@ const blocksFetched = (data) => ({
 
 const blockState = (data) => ({
   type: 'blockState',
+  payload: data,
+});
+
+const blockHovered = (data) => ({
+  type: 'blockHovered',
+  payload: data,
+});
+
+const blockDragHandlerReceived = (data) => ({
+  type: 'blockDragHandlerReceived',
   payload: data,
 });
 
@@ -54,6 +68,14 @@ const reducer = (state, action) => {
         ...state,
         page: action.payload[0],
       };
+
+    case 'blockHovered':
+      newState.settings.hoveredBlockData = action.payload;
+      return newState;
+
+    case 'blockDragHandlerReceived':
+      newState.settings.blockDragHandler = action.payload;
+      return newState;
 
     case 'blocksFetched':
       newState.blocks = action.payload;
@@ -121,6 +143,8 @@ const store = {
     fetchPage,
     blocksFetched,
     blockState,
+    blockHovered,
+    blockDragHandlerReceived,
     setBlock,
     error,
   },

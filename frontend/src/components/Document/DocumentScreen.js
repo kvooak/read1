@@ -1,11 +1,11 @@
 /* eslint no-underscore-dangle: 2 */
 import React, { useState, useContext, useEffect, useCallback } from 'react';
+
 import api from '../../api/api';
 import store from './functions/store';
 import { PageContext } from './PageStore';
 import transWorks from './functions/transactionWorks';
 import blockOperationSet from './functions/blockOperationSet';
-
 import Container from '../../_custom/UI/Container';
 import ContentWrapper from '../../_custom/UI/ContentWrapper';
 import PageContent from './PageContent';
@@ -16,7 +16,7 @@ import useFocusBlock from '../../_custom/Hook/Blocks/useFocusBlock';
 import useSaveTransactions from '../../_custom/Hook/Transactions/useSaveTransactions';
 
 export default function DocumentScreen() {
-  const { dispatch, state } = useContext(PageContext);
+  const { dispatch, state, useSelector } = useContext(PageContext);
   const [transactions, setTransactions] = useState([]);
 
   const { createTransaction } = transWorks;
@@ -63,18 +63,31 @@ export default function DocumentScreen() {
   };
 
   const [hover, setHover] = useState(null);
-  const [hoverData, setHoverData] = useState(null);
+  const dragHandlerRef = useSelector((s) => s.settings.blockDragHandler);
   useEffect(() => {
     if (hover) {
       const { id } = hover;
-      const block = state.blocks.find((b) => b.id === id);
-      setHoverData(block);
+      const blockData = state.blocks.find((b) => b.id === id);
+      dispatch(store.actions.blockHovered(blockData));
     }
   }, [hover]);
 
   const findBlockRefByID = (id) => {
     const ref = refs.find((r) => r.id === id);
     return ref;
+  };
+
+  const findBlockRefByVerticalMousePos = (pos) => {
+    const block = refs.find(
+      (ref) => pos >= ref.offsetTop && pos <= ref.offsetTop + ref.clientHeight,
+    );
+    return block;
+  };
+
+  const handleMouseMove = (event) => {
+    const { pageY } = event;
+    const block = findBlockRefByVerticalMousePos(pageY);
+    setHover(block);
   };
 
   const [typeSearchBlockID, setTypeSearchBlockID] = useState(null);
@@ -89,19 +102,6 @@ export default function DocumentScreen() {
   const handleTypeSearchCancel = () => {
     setTypeSearchBlockID(null);
     setTypeSearchBlock(null);
-  };
-
-  const findBlockRefByVerticalMousePos = (pos) => {
-    const block = refs.find(
-      (ref) => pos >= ref.offsetTop && pos <= ref.offsetTop + ref.clientHeight,
-    );
-    return block;
-  };
-
-  const handleMouseMove = (event) => {
-    const { pageY } = event;
-    const block = findBlockRefByVerticalMousePos(pageY);
-    setHover(block);
   };
 
   const addTransaction = (transaction) => {
@@ -208,7 +208,7 @@ export default function DocumentScreen() {
           placement="left-start"
         >
           <BlockMenuInterface
-            block={hoverData}
+            dragHandlerRef={dragHandlerRef}
             onKill={handleKillBlock}
             onAdd={handleAddBlockFromMenu}
           />
