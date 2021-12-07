@@ -5,9 +5,20 @@ const initialState = {
   error: null,
   settings: {
     hoveredBlockData: null,
-    blockDragHandler: null,
+    blockDragHandle: null,
+    blockWithHandleID: null,
   },
 };
+
+const documentState = (data) => ({
+  type: 'documentState',
+  payload: data,
+});
+
+const blockState = (data) => ({
+  type: 'blockState',
+  payload: data,
+});
 
 const error = (data) => ({
   type: 'error',
@@ -24,8 +35,8 @@ const blocksFetched = (data) => ({
   payload: data,
 });
 
-const blockState = (data) => ({
-  type: 'blockState',
+const blocksAfterMove = (data) => ({
+  type: 'blocksAfterMove',
   payload: data,
 });
 
@@ -34,13 +45,13 @@ const blockHovered = (data) => ({
   payload: data,
 });
 
-const blockDragHandlerReceived = (data) => ({
-  type: 'blockDragHandlerReceived',
+const blockWithHandleID = (data) => ({
+  type: 'blockWithHandleID',
   payload: data,
 });
 
-const setBlock = (data) => ({
-  type: 'setBlock',
+const blockDragHandleReceived = (data) => ({
+  type: 'blockDragHandleReceived',
   payload: data,
 });
 
@@ -61,6 +72,7 @@ const updatePropBranch = (path, value) => {
 
 const reducer = (state, action) => {
   const newState = { ...state };
+  let operations;
 
   switch (action.type) {
     case 'fetchPage':
@@ -73,16 +85,37 @@ const reducer = (state, action) => {
       newState.settings.hoveredBlockData = action.payload;
       return newState;
 
-    case 'blockDragHandlerReceived':
-      newState.settings.blockDragHandler = action.payload;
+    case 'blockWithHandleID':
+      newState.settings.blockWithHandleID = action.payload;
+      return newState;
+
+    case 'blockDragHandleReceived':
+      newState.settings.blockDragHandle = action.payload;
       return newState;
 
     case 'blocksFetched':
       newState.blocks = action.payload;
       return newState;
 
+    case 'blocksAfterMove':
+      newState.blocks = action.payload;
+      return newState;
+
+    // documentState deals with pure document operations only
+    // so it will use the first operation in operations array
+    // as the actual operation that update meaningful document data,
+    // as the second operation will just update
+    // document 'last_updated_time'
+    case 'documentState':
+      operations = action.payload.operations;
+      const [documentOp] = operations;
+      if (documentOp.command === 'listRenew') {
+        newState.page.content = documentOp.args;
+      }
+      return newState;
+
     case 'blockState':
-      const { operations } = action.payload;
+      operations = action.payload.operations;
       const [blockOp, effectOp] = operations;
       const { args, command } = effectOp;
       const blockID = blockOp.pointer.id;
@@ -121,9 +154,6 @@ const reducer = (state, action) => {
       }
       return newState;
 
-    case 'setBlock':
-      return state;
-
     case 'error':
       return {
         ...state,
@@ -141,11 +171,13 @@ const store = {
   storeSeed,
   actions: {
     fetchPage,
-    blocksFetched,
+    documentState,
     blockState,
+    blocksFetched,
+    blocksAfterMove,
     blockHovered,
-    blockDragHandlerReceived,
-    setBlock,
+    blockDragHandleReceived,
+    blockWithHandleID,
     error,
   },
 };

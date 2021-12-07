@@ -7,7 +7,10 @@ const StandardIconButton = styled.button`
   background: none;
   border: 1px solid transparent;
   border-radius: 4px;
-  cursor: pointer;
+  cursor: ${(props) => {
+    if (props.cursor) return `${props.cursor};`;
+    return 'pointer;';
+  }};
   display: flex;
   justify-content: flex-start;
   overflow: hidden;

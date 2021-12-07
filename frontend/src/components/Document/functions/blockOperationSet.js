@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
+/* START DEFAULT OPERATIONS */
 const newBlockEmbryo = (id, parentID) => {
   const timeNow = Date.now();
   return {
@@ -34,6 +35,13 @@ const documentSet = (id, path, args) => ({
   args,
 });
 
+const documentUpdate = (id, path, args) => ({
+  pointer: { collection: 'documents', id },
+  path,
+  command: 'update',
+  args,
+});
+
 const blockContentList = (id, command, args) => ({
   pointer: { collection: 'documents', id },
   path: ['content'],
@@ -45,13 +53,10 @@ const setBlockLastUpdated = (blockID) => {
   const timeNow = Date.now();
   return documentSet(blockID, ['last_edited_time'], timeNow);
 };
+/* END DEFAULT OPERATIONS */
 
-const newBlockSharedOp = ({
-  cursorID,
-  parentID,
-  args,
-  command,
-}) => {
+/* START COMPLEX OPERATIONS */
+const newBlockSharedOp = ({ cursorID, parentID, args, command }) => {
   let newBlockArgs = args;
   const id = uuidv4();
   const timeNow = Date.now();
@@ -71,8 +76,7 @@ const newBlockSharedOp = ({
   );
   const setParentLastUpdated = setBlockLastUpdated(parentID);
   const setNewBlock = blockSet(id, [], newBlockArgs);
-  const ops = [setNewBlock, setParentContentList, setParentLastUpdated];
-  return ops;
+  return [setNewBlock, setParentContentList, setParentLastUpdated];
 };
 
 const newBlockBelowCursor = (cursorID, parentID, args) => {
@@ -101,25 +105,29 @@ const newBlockAtBottom = (parentID, args) => {
 const killBlock = (blockID, parentID) => {
   const setParentLastUpdated = setBlockLastUpdated(parentID);
   const updateBlock = blockUpdate(blockID, ['alive'], false);
-  const updateParentContentList = blockContentList(
-    parentID,
-    'listRemove',
-    { id: blockID },
-  );
-  const ops = [updateBlock, updateParentContentList, setParentLastUpdated];
-  return ops;
+  const updateParentContentList = blockContentList(parentID, 'listRemove', {
+    id: blockID,
+  });
+  return [updateBlock, updateParentContentList, setParentLastUpdated];
 };
 
 const setBlockType = (blockID, parentID, type) => {
   const setParentLastUpdated = setBlockLastUpdated(parentID);
   const setBlock = blockSet(blockID, ['type'], type);
-  const ops = [setBlock, setParentLastUpdated];
-  return ops;
+  return [setBlock, setParentLastUpdated];
 };
+
+const newDocumentContent = (documentID, content) => {
+  const setDocumentContent = documentUpdate(documentID, ['content'], content);
+  const setDocumentLastUpdated = setBlockLastUpdated(documentID);
+  return [setDocumentContent, setDocumentLastUpdated];
+};
+/* END COMPLEX OPERATIONS */
 
 const blockOperationSet = {
   newBlockBelowCursor,
   newBlockAtBottom,
+  newDocumentContent,
   killBlock,
   setBlockType,
 };

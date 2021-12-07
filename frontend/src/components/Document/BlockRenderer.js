@@ -7,6 +7,8 @@ const TEXT_FAMILY = ['text', 'header', 'sub_header', 'sub_sub_header'];
 export default function BlockRenderer(props) {
   const {
     block,
+    findBlock,
+    moveBlock,
     onChange,
     onMount,
     onFocus,
@@ -21,6 +23,8 @@ export default function BlockRenderer(props) {
           key={block.id}
           block={block}
           styles={blockStyles[type]}
+          findBlock={findBlock}
+          moveBlock={moveBlock}
           onChange={onChange}
           onMount={onMount}
           onFocus={onFocus}
