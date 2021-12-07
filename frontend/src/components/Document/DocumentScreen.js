@@ -17,12 +17,18 @@ import BlockTypeSearchInterface from './BlockTypeSearchInterface';
 import useFocusBlock from '../../_custom/Hook/Blocks/useFocusBlock';
 import useSaveTransactions from '../../_custom/Hook/Transactions/useSaveTransactions';
 
+const operationTypes = {
+  BLOCK: 'block',
+  DOCUMENT: 'document',
+};
+
 export default function DocumentScreen() {
   const { dispatch, state } = useContext(PageContext);
   const [transactions, setTransactions] = useState([]);
 
   const { createTransaction } = transWorks;
-  const { killBlock, newBlockBelowCursor, setBlockType } = blockOperationSet;
+  const { killBlock, newBlockBelowCursor, setBlockType, newDocumentContent } =
+    blockOperationSet;
   const pageID = state.page?.id;
 
   const [cursor, setCursor] = useState(null);
@@ -73,6 +79,10 @@ export default function DocumentScreen() {
     }
   }, [hover]);
 
+  const handleResetHover = () => {
+    setHover(null);
+  };
+
   const findBlockRefByID = (id) => {
     const ref = refs.find((r) => r.id === id);
     return ref;
@@ -114,37 +124,61 @@ export default function DocumentScreen() {
     addTransaction(transaction);
   };
 
-  const syncTransactionWithStore = (operations) => {
+  const syncTransactionWithStore = ({ type, ops }) => {
     // update frontend changes
-    dispatch(store.actions.blockState({ operations }));
+    if (type === operationTypes.BLOCK) {
+      dispatch(store.actions.blockState({ operations: ops }));
+    }
+    if (type === operationTypes.DOCUMENT) {
+      dispatch(store.actions.documentState({ operations: ops }));
+    }
     // regardless request state
-    const transaction = createTransaction(operations);
+    const transaction = createTransaction(ops);
     addTransaction(transaction);
   };
 
-  const [operations, setOperations] = useState([]);
+  const [operations, setOperations] = useState(null);
+  const newOperations = (type, ops) => {
+    setOperations({ type, ops });
+  };
+
   useEffect(() => {
-    if (operations.length) {
+    if (operations?.ops.length) {
       syncTransactionWithStore(operations);
     }
-  }, [operations]);
+  }, [operations?.ops]);
 
   const handleKillBlock = (blockID) => {
     setHover(null);
-    setOperations(killBlock(blockID, pageID));
+    newOperations(operationTypes.BLOCK, killBlock(blockID, pageID));
     handleMoveCursorUp(blockID);
   };
 
   const handleNewBlockBelowCursor = (cursorID, args) => {
-    setOperations(newBlockBelowCursor(cursorID, pageID, args));
+    newOperations(
+      operationTypes.BLOCK,
+      newBlockBelowCursor(cursorID, pageID, args),
+    );
   };
 
   const handleBlockTypeSelect = (type) => {
-    setOperations(setBlockType(typeSearchBlockID, pageID, type));
+    newOperations(
+      operationTypes.BLOCK,
+      setBlockType(typeSearchBlockID, pageID, type),
+    );
   };
 
   const handleAddBlockFromMenu = (blockID, args) => {
     handleNewBlockBelowCursor(blockID, args);
+  };
+
+  const handleBlockMoved = (blocksAfterMove) => {
+    const content = blocksAfterMove.map((b) => b.id);
+    dispatch(store.actions.blocksAfterMove(blocksAfterMove));
+    newOperations(
+      operationTypes.DOCUMENT,
+      newDocumentContent(pageID, content),
+    );
   };
 
   const handleDownKeyCommand = (event) => {
@@ -194,6 +228,7 @@ export default function DocumentScreen() {
       <ContentWrapper onMouseMove={handleMouseMove}>
         <DndProvider backend={HTML5Backend}>
           <PageContent
+            onBlockMoved={handleBlockMoved}
             onChange={handlePageContentChange}
             onReadDownKeyCommand={handleDownKeyCommand}
             onFocus={handleBlockFocus}
@@ -210,6 +245,7 @@ export default function DocumentScreen() {
           placement="left-start"
         >
           <BlockMenuInterface
+            onForceUnmount={handleResetHover}
             onKill={handleKillBlock}
             onAdd={handleAddBlockFromMenu}
           />

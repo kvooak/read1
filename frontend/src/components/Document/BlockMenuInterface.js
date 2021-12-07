@@ -1,5 +1,5 @@
 /* eslint no-underscore-dangle: 0 */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 
@@ -22,7 +22,7 @@ const InterfaceWrapper = styled.div`
 
 const MenuButtonGroup = (props) => {
   const { dispatch, useSelector } = useContext(PageContext);
-  const { blockID, onMenuToggle, onAdd } = props;
+  const { blockID, onMenuToggle, onAdd, onForceUnmount } = props;
 
   const dragHandler = useSelector((s) => s.settings.blockDragHandle);
   const handleAddEmptyBlock = () => {
@@ -38,8 +38,18 @@ const MenuButtonGroup = (props) => {
   };
 
   const handleDragProxy = (node) => {
-    const { drag, drop } = dragHandler;
-    return drag(drop(node));
+    if (dragHandler) {
+      const { drag, drop } = dragHandler;
+      return drag(drop(node));
+    }
+    return null;
+  };
+
+  const handleDraggingStarted = () => {
+    // hide the block menu interface while dragging
+    // to avoid visual confusion and possible bugs
+    // with the mouse state in relative to Drag Button
+    onForceUnmount();
   };
 
   return (
@@ -52,9 +62,10 @@ const MenuButtonGroup = (props) => {
       </StandardIconButton>
       <StandardIconButton
         ref={handleDragProxy}
-        onMouseOver={handleInitDragHandle}
+        onMouseEnter={handleInitDragHandle}
         onMouseLeave={handleClearDragHandle}
-        cursor="move"
+        onDrag={handleDraggingStarted}
+        cursor="grab"
       >
         <DragIndicatorIcon sx={{ color: 'rgba(15, 15, 15, 0.2)' }} />
       </StandardIconButton>
@@ -70,7 +81,7 @@ MenuButtonGroup.propTypes = {
 
 export default function BlockMenuInterface(props) {
   const { useSelector } = useContext(PageContext);
-  const { onKill, onAdd } = props;
+  const { onKill, onAdd, onForceUnmount } = props;
 
   const block = useSelector((state) => state.settings.hoveredBlockData);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -100,6 +111,7 @@ export default function BlockMenuInterface(props) {
         blockID={block.id}
         onMenuToggle={handleOnMenuToggle}
         onAdd={handleOnAdd}
+        onForceUnmount={onForceUnmount}
       />
 
       <StandardPopover

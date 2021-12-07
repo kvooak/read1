@@ -1,5 +1,5 @@
 /* eslint no-underscore-dangle: 0 */
-import React, { useEffect, useContext, useRef, useState } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import striptags from 'striptags';
@@ -9,15 +9,6 @@ import store from '../Document/functions/store';
 import { PageContext } from '../Document/PageStore';
 import useDebounce from '../../_custom/Hook/useDebounce';
 import StandardEditable from '../../_custom/UI/StandardEditable';
-
-const handleStyle = {
-  backgroundColor: 'green',
-  width: '0px',
-  height: '0px',
-  display: 'flex',
-  cursor: 'move',
-  position: 'absolute',
-};
 
 const Wrapper = styled.div`
   display: inline-flex;
@@ -177,19 +168,23 @@ export default function TextBlock(props) {
     />
   );
 
-  const [dragHandleRef, setDragHandleRef] = useState(null);
-  const handleDragHandleRef = (node) => {
-    setDragHandleRef(node);
+  const [isMount, setIsMount] = useState(false);
+  const handleRefInit = (node) => {
+    setIsMount(Boolean(node));
     setBlockRef(node);
-    if (isDragHandleInit) return drag(drop(node));
+    // when a drag handle is trigger, turn all refs of all blocks
+    // into react-dnd refs, to perform dnd animation
+    if (blockWithHandleID) return drag(drop(node));
     return node;
   };
   useEffect(() => {
-    dispatch(store.actions.blockDragHandleReceived({ drag, drop }));
-  }, [dragHandleRef]);
+    if (isDragHandleInit && isMount) {
+      dispatch(store.actions.blockDragHandleReceived({ drag, drop }));
+    }
+  }, [isMount, isDragHandleInit]);
 
   const Block = (
-    <BlockWrapper ref={handleDragHandleRef} id={block.id}>
+    <BlockWrapper ref={handleRefInit} id={block.id}>
       <div ref={preview} style={{ opacity, width: '100%' }}>
         {Editable}
       </div>

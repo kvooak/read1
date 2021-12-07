@@ -10,6 +10,16 @@ const initialState = {
   },
 };
 
+const documentState = (data) => ({
+  type: 'documentState',
+  payload: data,
+});
+
+const blockState = (data) => ({
+  type: 'blockState',
+  payload: data,
+});
+
 const error = (data) => ({
   type: 'error',
   payload: data,
@@ -25,8 +35,8 @@ const blocksFetched = (data) => ({
   payload: data,
 });
 
-const blockState = (data) => ({
-  type: 'blockState',
+const blocksAfterMove = (data) => ({
+  type: 'blocksAfterMove',
   payload: data,
 });
 
@@ -42,11 +52,6 @@ const blockWithHandleID = (data) => ({
 
 const blockDragHandleReceived = (data) => ({
   type: 'blockDragHandleReceived',
-  payload: data,
-});
-
-const setBlock = (data) => ({
-  type: 'setBlock',
   payload: data,
 });
 
@@ -67,6 +72,7 @@ const updatePropBranch = (path, value) => {
 
 const reducer = (state, action) => {
   const newState = { ...state };
+  let operations;
 
   switch (action.type) {
     case 'fetchPage':
@@ -91,8 +97,25 @@ const reducer = (state, action) => {
       newState.blocks = action.payload;
       return newState;
 
+    case 'blocksAfterMove':
+      newState.blocks = action.payload;
+      return newState;
+
+    // documentState deals with pure document operations only
+    // so it will use the first operation in operations array
+    // as the actual operation that update meaningful document data,
+    // as the second operation will just update
+    // document 'last_updated_time'
+    case 'documentState':
+      operations = action.payload.operations;
+      const [documentOp] = operations;
+      if (documentOp.command === 'listRenew') {
+        newState.page.content = documentOp.args;
+      }
+      return newState;
+
     case 'blockState':
-      const { operations } = action.payload;
+      operations = action.payload.operations;
       const [blockOp, effectOp] = operations;
       const { args, command } = effectOp;
       const blockID = blockOp.pointer.id;
@@ -131,9 +154,6 @@ const reducer = (state, action) => {
       }
       return newState;
 
-    case 'setBlock':
-      return state;
-
     case 'error':
       return {
         ...state,
@@ -151,12 +171,13 @@ const store = {
   storeSeed,
   actions: {
     fetchPage,
-    blocksFetched,
+    documentState,
     blockState,
+    blocksFetched,
+    blocksAfterMove,
     blockHovered,
     blockDragHandleReceived,
     blockWithHandleID,
-    setBlock,
     error,
   },
 };

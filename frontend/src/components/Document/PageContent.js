@@ -5,6 +5,7 @@ import update from 'immutability-helper';
 
 import { PageContext } from './PageStore';
 import BlockRenderer from './BlockRenderer';
+import useDebounce from '../../_custom/Hook/useDebounce';
 
 const BlocksWrapper = styled.div`
   display: flex;
@@ -13,13 +14,21 @@ const BlocksWrapper = styled.div`
 
 export default function PageContent(props) {
   const { useSelector } = useContext(PageContext);
-  const { onChange, onReadDownKeyCommand, onMount, onFocus } = props;
+  const { onBlockMoved, onChange, onReadDownKeyCommand, onMount, onFocus } =
+    props;
   const blocks = useSelector((state) => state.blocks);
   const [dndBlocks, setDndBlocks] = useState([]);
 
   useEffect(() => {
-    setDndBlocks(blocks);
+    if (!dndBlocks.length) setDndBlocks(blocks);
   }, [blocks]);
+
+  const debouncedBlocks = useDebounce(dndBlocks, 200);
+  useEffect(() => {
+    if (debouncedBlocks.length) {
+      onBlockMoved(debouncedBlocks);
+    }
+  }, [debouncedBlocks]);
 
   const findBlock = useCallback(
     (id) => {
@@ -31,6 +40,7 @@ export default function PageContent(props) {
     },
     [dndBlocks],
   );
+
   const moveBlock = useCallback(
     (id, toIndex) => {
       const { block, index } = findBlock(id);
@@ -45,10 +55,6 @@ export default function PageContent(props) {
     },
     [findBlock, dndBlocks, setDndBlocks],
   );
-
-  //useEffect(() => {
-  //  console.log(dndBlocks);
-  //}, [dndBlocks]);
 
   const [, drop] = useDrop(() => ({ accept: 'block' }));
 

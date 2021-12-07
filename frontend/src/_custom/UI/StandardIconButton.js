@@ -8,7 +8,7 @@ const StandardIconButton = styled.button`
   border: 1px solid transparent;
   border-radius: 4px;
   cursor: ${(props) => {
-    if (props.cursor === 'move') return 'move;';
+    if (props.cursor) return `${props.cursor};`;
     return 'pointer;';
   }};
   display: flex;
